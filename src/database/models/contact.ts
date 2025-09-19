@@ -1,10 +1,9 @@
-// models/customer-contact.ts
 import {
   Table, Column, Model, DataType,
   PrimaryKey, Default, CreatedAt, UpdatedAt
 } from 'sequelize-typescript';
 
-@Table({ tableName: 'customer_contacts', underscored: true })
+@Table({ tableName: 'contacts', underscored: true })
 export default class Contact extends Model<Contact> {
   @PrimaryKey @Default(DataType.UUIDV4)
   @Column(DataType.UUID)

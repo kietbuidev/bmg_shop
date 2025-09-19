@@ -6,7 +6,7 @@ import {CustomFindOptions} from '../../utils/types';
 export default class Language extends Model<Language> {
   @AutoIncrement
   @PrimaryKey
-  @Column({type: DataType.BIGINT.UNSIGNED, allowNull: false})
+  @Column({type: DataType.BIGINT, allowNull: false})
   declare id: number;
 
   @Column({type: DataType.STRING(255), allowNull: false})

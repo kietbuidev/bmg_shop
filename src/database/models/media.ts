@@ -4,7 +4,7 @@ import {Table, Column, Model, DataType, CreatedAt, UpdatedAt, AutoIncrement, Pri
 export default class Media extends Model<Media> {
   @AutoIncrement
   @PrimaryKey
-  @Column({type: DataType.BIGINT.UNSIGNED, allowNull: false})
+  @Column({type: DataType.BIGINT, allowNull: false})
   declare id: number;
 
   @Column({type: DataType.STRING(255), allowNull: true})

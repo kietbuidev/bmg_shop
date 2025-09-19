@@ -9,7 +9,6 @@ import {ConfigDefault, HTTPCode, StatusActive} from '../utils/enums';
 import {IConfig, IPaginateResult, IRequestQuery} from '../utils/types';
 import authJwt from '../middleware/authJwt';
 import configJwt from '../config/jwt';
-import {payloadToken} from '../database/models/dtos/jwtDto';
 import {
   RegisterDto,
   LoginDto,
@@ -64,7 +63,7 @@ export class UserService {
     return fallback.slice(0, 2).toUpperCase() || 'US';
   }
 
-  private buildPayload(user: User): payloadToken {
+  private buildPayload(user: User): any {
     const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.email;
     return {
       user_id: user.id,

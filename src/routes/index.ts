@@ -1,17 +1,13 @@
 import {Router} from 'express';
-import {UserRouter} from './userRoutes';
 import {CategoryRouter} from './categoryRoutes';
 import {ProductRouter} from './productRoutes';
 import {ContactRouter} from './contactRoutes';
+import {OrderRouter} from './orderRoutes';
 import Container from 'typedi';
 
 const router = Router();
 
 const defaultRoutes = [
-  {
-    path: '/users',
-    route: Container.get(UserRouter).getRouter(),
-  },
   {
     path: '/categories',
     route: Container.get(CategoryRouter).getRouter(),
@@ -23,6 +19,10 @@ const defaultRoutes = [
   {
     path: '/contacts',
     route: Container.get(ContactRouter).getRouter(),
+  },
+  {
+    path: '/orders',
+    route: Container.get(OrderRouter).getRouter(),
   },
 ];
 

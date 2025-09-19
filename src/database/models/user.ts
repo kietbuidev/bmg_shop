@@ -4,7 +4,7 @@ import {Table, Column, Model, CreatedAt, UpdatedAt, DataType, AutoIncrement, Pri
 export default class User extends Model<User> {
   @PrimaryKey
   @AutoIncrement
-  @Column({type: DataType.BIGINT.UNSIGNED})
+  @Column({type: DataType.BIGINT})
   declare id: number;
 
   @Column({type: DataType.STRING(255), allowNull: true})
