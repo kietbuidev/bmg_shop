@@ -8,6 +8,7 @@ import Order from './models/order';
 import Product from './models/product';
 import OrderItem from './models/order_item';
 import Customer from './models/customer';
+import Counter from './models/counter';
 
 const database = process.env.DB_NAME || 'postgres';
 const username = process.env.DB_USER || 'postgres';
@@ -24,7 +25,7 @@ const sequelize = new Sequelize({
   port,
   dialect: 'postgres',
   logging: enableLogging ? (msg) => logger.debug(msg) : false,
-  models: [Category, Contact, Language, Media, Order, Product, Customer, OrderItem],
+  models: [Category, Contact, Language, Media, Order, Product, Customer, OrderItem, Counter],
   dialectOptions:
     process.env.DB_SSL === 'true'
       ? {
