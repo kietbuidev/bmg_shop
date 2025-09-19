@@ -1,11 +1,10 @@
 // models/category.ts
 import {
   Table, Column, Model, DataType, PrimaryKey, AutoIncrement, ForeignKey,
-  BelongsTo, HasMany, CreatedAt, UpdatedAt, DeletedAt, DefaultScope, Scopes, AfterFind
+  BelongsTo, HasMany, CreatedAt, UpdatedAt, DeletedAt, DefaultScope, Scopes, AfterFind,
+  Default
 } from 'sequelize-typescript';
-import Media from './media';
-import { CustomFindOptions } from '../../utils/types';
-import { translateModel } from '../../utils/language';
+
 
 @DefaultScope(() => ({
   where: { is_active: true },
@@ -19,10 +18,10 @@ import { translateModel } from '../../utils/language';
 
 @Table({ tableName: 'categories', paranoid: true, underscored: true })
 export default class Category extends Model<Category> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column({ type: DataType.UUIDV4 })
-  declare id: string;
+   @PrimaryKey
+   @Default(DataType.UUIDV4)
+   @Column({type: DataType.UUIDV4})
+   declare id: string;
 
   @Column({ type: DataType.STRING(255), allowNull: false })
   declare name: string;
@@ -71,16 +70,4 @@ export default class Category extends Model<Category> {
 
   @HasMany(() => Category, 'parent_id')
   children?: Category[];
-
-  @BelongsTo(() => Media, { foreignKey: 'thumbnail_id', constraints: true })
-  thumbnail?: Media;
-
-  @AfterFind
-  static afterFindHook(data: Category | Category[] | null, options: CustomFindOptions) {
-    if (!data) return;
-    const translation = (options as any)?.translation || null;
-    if (!translation) return;
-    if (Array.isArray(data)) data.forEach((d) => translateModel(d as any, translation));
-    else translateModel(data as any, translation);
-  }
 }

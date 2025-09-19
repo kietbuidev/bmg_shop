@@ -1,19 +1,23 @@
 import {Request, Response, NextFunction} from 'express';
 import {validate, ValidationError} from 'class-validator';
-import {plainToClass} from 'class-transformer';
+import {instanceToPlain, plainToClass, plainToInstance} from 'class-transformer';
 import {logger} from '../utils/logger';
 import {IConfig} from '../utils/types';
 import {ConfigDefault, HTTPCode} from '../utils/enums';
 
 export const validateDto =
   <T extends object>(dtoClass: new () => T) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    const config = req.headers as unknown as IConfig;
-    // i18n.locale = config.language || ConfigDefault.language;
-    const dtoInstance = plainToClass(dtoClass, req.method === 'GET' ? req.query : req.body);
-
-    const errors: ValidationError[] = await validate(dtoInstance);
-
+  async (req: Request, res: Response, next: NextFunction) => {    
+    const method = req.method.toUpperCase();
+    const payload = method === 'GET' ? req.query : req.body;
+    const dtoInstance = plainToInstance(dtoClass, payload, {
+      exposeDefaultValues: true,
+    });
+    const errors = await validate(dtoInstance, {
+        whitelist: true,
+        skipMissingProperties: method === 'GET' || method === 'PATCH',
+        validationError: { target: false, value: false },
+      });
     if (errors.length > 0) {
       const extractErrors = (validationErrors: ValidationError[]): string[] => {
         return validationErrors.flatMap((error) => {
@@ -31,16 +35,13 @@ export const validateDto =
       return res.status(HTTPCode.BAD_REQUEST).json({
         status: HTTPCode.BAD_REQUEST,
         error_codes: formattedErrors.join(', '),
-        message: "",
-        // errors: formattedErrors,
+        message: formattedErrors.map((error) => error).join(', '),
+        errors: formattedErrors,
         option: null,
       });
     }
 
-    if (req.method === 'GET') {
-      req.query = dtoInstance as unknown as Request['query'];
-    } else {
-      req.body = dtoInstance;
-    }
+    (req as any).validated = instanceToPlain(dtoInstance);
+
     next();
   };

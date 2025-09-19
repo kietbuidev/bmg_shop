@@ -115,7 +115,7 @@ export class CategoryService {
   }
 
   async list(query: CategoryQueryDto): Promise<IPaginateResult<Category>> {
-    const {page = 1, limit = 10, parent_id, include_inactive, is_popular, search} = query;
+    const {page = 1, limit = 10, parent_id, is_popular, search} = query;
 
     const where: any = {};
 
@@ -142,7 +142,6 @@ export class CategoryService {
       ],
     };
 
-    if (include_inactive) {
       const pageNumber = Number(page) || 1;
       const limitNumber = Number(limit) || 10;
       const offset = pageNumber > 1 ? (pageNumber - 1) * limitNumber : 0;
@@ -165,12 +164,6 @@ export class CategoryService {
         },
         rows: rows as Category[],
       };
-    }
-
-    return this.categoryRepository.findAndPaginate(options, {
-      page,
-      limit,
-    });
   }
 
   async getById(id: string): Promise<Category> {

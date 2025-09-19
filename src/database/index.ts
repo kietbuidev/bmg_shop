@@ -6,6 +6,7 @@ import Language from './models/language';
 import Media from './models/media';
 import Order from './models/order';
 import Post from './models/post';
+import Product from './models/product';
 import User from './models/user';
 
 const database = process.env.DB_NAME || 'postgres';
@@ -23,7 +24,7 @@ const sequelize = new Sequelize({
   port,
   dialect: 'postgres',
   logging: enableLogging ? (msg) => logger.debug(msg) : false,
-  models: [User, Category, Contact, Language, Media, Order, Post],
+  models: [User, Category, Contact, Language, Media, Order, Post, Product],
   dialectOptions:
     process.env.DB_SSL === 'true'
       ? {

@@ -86,11 +86,6 @@ export class CategoryRouter {
  *          type: integer
  *          nullable: true
  *      - in: query
- *        name: include_inactive
- *        schema:
- *          type: boolean
- *          example: false
- *      - in: query
  *        name: is_popular
  *        schema:
  *          type: boolean
@@ -153,6 +148,21 @@ export class CategoryRouter {
  *        application/json:
  *          schema:
  *            $ref: '#/components/schemas/CategoryCreateInput'
+ *          example:
+ *            name: "Women"
+ *            slug: "women"
+ *            description: "Category for women's fashion"
+ *            parent_id: null
+ *            thumbnail_id: "f25f64a6-3ac7-4d26-88f2-ff9d8ae81234"
+ *            gallery:
+ *              - "women/banner-1.jpg"
+ *              - "women/banner-2.jpg"
+ *            is_active: true
+ *            is_popular: true
+ *            priority: 10
+ *            meta_title: "Women fashion"
+ *            meta_keyword: "women,fashion"
+ *            meta_description: "Meta description for women fashion"
  *     responses:
  *      201:
  *        description: Created
@@ -186,6 +196,15 @@ export class CategoryRouter {
  *        application/json:
  *          schema:
  *            $ref: '#/components/schemas/CategoryUpdateInput'
+ *          example:
+ *            name: "Women Collection"
+ *            description: "Updated description for women category"
+ *            is_active: true
+ *            is_popular: false
+ *            priority: 15
+ *            meta_title: "Women collection"
+ *            meta_keyword: "women,collection"
+ *            meta_description: "Updated meta description"
  *     responses:
  *      200:
  *        description: Updated

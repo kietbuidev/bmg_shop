@@ -172,16 +172,6 @@ export class CategoryQueryDto {
     return Boolean(value);
   })
   @IsBoolean()
-  include_inactive?: boolean;
-
-  @IsOptional()
-  @Transform(({value}) => {
-    if (value === undefined || value === null || value === '') return undefined;
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'string') return value === 'true' || value === '1';
-    return Boolean(value);
-  })
-  @IsBoolean()
   is_popular?: boolean;
 
   @IsOptional()

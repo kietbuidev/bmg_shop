@@ -1,0 +1,257 @@
+import {Service} from 'typedi';
+import {FindOptions, Op} from 'sequelize';
+import slug from 'slug';
+import Product from '../database/models/product';
+import ProductRepository from '../database/repositories/product';
+import CategoryRepository from '../database/repositories/category';
+import Category from '../database/models/category';
+import {CreateProductDto, ProductQueryDto, UpdateProductDto} from '../database/models/dtos/productDto';
+import {CustomError, NotFoundError} from '../utils/customError';
+import {HTTPCode} from '../utils/enums';
+import {IPaginateResult} from '../utils/types';
+
+@Service()
+export class ProductService {
+  private readonly productRepository: ProductRepository;
+  private readonly categoryRepository: CategoryRepository;
+
+  constructor() {
+    this.productRepository = new ProductRepository();
+    this.categoryRepository = new CategoryRepository();
+  }
+
+  private sanitizePayload<T extends Record<string, unknown>>(payload: T): T {
+    return Object.entries(payload).reduce((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key as keyof T] = value as T[keyof T];
+      }
+      return acc;
+    }, {} as T);
+  }
+
+  private normalizeArray(input: unknown, fallback: unknown[] | undefined): unknown[] | undefined {
+    if (input === undefined) {
+      return fallback;
+    }
+
+    if (input === null) {
+      return [];
+    }
+
+    if (Array.isArray(input)) {
+      return input;
+    }
+
+    if (typeof input === 'string') {
+      try {
+        const parsed = JSON.parse(input);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (error) {
+        return [input];
+      }
+      return [input];
+    }
+
+    return [input];
+  }
+
+  private async validateCategory(categoryId?: string | null): Promise<string | null | undefined> {
+    if (categoryId === undefined) {
+      return undefined;
+    }
+
+    if (categoryId === null) {
+      return null;
+    }
+
+    const category = await this.categoryRepository.getModel().scope('withInactive').findByPk(categoryId);
+    if (!category) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_CATEGORY_NOT_FOUND');
+    }
+
+    return categoryId;
+  }
+
+  private async resolveSlug(name?: string | null, requested?: string | null, excludeId?: string): Promise<string | undefined> {
+    const source = (requested ?? name ?? '').trim();
+    if (!source) {
+      return undefined;
+    }
+
+    const base = slug(source, {lower: true});
+    if (!base) {
+      return undefined;
+    }
+
+    let candidate = base;
+    let suffix = 1;
+    const model = this.productRepository.getModel().scope('withInactive');
+
+    while (true) {
+      const where: Record<string, unknown> = {slug: candidate};
+      if (excludeId) {
+        where.id = {
+          [Op.ne]: excludeId,
+        };
+      }
+
+      const existing = await model.findOne({where});
+      if (!existing) {
+        return candidate;
+      }
+      candidate = `${base}-${suffix++}`;
+    }
+  }
+
+  private async findByIdOrThrow(id: string): Promise<Product> {
+    const product = await this.productRepository.getModel().scope('withInactive').findByPk(id);
+    if (!product) {
+      throw new NotFoundError('PRODUCT_NOT_FOUND');
+    }
+    return product;
+  }
+
+  async list(query: ProductQueryDto): Promise<IPaginateResult<Product>> {
+    const {page = 1, limit = 10, category_id, is_popular, search} = query;
+
+    const where: {[key: string]: unknown; [key: symbol]: unknown} = {};
+
+    if (category_id) {
+      where.category_id = category_id;
+    }
+
+    if (is_popular !== undefined) {
+      where.is_popular = is_popular;
+    }
+
+    if (search) {
+      where[Op.or] = [{name: {[Op.iLike]: `%${search}%`}}, {slug: {[Op.iLike]: `%${search}%`}}, {code: {[Op.iLike]: `%${search}%`}}];
+    }
+
+    const options: FindOptions = {
+      where,
+      include: [
+        {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name', 'slug', 'description', 'thumbnail_id', 'gallery', 'priority'],
+        },
+      ],
+      order: [
+        ['priority', 'DESC'],
+        ['name', 'ASC'],
+      ],
+    };
+
+      const pageNumber = Number(page) || 1;
+      const limitNumber = Number(limit) || 10;
+      const offset = pageNumber > 1 ? (pageNumber - 1) * limitNumber : 0;
+
+      const scopedModel = this.productRepository.getModel().scope('withInactive');
+      const {count, rows} = await scopedModel.findAndCountAll({
+        ...options,
+        offset,
+        limit: limitNumber,
+      });
+
+      const total_page = Math.ceil(count / limitNumber || 1);
+
+      return {
+        pagination: {
+          total_page,
+          per_page: limitNumber,
+          current_page: pageNumber,
+          count,
+        },
+        rows: rows as Product[],
+      };
+  }
+
+  async listByCategory(categoryId: string, query: {}): Promise<Product[]> {
+
+    const scopes: any[] = [{method: ['byCategory', categoryId]}];
+ 
+    return this.productRepository
+      .getModel()
+      .scope(...scopes)
+      .findAll({
+        include: [{model: Category, as: 'category'}],
+        order: [
+          ['priority', 'DESC'],
+          ['name', 'ASC'],
+        ],
+      });
+  }
+
+  async getById(id: string, incrementView: boolean = false): Promise<Product> {
+    const product = await this.findByIdOrThrow(id);
+
+    if (incrementView) {
+      await product.increment('view_count', {by: 1});
+      await product.reload();
+    }
+
+    return product;
+  }
+
+  async create(payload: CreateProductDto): Promise<Product> {
+    const categoryId = await this.validateCategory(payload.category_id ?? null);
+    const slugValue = await this.resolveSlug(payload.name, payload.slug);
+    const gallery = this.normalizeArray(payload.gallery, []);
+    const sizes = this.normalizeArray(payload.sizes, []);
+    const colors = this.normalizeArray(payload.colors, []);
+
+    const data = this.sanitizePayload({
+      ...payload,
+      category_id: categoryId,
+      slug: slugValue,
+      gallery,
+      sizes,
+      colors,
+      regular_price: payload.regular_price ?? '0',
+      sale_price: payload.sale_price ?? '0',
+      percent: payload.percent ?? '0',
+      currency: payload.currency ?? 'VND',
+      is_active: payload.is_active ?? true,
+      is_popular: payload.is_popular ?? false,
+      priority: payload.priority ?? 0,
+    });
+
+    const product = await this.productRepository.create(data as Product);
+    return this.getById(product.id);
+  }
+
+  async update(id: string, payload: UpdateProductDto): Promise<Product> {
+    const current = await this.findByIdOrThrow(id);
+    const categoryId = await this.validateCategory(payload.category_id);
+    const gallery = this.normalizeArray(payload.gallery, undefined);
+    const sizes = this.normalizeArray(payload.sizes, undefined);
+    const colors = this.normalizeArray(payload.colors, undefined);
+    const slugValue = await this.resolveSlug(payload.name ?? current.name, payload.slug, id);
+
+    const data = this.sanitizePayload({
+      ...payload,
+      category_id: categoryId,
+      gallery,
+      sizes,
+      colors,
+      slug: slugValue,
+    });
+
+    const [affected] = await this.productRepository.update(id, data as Partial<Product>);
+    if (!affected) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_NOT_UPDATED');
+    }
+
+    return this.getById(id);
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.findByIdOrThrow(id);
+    await this.productRepository.delete(id);
+  }
+}
+
+export default ProductService;
