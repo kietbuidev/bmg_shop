@@ -1,0 +1,86 @@
+<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>
+<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sec=\"http://xml.amadeus.com/2010/06/Security_v1\" xmlns:typ=\"http://xml.amadeus.com/2010/06/Types_v1\" xmlns:app=\"http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3\" xmlns:ses=\"http://xml.amadeus.com/2010/06/Session_v3\" xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\" xmlns:vls=\"http://xml.amadeus.com/VLSSOQ_04_1\"> 
+    <soapenv:Header xmlns:add=\"http://www.w3.org/2005/08/addressing\">   
+        <add:MessageID>813daea9-a181-41ed-b284-6fac44bcd142</add:MessageID>
+        <add:To>https://nodeD1.production.webservices.amadeus.com/1ASIWHEYHAH</add:To>
+        <add:Action>http://webservices.amadeus.com/HBKRCQ_20_1_1A</add:Action>
+        <awsse:Session TransactionStatusCode=\"End\" xmlns:awsse=\"http://xml.amadeus.com/2010/06/Session_v3\">     
+            <awsse:SessionId>0OAMHI0NC1</awsse:SessionId>
+            <awsse:SequenceNumber>4</awsse:SequenceNumber>
+            <awsse:SecurityToken>2N4S2CP5XXN4A2AOOX4MZPJ1X7</awsse:SecurityToken>
+        </awsse:Session>
+    </soapenv:Header>
+    <soapenv:Body>   
+        <Hotel_Sell xmlns=\"http://xml.amadeus.com/HBKRCQ_20_1_1A\">     
+            <travelAgentRef>       
+                <status>APE</status>
+                <reference>         
+                    <type>OT</type>
+                    <value>4</value>
+                </reference>
+            </travelAgentRef>
+            <roomStayData>       
+                <markerRoomStayData/>
+                <globalBookingInfo>         
+                    <markerGlobalBookingInfo/>
+                    <bookingSource>           
+                        <originIdentification>             
+                            <originatorId>96089136</originatorId>
+                        </originIdentification>
+                    </bookingSource>
+                    <representativeParties>           
+                        <occupantList>             
+                            <passengerReference>               
+                                <type>BHO</type>
+                                <value>2</value>
+                            </passengerReference>
+                        </occupantList>
+                    </representativeParties>
+                </globalBookingInfo>
+                <roomList>         
+                    <markerRoomstayQuery/>
+                    <roomRateDetails>           
+                        <marker/>
+                        <hotelProductReference>             
+                            <referenceDetails>               
+                                <type>BC</type>
+                                <value>6NNLO15779</value>
+                            </referenceDetails>
+                        </hotelProductReference>
+                        <markerOfExtra/>
+                    </roomRateDetails>
+                    <guaranteeOrDeposit>           
+                        <paymentInfo>             
+                            <paymentDetails>               
+                                <formOfPaymentCode>1</formOfPaymentCode>
+                                <paymentType>2</paymentType>
+                                <serviceToPay>3</serviceToPay>
+                            </paymentDetails>
+                        </paymentInfo>
+                        <groupCreditCardInfo>             
+                            <creditCardInfo>               
+                                <ccInfo>                 
+                                    <vendorCode>VI</vendorCode>
+                                    <cardNumber>4444333322221111</cardNumber>
+                                    <securityId>565</securityId>
+                                    <expiryDate>1228</expiryDate>
+                                    <ccHolderName>LE THI KIM AN</ccHolderName>
+                                    <surname>Lethi</surname>
+                                    <firstName>Kiman</firstName>
+                                </ccInfo>
+                            </creditCardInfo>                        
+                        </groupCreditCardInfo>
+                    </guaranteeOrDeposit>
+                    <guestList>           
+                        <occupantList>             
+                            <passengerReference>               
+                                <type>RMO</type>
+                                <value>2</value>
+                            </passengerReference>
+                        </occupantList>
+                    </guestList>
+                </roomList>
+            </roomStayData>
+        </Hotel_Sell>
+    </soapenv:Body>
+</soapenv:Envelope>

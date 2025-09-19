@@ -1,0 +1,11 @@
+
+node_modules
+build
+dist
+.history
+.idea
+.vscode
+.eslintcache
+deploy
+docker
+kubernetes

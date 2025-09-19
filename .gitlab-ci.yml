@@ -1,0 +1,81 @@
+default:
+  tags:
+    - runner-heyotripv2
+
+stages:
+  - build image
+  - deploy to EKS
+
+.build:
+  stage: build image
+  image: docker:24.0.5
+  variables:
+    DOCKER_TLS_CERTDIR: '/certs'
+    TZ: 'Asia/Ho_Chi_Minh' # Set timezone
+  before_script:
+    - source /app/.env.${CI_COMMIT_BRANCH}
+    - echo $GITLAB_REGISTRY_TOKEN | docker login -u $GITLAB_REGISTRY_USER $CI_REGISTRY --password-stdin
+  script:
+    - docker build --build-arg dynamic_branch=${CI_COMMIT_BRANCH} -t $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA -f docker/Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+    - docker image rm $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+
+.deploy:
+  stage: deploy to EKS
+  variables:
+    NAMESPACE: hotel-system-v2
+    TZ: 'Asia/Ho_Chi_Minh' # Set timezone
+  image: opsworksco/aws-helm-kubectl:3.12.2-1.27.4
+  before_script:
+    - source /app/.env.${CI_COMMIT_BRANCH}
+    - export KUBECONFIG=/app/kubeconfig-${CI_COMMIT_BRANCH}.conf
+    - chmod 400 ${KUBECONFIG}
+    - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    - export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+    - export CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+    - export CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
+    - export CI_COMMIT_BRANCH=$CI_COMMIT_BRANCH
+  script:
+    - cd kubernetes
+    - kubectl apply -f heyo-api-svc.yaml -n ${NAMESPACE}
+    - kubectl apply -f secret-env-${CI_COMMIT_BRANCH}.yaml -n ${NAMESPACE}
+    - envsubst < deployment-${CI_COMMIT_BRANCH}.yaml | kubectl apply -n ${NAMESPACE} -f -
+
+      #### Build image
+build docker image develop:
+  extends: .build
+  when: manual
+  only:
+    - develop
+
+build docker image uat:
+  extends: .build
+  when: manual
+  only:
+    - uat
+
+build docker image live:
+  extends: .build
+  when: manual
+  only:
+    - live
+
+#### Deploy to EKS
+deploy to EKS develop:
+  when: manual
+  only:
+    - develop
+  extends: .deploy
+
+deploy to EKS uat:
+  when: manual
+  only:
+    - uat
+  extends: .deploy
+
+deploy to EKS live:
+  when: manual
+  only:
+    - live
+  extends: .deploy

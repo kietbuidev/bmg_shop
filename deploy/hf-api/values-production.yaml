@@ -1,0 +1,87 @@
+replicaCount: 3
+
+ingress:
+  enabled: true
+  annotations:
+    # kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/subnets: subnet-06bd9778dc66fb8fc, subnet-087c3f7556b1b3335, subnet-020e7c1c509ee2724
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/target-type: ip
+  hosts:
+    - host: api.heyotrip.com
+      paths:
+        - path: /
+  # tls:
+    #- secretName: heyotrip-api.2022-2023
+    # - hosts:
+    #  - heyotrip-api.hhllglobal.com
+# volume:
+#   name: heyotrip-data-upload
+#   size: 10Gi
+#   storageClass: "ebs-sc"
+
+## Persist data to a persistent volume
+persistence:
+  enabled: false
+  ## database data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: "ebs-sc"
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  volumeName: "heyotrip-static-live-pvc"
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 3000
+
+env:
+  nodeEnvironment: development
+  port: 3000
+  dbHost: heyotrip-live-sql-db.ctflqijoe1jh.ap-southeast-1.rds.amazonaws.com
+  dbName: heyotrip
+  dbUser: admin
+  dialect: postgres
+  redisHost: redis.redis
+  redisPort: 26379
+  redisMasterName: mymaster
+  adminUrl: https://api.heyotrip.com/
+  clientUrl: https://heyotrip.com/
+  ezcApiUrl: https://oneapi.oneinventory.com/api
+  ezcApiKey: HAHALOLO
+  ezcSecretKey: 13fa489e00631ed39a40c58900ff75f0e024b0fa4016f7bf8c169c01ee419c9b
+  tvpPcc: 79B5
+  tvpBranchCode: P3749041
+  tvpUsername: Universal API/uAPI5917069471-fc4d6656
+  tvpPassword: Z?d9xY4_5z
+  tvpAuthBy: HAHALOLO
+  tvpBaseUrl: https://apac.universal-api.travelport.com/B2BGateway/connect/uAPI/
+  hplUser: ""
+  hplPass: ""
+  hplProductKey: ""
+  hplAgentAccount: ""
+  hplAgentPassword: ""
+  hplBaseUrl: http://api.hophilong.vn/flights
+  stripePubKey: ""
+  stripeSecKey: ""
+  vbiDtacKey: ""
+  cardNumber: ""
+  cardCVC: ""
+  cardEXP: ""
+  ggKey: ""
+  vbiNsd: admin@hahalolo.vn
+  vbiPrivateKey: H1BCBC54HY591D1667FB95G3C79876
+  vbiCode: admin@hahalolo.vn-AD2C92FC36BAE91D1667FB5B3DE76454
+  vbiNhom: HALO_VN
+  vbiBaseUrl: https://api.evbi.vn
+
+dbSecret:
+  name: postgres-secret
+  key: postgres-password

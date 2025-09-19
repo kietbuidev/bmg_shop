@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+  app:
+    container_name: heyotrip-app
+    build: .
+    ports:
+      - 3000:3000
+    env_file: .env
+    depends_on:
+      - db
+  db:
+    container_name: heyotrip-db
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=heyotrip
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=changeme
+    networks:
+      - app_network
+    ports:
+      - 5432:5432
+    restart: on-failure
+    volumes:
+      - ./../data/db/postgres:/var/lib/postgresql/data:delegated
+volumes:
+  db-data-q-software:

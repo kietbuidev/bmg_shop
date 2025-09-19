@@ -1,0 +1,10 @@
+.git
+.gitignore
+.gitlab-ci*.yml
+.vscode
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+kubernetes
+node_modules
+deploy
