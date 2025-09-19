@@ -5,20 +5,11 @@ import CategoryService from '../services/categoryService';
 import {CategoryQueryDto, CreateCategoryDto, UpdateCategoryDto} from '../database/models/dtos/categoryDto';
 import {CustomError} from '../utils/customError';
 import {HTTPCode} from '../utils/enums';
+import { validate as uuidValidate, version as uuidVersion } from 'uuid';
 
 @Service()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
-
-  private parseId(idParam: string): number {
-    const id = Number(idParam);
-
-    if (!Number.isFinite(id) || Number.isNaN(id) || id <= 0) {
-      throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_CATEGORY_ID');
-    }
-
-    return id;
-  }
 
   async list(req: Request, res: Response, next: NextFunction) {
     try {
@@ -91,6 +82,23 @@ export class CategoryController {
       next(error);
     }
   }
+
+  // private func
+private parseId(idParam: string): string {
+  const id = idParam?.trim();
+
+  // Kiểm tra rỗng
+  if (!id) {
+    throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_CATEGORY_ID');
+  }
+
+  // Nếu bạn muốn check đúng UUID v4
+  if (!uuidValidate(id) || uuidVersion(id) !== 4) {
+    throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_CATEGORY_ID');
+  }
+
+  return id;
+}
 }
 
 export default CategoryController;

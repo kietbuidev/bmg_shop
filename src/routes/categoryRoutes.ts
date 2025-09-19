@@ -124,7 +124,7 @@ export class CategoryRouter {
  *        name: id
  *        required: true
  *        schema:
- *          type: integer
+ *          type: string
  *     responses:
  *      200:
  *        description: Success
@@ -179,7 +179,7 @@ export class CategoryRouter {
  *        name: id
  *        required: true
  *        schema:
- *          type: integer
+ *          type: string
  *     requestBody:
  *      required: true
  *      content:
@@ -214,7 +214,7 @@ export class CategoryRouter {
  *        name: id
  *        required: true
  *        schema:
- *          type: integer
+ *          type: string
  *     responses:
  *      200:
  *        description: Deleted

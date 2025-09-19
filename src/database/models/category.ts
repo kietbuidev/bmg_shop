@@ -22,7 +22,7 @@ export default class Category extends Model<Category> {
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.UUIDV4 })
-  declare id: number;
+  declare id: string;
 
   @Column({ type: DataType.STRING(255), allowNull: false })
   declare name: string;
@@ -34,12 +34,11 @@ export default class Category extends Model<Category> {
   declare description: string | null;
 
   @ForeignKey(() => Category)
-  @Column({ type: DataType.BIGINT, allowNull: true })
-  declare parent_id: number | null;
+  @Column({ type: DataType.UUIDV4, allowNull: true })
+  declare parent_id: string | null;
 
-  @ForeignKey(() => Media)
-  @Column({ type: DataType.BIGINT, allowNull: true })
-  declare thumbnail_id: number | null;
+  @Column({ type: DataType.STRING(255), allowNull: true })
+  declare thumbnail_id: string | null;
 
   @Column({ type: DataType.JSONB, allowNull: false, defaultValue: [] })
   declare gallery: any[];

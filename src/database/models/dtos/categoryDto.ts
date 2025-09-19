@@ -9,6 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { String } from 'lodash';
 
 export class CreateCategoryDto {
   @IsString()
@@ -26,16 +27,12 @@ export class CreateCategoryDto {
   description?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : Number(value)))
-  @IsInt()
-  @Min(1)
-  parent_id?: number | null;
+  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
+  parent_id?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : Number(value)))
-  @IsInt()
-  @Min(1)
-  thumbnail_id?: number | null;
+  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
+  thumbnail_id?: string | null;
 
   @IsOptional()
   @IsArray()
@@ -97,16 +94,12 @@ export class UpdateCategoryDto {
   description?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : Number(value)))
-  @IsInt()
-  @Min(1)
-  parent_id?: number | null;
+  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
+  parent_id?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : Number(value)))
-  @IsInt()
-  @Min(1)
-  thumbnail_id?: number | null;
+  @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
+  thumbnail_id?: string | null;
 
   @IsOptional()
   @IsArray()

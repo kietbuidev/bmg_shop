@@ -11,6 +11,7 @@ import morgan from 'morgan';
 import {logger, stream} from './utils/logger';
 import path from 'path';
 import {NotFoundError} from './utils/customError';
+import {connectDatabase} from './database';
 
 require('dotenv').config();
 
@@ -19,7 +20,7 @@ const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'localhost';
 
 const app = express();
-const logFormat = process.env.LOG_FORMAT || 'combined';
+const logFormat = process.env.LOG_FORMAT || 'short';
 
 // Add a list of allowed origins.
 // If you have more origins you would like to add, you can add them to the array below.
@@ -85,13 +86,24 @@ app.use((req: Request, res: Response) => {
 
 app.use(errorMiddleware);
 
-httpServer.listen(PORT, () => {
-  console.log(`========== ENV: ${PORT} ============`);
-  console.log(`🚀 App listening on the port ${PORT}`);
-  console.log(`=================================`);
+const startServer = async () => {
+  try {
+    await connectDatabase();
 
-  logger.info(`=================================`);
-  logger.info(`======= ENV: ${NODE_ENV} =======`);
-  logger.info(`🚀 App listening on the port ${PORT}`);
-  logger.info(`=================================`);
-});
+    httpServer.listen(PORT, () => {
+      console.log(`========== ENV: ${PORT} ============`);
+      console.log(`🚀 App listening on the port ${PORT}`);
+      console.log(`=================================`);
+
+      logger.info(`=================================`);
+      logger.info(`======= ENV: ${NODE_ENV} =======`);
+      logger.info(`🚀 App listening on the port ${PORT}`);
+      logger.info(`=================================`);
+    });
+  } catch (error) {
+    logger.error('Failed to connect to the database. Shutting down...', error as Error);
+    process.exit(1);
+  }
+};
+
+startServer();

@@ -1,6 +1,7 @@
 import {Service} from 'typedi';
 import {Op} from 'sequelize';
 import type {FindOptions} from 'sequelize';
+import slug from 'slug';
 import Category from '../database/models/category';
 import CategoryRepository from '../database/repositories/category';
 import {CategoryQueryDto, CreateCategoryDto, UpdateCategoryDto} from '../database/models/dtos/categoryDto';
@@ -25,7 +26,82 @@ export class CategoryService {
     }, {} as T);
   }
 
-  private async findByIdOrThrow(id: number): Promise<Category> {
+  private normalizeGallery(input?: unknown): unknown[] {
+    if (Array.isArray(input)) {
+      return input;
+    }
+
+    if (typeof input === 'string') {
+      try {
+        const parsed = JSON.parse(input);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (error) {
+        return [input];
+      }
+    }
+
+    if (input === undefined || input === null) {
+      return [];
+    }
+
+    return [input];
+  }
+
+  private async resolveSlug(name?: string | null, requested?: string | null, excludeId?: string): Promise<string | undefined> {
+    const source = (requested ?? name ?? '').trim();
+    if (!source) {
+      return undefined;
+    }
+
+    const base = slug(source, {lower: true});
+    if (!base) {
+      return undefined;
+    }
+
+    let candidate = base;
+    let suffix = 1;
+    const model = this.categoryRepository.getModel().scope('withInactive');
+
+    while (true) {
+      const where: Record<string, unknown> = {slug: candidate};
+      if (excludeId) {
+        where.id = {
+          [Op.ne]: excludeId,
+        };
+      }
+
+      const existing = await model.findOne({where});
+      if (!existing) {
+        return candidate;
+      }
+      candidate = `${base}-${suffix++}`;
+    }
+  }
+
+  private async validateParent(parentId?: string | null, selfId?: string): Promise<string | null | undefined> {
+    if (parentId === undefined) {
+      return undefined;
+    }
+
+    if (parentId === null) {
+      return null;
+    }
+
+    if (selfId && parentId === selfId) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'CATEGORY_PARENT_INVALID');
+    }
+
+    const parent = await this.categoryRepository.getModel().scope('withInactive').findByPk(parentId);
+    if (!parent) {
+      throw new NotFoundError('PARENT_CATEGORY_NOT_FOUND');
+    }
+
+    return parentId;
+  }
+
+  private async findByIdOrThrow(id: string): Promise<Category> {
     const category = await this.categoryRepository
       .getModel()
       .scope('withInactive')
@@ -97,14 +173,20 @@ export class CategoryService {
     });
   }
 
-  async getById(id: number): Promise<Category> {
+  async getById(id: string): Promise<Category> {
     return this.findByIdOrThrow(id);
   }
 
   async create(payload: CreateCategoryDto): Promise<Category> {
+    const parentId = await this.validateParent(payload.parent_id ?? null);
+    const slug = await this.resolveSlug(payload.name, payload.slug);
+    const gallery = this.normalizeGallery(payload.gallery);
+
     const data = this.sanitizePayload({
       ...payload,
-      gallery: payload.gallery ?? [],
+      parent_id: parentId,
+      slug,
+      gallery,
       is_active: payload.is_active ?? true,
       is_popular: payload.is_popular ?? false,
       priority: payload.priority ?? 0,
@@ -114,10 +196,19 @@ export class CategoryService {
     return this.findByIdOrThrow(category.id);
   }
 
-  async update(id: number, payload: UpdateCategoryDto): Promise<Category> {
-    await this.findByIdOrThrow(id);
+  async update(id: string, payload: UpdateCategoryDto): Promise<Category> {
+    const current = await this.findByIdOrThrow(id);
 
-    const data = this.sanitizePayload({...payload});
+    const parentId = await this.validateParent(payload.parent_id, id);
+    const gallery = payload.gallery !== undefined ? this.normalizeGallery(payload.gallery) : undefined;
+    const slug = await this.resolveSlug(payload.name ?? current.name, payload.slug, id);
+
+    const data = this.sanitizePayload({
+      ...payload,
+      parent_id: parentId,
+      gallery,
+      slug,
+    });
 
     const [affected] = await this.categoryRepository.update(id, data as Partial<Category>);
     if (!affected) {
@@ -127,7 +218,7 @@ export class CategoryService {
     return this.findByIdOrThrow(id);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     await this.findByIdOrThrow(id);
     await this.categoryRepository.delete(id);
   }
