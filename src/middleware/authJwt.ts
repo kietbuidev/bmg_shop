@@ -1,11 +1,7 @@
 import jwt from 'jsonwebtoken';
 import configJwt from '../config/jwt';
-import {RedisClient} from '../config/redis';
-import createHttpError from 'http-errors';
-import {NotFoundError} from '../utils/customError';
-import {payloadToken} from '../database/models/dtos/jwtDto';
 
-const signAccessToken = (payloadToken: payloadToken) => {
+const signAccessToken = (payloadToken: any) => {
   return new Promise((resolve, reject) => {
     const payload = {
       userId: payloadToken.user_id,
