@@ -5,8 +5,6 @@ ARG NODE_VERSION=20
 FROM node:${NODE_VERSION}-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ tzdata
-
-# copy package + lock nếu có (dấu * không lỗi khi thiếu)
 COPY package.json package-lock.json* ./
 
 # nếu có lock -> npm ci ; nếu không -> npm install
@@ -28,7 +26,6 @@ FROM node:${NODE_VERSION}-alpine AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 
-# nếu có lock -> npm ci --omit=dev ; nếu không -> npm install --omit=dev
 RUN if [ -f package-lock.json ]; then \
       npm ci --omit=dev; \
     else \
@@ -38,14 +35,19 @@ RUN if [ -f package-lock.json ]; then \
 # ---------- runner ----------
 FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
+
 RUN apk add --no-cache tzdata
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# copy deps runtime + build output
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build     /app/dist         ./dist
 COPY package.json ./
+
+# tạo thư mục logs riêng (ngoài dist) và gán quyền cho user node
+RUN mkdir -p /app/logs && chown -R node:node /app
 
 USER node
 EXPOSE 3000
