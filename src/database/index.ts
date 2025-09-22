@@ -9,10 +9,10 @@ import OrderItem from './models/order_item';
 import Customer from './models/customer';
 import Counter from './models/counter';
 
-const database = process.env.DB_NAME || 'postgres';
-const username = process.env.DB_USER || 'postgres';
-const password = process.env.DB_PASSWORD ?? process.env.DB_PASS ?? '';
-const host = process.env.DB_HOST || '127.0.0.1';
+const database = process.env.DB_NAME || 'neondb';
+const username = process.env.DB_USER || 'neondb_owner';
+const password = process.env.DB_PASSWORD || 'npg_oUs8lLVi1cWv';
+const host = process.env.DB_HOST || 'ep-silent-mode-a1zbfikm-pooler.ap-southeast-1.aws.neon.tech';
 const port = Number(process.env.DB_PORT || 5432);
 const enableLogging = process.env.DB_LOGGING === 'true';
 
