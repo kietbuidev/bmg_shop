@@ -3,22 +3,22 @@ import crypto from 'crypto';
 import moment from 'moment-timezone';
 import {ServiceType, ProviderCode, ExpiredBookingHotelClient, ExpiredBookingFlightClient, ExpiredBookingHotelAdmin, ExpiredBookingFlightAdmin, HTTPCode} from './enums';
 import bcrypt from 'bcrypt';
-import Constants from '../config/constantConfig';
+// import Constants from '../config/constantConfig';
 import axios from 'axios';
-import urlConfig from '../config/urlConfig';
+// import urlConfig from '../config/urlConfig';
 import {DeleteObjectCommand, PutObjectCommand, S3Client} from '@aws-sdk/client-s3';
 import authConfig from '../config/authConfig';
 import {CustomError} from './customError';
-import CoinRewards from '../database/models/coin_rewards';
+// import CoinRewards from '../database/models/coin_rewards';
 
 const algorithm = 'aes-256-ctr';
 const secretKey = 'vOVH6sdmpNWj&U*(%$H^dxs0(Llq#$G^';
 
-export const checkImageNotfound = (image: string) => {
-  if (typeof image !== 'string' || !image.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
-    return `${urlConfig.S3_URL}static/general/no_image.png`;
-  } else return image;
-};
+// export const checkImageNotfound = (image: string) => {
+//   if (typeof image !== 'string' || !image.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
+//     return `${urlConfig.S3_URL}static/general/no_image.png`;
+//   } else return image;
+// };
 
 export const createOrderCode = async function (type = ServiceType.HOTEL, vendor: string = ProviderCode.TRAVELPORT) {
   let orderType = 2;
@@ -234,27 +234,27 @@ export function timeZoneVN(time) {
   return time;
 }
 
-export function formatTime(time = '') {
-  let timeKey = 0;
-  if (time) {
-    let flightTime = Constants.FLIGHT_TIME_FILTER,
-      formatTime = 'HH:mm';
-    for (const key in flightTime) {
-      if (Object.hasOwnProperty.call(flightTime, key)) {
-        let eleTime = flightTime[key];
-        eleTime = eleTime.split(' - ');
-        eleTime[0] = moment(eleTime[0], formatTime).format(formatTime);
-        eleTime[1] = moment(eleTime[1], formatTime).format(formatTime);
-        if (time >= eleTime[0] && time <= eleTime[1]) {
-          timeKey = parseInt(key);
-          break;
-        }
-      }
-    }
-  }
+// export function formatTime(time = '') {
+//   let timeKey = 0;
+//   if (time) {
+//     let flightTime = Constants.FLIGHT_TIME_FILTER,
+//       formatTime = 'HH:mm';
+//     for (const key in flightTime) {
+//       if (Object.hasOwnProperty.call(flightTime, key)) {
+//         let eleTime = flightTime[key];
+//         eleTime = eleTime.split(' - ');
+//         eleTime[0] = moment(eleTime[0], formatTime).format(formatTime);
+//         eleTime[1] = moment(eleTime[1], formatTime).format(formatTime);
+//         if (time >= eleTime[0] && time <= eleTime[1]) {
+//           timeKey = parseInt(key);
+//           break;
+//         }
+//       }
+//     }
+//   }
 
-  return Number(timeKey);
-}
+//   return Number(timeKey);
+// }
 
 export function timeConvert(n) {
   const num = n;
@@ -581,81 +581,81 @@ export function decodeBase64Image(base64String: string) {
   };
 }
 
-export async function updateImageS3(imageBase64: string, folderName: string): Promise<{filename: string; path: string; type: string; size: number}> {
-  try {
-    // Cấu hình AWS S3
-    const s3 = new S3Client({
-      region: authConfig.s3.region,
-      credentials: {
-        accessKeyId: authConfig.s3.accessKeyId,
-        secretAccessKey: authConfig.s3.secretAccessKey,
-      },
-    });
+// export async function updateImageS3(imageBase64: string, folderName: string): Promise<{filename: string; path: string; type: string; size: number}> {
+//   try {
+//     // Cấu hình AWS S3
+//     const s3 = new S3Client({
+//       region: authConfig.s3.region,
+//       credentials: {
+//         accessKeyId: authConfig.s3.accessKeyId,
+//         secretAccessKey: authConfig.s3.secretAccessKey,
+//       },
+//     });
 
-    const {buffer, contentType, extension} = decodeBase64Image(imageBase64);
-    const fileName = `${Date.now()}.${extension}`;
-    const key = `images/upload/${folderName}/${authConfig.s3.folder}${fileName}`;
-    const bucket = 'heyotrip-img';
+//     const {buffer, contentType, extension} = decodeBase64Image(imageBase64);
+//     const fileName = `${Date.now()}.${extension}`;
+//     const key = `images/upload/${folderName}/${authConfig.s3.folder}${fileName}`;
+//     const bucket = 'heyotrip-img';
 
-    const command = new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      Body: buffer,
-      ContentType: contentType,
-      ContentEncoding: 'base64',
-      ACL: 'public-read',
-    });
+//     const command = new PutObjectCommand({
+//       Bucket: bucket,
+//       Key: key,
+//       Body: buffer,
+//       ContentType: contentType,
+//       ContentEncoding: 'base64',
+//       ACL: 'public-read',
+//     });
 
-    await s3.send(command);
-    const location = `https://${bucket}.s3.ap-southeast-1.amazonaws.com/${key}`;
+//     await s3.send(command);
+//     const location = `https://${bucket}.s3.ap-southeast-1.amazonaws.com/${key}`;
 
-    return {
-      filename: fileName,
-      path: location,
-      type: extension,
-      size: buffer.length,
-    };
-  } catch (error) {
-    if (error.errorCode) {
-      throw new CustomError(error.statusCode, error.errorCode);
-    } else {
-      throw new Error(error.message);
-    }
-  }
-}
+//     return {
+//       filename: fileName,
+//       path: location,
+//       type: extension,
+//       size: buffer.length,
+//     };
+//   } catch (error) {
+//     if (error.errorCode) {
+//       throw new CustomError(error.statusCode, error.errorCode);
+//     } else {
+//       throw new Error(error.message);
+//     }
+//   }
+// }
 
-export async function deleteImageS3(imageUrl: string): Promise<void> {
-  try {
-    // Cấu hình AWS S3
-    const s3 = new S3Client({
-      region: authConfig.s3.region,
-      credentials: {
-        accessKeyId: authConfig.s3.accessKeyId,
-        secretAccessKey: authConfig.s3.secretAccessKey,
-      },
-    });
-    if (!imageUrl) {
-      return null;
-    }
+// export async function deleteImageS3(imageUrl: string): Promise<void> {
+//   try {
+//     // Cấu hình AWS S3
+//     const s3 = new S3Client({
+//       region: authConfig.s3.region,
+//       credentials: {
+//         accessKeyId: authConfig.s3.accessKeyId,
+//         secretAccessKey: authConfig.s3.secretAccessKey,
+//       },
+//     });
+//     if (!imageUrl) {
+//       return null;
+//     }
 
-    const key = imageUrl.split('amazonaws.com/')[1];
-    if (!key) {
-      return null;
-    }
-    const command = new DeleteObjectCommand({
-      Bucket: 'heyotrip-img',
-      Key: key,
-    });
+//     const key = imageUrl.split('amazonaws.com/')[1];
+//     if (!key) {
+//       return null;
+//     }
+//     const command = new DeleteObjectCommand({
+//       Bucket: 'heyotrip-img',
+//       Key: key,
+//     });
 
-    await s3.send(command);
-  } catch (error) {
-    if (error.errorCode) {
-      throw new CustomError(error.statusCode, error.errorCode);
-    } else {
-      throw new Error(error.message);
-    }
-  }
-}
+//     await s3.send(command);
+//   } catch (error) {
+//     if (error.errorCode) {
+//       throw new CustomError(error.statusCode, error.errorCode);
+//     } else {
+//       throw new Error(error.message);
+//     }
+//   }
+// }
 
 export function getCurrentAndNextTier(tiers, count: number) {
   if (!tiers || tiers.length === 0) return {current: null, next: null};
@@ -689,25 +689,25 @@ export function chunkArray<T>(arr: T[], chunkSize: number): T[][] {
   return result;
 }
 
-export function getCoinByPrice(price: number, rules: CoinRewards[]): number {
-  let left = 0;
-  let right = rules.length - 1;
+// export function getCoinByPrice(price: number, rules: CoinRewards[]): number {
+//   let left = 0;
+//   let right = rules.length - 1;
 
-  while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
-    const rule = rules[mid];
+//   while (left <= right) {
+//     const mid = Math.floor((left + right) / 2);
+//     const rule = rules[mid];
 
-    const max = rule.max_price ?? Infinity;
-    if (price >= rule.min_price && price <= max) {
-      return rule.coin_earned;
-    }
+//     const max = rule.max_price ?? Infinity;
+//     if (price >= rule.min_price && price <= max) {
+//       return rule.coin_earned;
+//     }
 
-    if (price < rule.min_price) {
-      right = mid - 1;
-    } else {
-      left = mid + 1;
-    } 
-  }
+//     if (price < rule.min_price) {
+//       right = mid - 1;
+//     } else {
+//       left = mid + 1;
+//     } 
+//   }
 
-  return 0;
-}
+//   return 0;
+// }
