@@ -60,3 +60,177 @@ export class PostRouter {
 }
 
 export default PostRouter;
+
+/**
+ * @openapi
+ * '/api/posts':
+ *  get:
+ *     tags:
+ *     - Posts
+ *     summary: List posts
+ *     description: Retrieve posts with pagination and optional filters
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *          example: 1
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *          example: 10
+ *      - in: query
+ *        name: is_active
+ *        schema:
+ *          type: boolean
+ *      - in: query
+ *        name: is_popular
+ *        schema:
+ *          type: boolean
+ *      - in: query
+ *        name: status
+ *        schema:
+ *          type: string
+ *      - in: query
+ *        name: search
+ *        schema:
+ *          type: string
+ *          example: fashion
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/PostListResponse'
+ */
+
+/**
+ * @openapi
+ * '/api/posts/{id}':
+ *  get:
+ *     tags:
+ *     - Posts
+ *     summary: Get post detail
+ *     description: Retrieve a post by id
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: string
+ *          format: uuid
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/PostDetailResponse'
+ *      404:
+ *        description: Post not found
+ */
+
+/**
+ * @openapi
+ * '/api/posts':
+ *  post:
+ *     tags:
+ *     - Posts
+ *     summary: Create post
+ *     description: Create a new post entry
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/PostCreateInput'
+ *          example:
+ *            post_title: "Summer Fashion Trends"
+ *            post_description: "Highlights from the latest runway shows"
+ *            is_active: true
+ *            gallery:
+ *              - "img/blog/summer-1.jpg"
+ *              - "img/blog/summer-2.jpg"
+ *     responses:
+ *      201:
+ *        description: Created
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/PostDetailResponse'
+ */
+
+/**
+ * @openapi
+ * '/api/posts/{id}':
+ *  put:
+ *     tags:
+ *     - Posts
+ *     summary: Update post
+ *     description: Update an existing post by id
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: string
+ *          format: uuid
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/PostUpdateInput'
+ *          example:
+ *            post_title: "Updated summer trends"
+ *            status: "published"
+ *            is_popular: true
+ *     responses:
+ *      200:
+ *        description: Updated
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/PostDetailResponse'
+ *      404:
+ *        description: Post not found
+ */
+
+/**
+ * @openapi
+ * '/api/posts/{id}':
+ *  delete:
+ *     tags:
+ *     - Posts
+ *     summary: Delete post
+ *     description: Remove a post by id
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: string
+ *          format: uuid
+ *     responses:
+ *      200:
+ *        description: Deleted
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/PostDeleteResponse'
+ *      404:
+ *        description: Post not found
+ */

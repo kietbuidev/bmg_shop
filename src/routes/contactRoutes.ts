@@ -31,7 +31,7 @@ export class ContactRouter {
       },
     );
 
-    this.router.patch(
+    this.router.put(
       '/:id/note',
       validateDto(UpdateContactNoteDto),
       async (req: Request, res: Response, next: NextFunction) => {
@@ -116,7 +116,7 @@ export default ContactRouter;
 /**
  * @openapi
  * '/api/contacts/{id}/note':
- *  patch:
+ *  put:
  *     tags:
  *     - Contacts
  *     summary: Update contact note
