@@ -5,8 +5,16 @@ ARG NODE_VERSION=20
 FROM node:${NODE_VERSION}-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ tzdata
-COPY package*.json ./
-RUN npm ci
+
+# copy package + lock nếu có (dấu * không lỗi khi thiếu)
+COPY package.json package-lock.json* ./
+
+# nếu có lock -> npm ci ; nếu không -> npm install
+RUN if [ -f package-lock.json ]; then \
+      npm ci; \
+    else \
+      npm install; \
+    fi
 
 # ---------- build (ts -> dist) ----------
 FROM deps AS build
@@ -15,29 +23,29 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-# ---------- prod-deps (deps runtime, bỏ devDeps) ----------
+# ---------- prod-deps (chỉ deps runtime) ----------
 FROM node:${NODE_VERSION}-alpine AS prod-deps
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --omit=dev
+COPY package.json package-lock.json* ./
 
-# ---------- runner (chạy thật) ----------
+# nếu có lock -> npm ci --omit=dev ; nếu không -> npm install --omit=dev
+RUN if [ -f package-lock.json ]; then \
+      npm ci --omit=dev; \
+    else \
+      npm install --omit=dev; \
+    fi
+
+# ---------- runner ----------
 FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
-
-# tzdata là optional; giữ lại nếu app cần set TZ
 RUN apk add --no-cache tzdata
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# copy deps + build output
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build     /app/dist         ./dist
-COPY package*.json ./
-
-# tạo thư mục app ghi log/upload nếu cần và gán quyền cho user 'node' có sẵn
-RUN mkdir -p /app/upload /app/logs && chown -R node:node /app
+COPY package.json ./
 
 USER node
 EXPOSE 3000
