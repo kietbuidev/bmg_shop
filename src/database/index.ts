@@ -15,6 +15,7 @@ const password = process.env.DB_PASSWORD || 'npg_oUs8lLVi1cWv';
 const host = process.env.DB_HOST || 'ep-silent-mode-a1zbfikm-pooler.ap-southeast-1.aws.neon.tech';
 const port = Number(process.env.DB_PORT || 5432);
 const enableLogging = process.env.DB_LOGGING === 'true';
+const ssl = process.env.DB_SSL || 'true'
 
 const sequelize = new Sequelize({
   database,
@@ -26,7 +27,7 @@ const sequelize = new Sequelize({
   logging: enableLogging ? (msg) => logger.debug(msg) : false,
   models: [Category, Contact, Order, Product, Post, Customer, OrderItem, Counter],
   dialectOptions:
-    process.env.DB_SSL === 'true'
+    ssl === 'true'
       ? {
           ssl: {
             require: true,
