@@ -6,7 +6,7 @@ import {validateDto} from '../middleware/validateDto';
 import {CreateCounterDto} from '../database/models/dtos/counterDto';
 
 @Service()
-export class CounterRouter {
+export class SystemRouter {
   private readonly router: Router;
 
   constructor(private readonly counterController: CounterController) {
@@ -16,7 +16,7 @@ export class CounterRouter {
 
   private initRoutes() {
     this.router.post(
-      '/',
+      '/counter',
       validateDto(CreateCounterDto),
       async (req: Request, res: Response, next: NextFunction) => {
         await this.counterController.create(req, res, next);
@@ -29,14 +29,14 @@ export class CounterRouter {
   }
 }
 
-export default CounterRouter;
+export default SystemRouter;
 
 /**
  * @openapi
- * '/api/counter':
+ * '/api/system/counter':
  *  post:
  *     tags:
- *     - Counter
+ *     - System
  *     summary: Save visitor counter
  *     description: Store visitor device information such as IP, OS, browser, and device.
  *     parameters:

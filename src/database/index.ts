@@ -2,10 +2,9 @@ import {Sequelize} from 'sequelize-typescript';
 import {logger} from '../utils/logger';
 import Category from './models/category';
 import Contact from './models/contact';
-import Language from './models/language';
-import Media from './models/media';
 import Order from './models/order';
 import Product from './models/product';
+import Post from './models/post';
 import OrderItem from './models/order_item';
 import Customer from './models/customer';
 import Counter from './models/counter';
@@ -25,7 +24,7 @@ const sequelize = new Sequelize({
   port,
   dialect: 'postgres',
   logging: enableLogging ? (msg) => logger.debug(msg) : false,
-  models: [Category, Contact, Language, Media, Order, Product, Customer, OrderItem, Counter],
+  models: [Category, Contact, Order, Product, Post, Customer, OrderItem, Counter],
   dialectOptions:
     process.env.DB_SSL === 'true'
       ? {

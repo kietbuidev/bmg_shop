@@ -6,7 +6,7 @@ import http from 'http';
 import swaggerDocs from './utils/swagger';
 import routes from './routes';
 import errorMiddleware from './middleware/error';
-import {RedisClient} from './config/redis';
+// import {RedisClient} from './config/redis';
 import morgan from 'morgan';
 import {logger, stream} from './utils/logger';
 import path from 'path';
@@ -51,10 +51,10 @@ app.use(express.json());
 const httpServer = http.createServer(app);
 
 // Connect to Redis
-const redisInstance = new RedisClient();
-redisInstance.connect().catch((error) => {
-  logger.error(`Redis connection error: ${error}`);
-});
+// const redisInstance = new RedisClient();
+// redisInstance.connect().catch((error) => {
+//   logger.error(`Redis connection error: ${error}`);
+// });
 
 app.get(`${VERSION}/api/`, (req: Request, res: Response) => {
   res.status(200).send('Congratulations! API is working!');
