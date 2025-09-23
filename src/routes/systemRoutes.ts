@@ -94,16 +94,18 @@ export default SystemRouter;
  *            type: object
  *            required:
  *              - file
- *              - path
  *            properties:
  *              file:
  *                type: string
  *                format: binary
  *                description: Image file to upload.
- *              path:
+ *              type:
  *                type: string
- *                description: Destination path in the storage service where the file should be placed.
- *                example: uploads/posts/featured
+ *                description: Logical folder preset to apply for the upload.
+ *                enum:
+ *                  - categories
+ *                  - posts
+ *                  - products
  *     responses:
  *      201:
  *        description: Created
