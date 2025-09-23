@@ -124,7 +124,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @Transform(({value}) => toNullableString(value))
-  thumbnail_id?: string | null;
+  thumbnail?: string | null;
 
   @IsOptional()
   @IsArray()
@@ -223,7 +223,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   @Transform(({value}) => toNullableString(value))
-  thumbnail_id?: string | null;
+  thumbnail?: string | null;
 
   @IsOptional() @IsArray()
   @Transform(({value}) => toArray(value, undefined))

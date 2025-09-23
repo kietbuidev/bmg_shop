@@ -194,7 +194,7 @@ export default ProductRouter;
  *            description: "Elegant minimal dress for summer."
  *            short_description: "Minimal summer dress"
  *            content: "<p>Detailed HTML description</p>"
- *            thumbnail_id: "a7d4a1c6-3e2f-4b1f-8c53-7f2bc3fb77b0"
+ *            thumbnail: "a7d4a1c6-3e2f-4b1f-8c53-7f2bc3fb77b0"
  *            gallery:
  *              - "img/gallery-1.jpg"
  *              - "img/gallery-2.jpg"

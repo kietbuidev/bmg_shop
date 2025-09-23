@@ -6,8 +6,9 @@
  *      type: object
  *      properties:
  *        id:
- *          type: number
- *          example: 1
+ *          type: string
+ *          format: uuid
+ *          example: "8b7f3b62-4f54-4f0f-9f51-49fc9ec5ae5c"
  *        name:
  *          type: string
  *          example: Women Fashion
@@ -18,10 +19,12 @@
  *          type: string
  *          nullable: true
  *        parent_id:
- *          type: number
+ *          type: string
+ *          format: uuid
  *          nullable: true
- *        thumbnail_id:
- *          type: number
+ *          example: "b1f0de49-8f5f-4e8c-b6bb-32b10b0aa70c"
+ *        thumbnail:
+ *          type: string
  *          nullable: true
  *        gallery:
  *          type: array
@@ -71,10 +74,12 @@
  *        description:
  *          type: string
  *        parent_id:
- *          type: number
+ *          type: string
+ *          format: uuid
  *          nullable: true
- *        thumbnail_id:
- *          type: number
+ *          example: "1d1e7cfd-3c41-4c47-8f4d-f6f5beb3fd93"
+ *        thumbnail:
+ *          type: string
  *          nullable: true
  *        gallery:
  *          type: array
@@ -111,10 +116,11 @@
  *        description:
  *          type: string
  *        parent_id:
- *          type: number
+ *          type: string
+ *          format: uuid
  *          nullable: true
- *        thumbnail_id:
- *          type: number
+ *        thumbnail:
+ *          type: string
  *          nullable: true
  *        gallery:
  *          type: array

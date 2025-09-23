@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import cors from 'cors';
 import helmet from 'helmet';
-import express, {Request, Response} from 'express';
+import express, {Request, Response, NextFunction} from 'express';
 import http from 'http';
 import swaggerDocs from './utils/swagger';
 import routes from './routes';
@@ -76,12 +76,10 @@ app.use(`/api`, routes);
 swaggerDocs(app);
 
 //Error handler must be last app.use!!
-app.use((req: Request, res: Response) => {
-  res.status(500).json({
-    success: false,
-    message: 'Something broke! Please contact support.',
-  });
-  console.log("=== req.get('host')==", req.get('host') + req.originalUrl);
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const message = `Route ${req.originalUrl} not found`;
+  logger.warn(message);
+  next(new NotFoundError(message));
 });
 
 app.use(errorMiddleware);

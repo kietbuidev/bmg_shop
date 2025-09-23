@@ -107,7 +107,7 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   @Transform(({value}) => toNullableString(value))
-  thumbnail_id?: string | null;
+  thumbnail?: string | null;
 
   @IsOptional()
   @IsArray()
@@ -164,7 +164,7 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   @Transform(({value}) => toNullableString(value))
-  thumbnail_id?: string | null;
+  thumbnail?: string | null;
 
   @IsOptional()
   @IsArray()

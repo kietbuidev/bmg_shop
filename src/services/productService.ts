@@ -66,6 +66,10 @@ export class ProductService {
       return null;
     }
 
+    if (categoryId === "") {
+      return null;
+    }
+
     const category = await this.categoryRepository.getModel().scope('withInactive').findByPk(categoryId);
     if (!category) {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_CATEGORY_NOT_FOUND');
@@ -136,7 +140,7 @@ export class ProductService {
         {
           model: Category,
           as: 'category',
-          attributes: ['id', 'name', 'slug', 'description', 'thumbnail_id', 'gallery', 'priority'],
+          attributes: ['id', 'name', 'slug', 'description', 'thumbnail', 'gallery', 'priority'],
         },
       ],
       order: [

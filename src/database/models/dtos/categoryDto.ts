@@ -32,7 +32,7 @@ export class CreateCategoryDto {
 
   @IsOptional()
   @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
-  thumbnail_id?: string | null;
+  thumbnail?: string | null;
 
   @IsOptional()
   @IsArray()
@@ -99,7 +99,7 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
-  thumbnail_id?: string | null;
+  thumbnail?: string | null;
 
   @IsOptional()
   @IsArray()

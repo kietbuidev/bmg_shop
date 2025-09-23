@@ -33,7 +33,7 @@ export default class OrderItem extends Model<OrderItem> {
   declare product_name: string;
 
   @Column({ type: DataType.STRING(255), allowNull: true })
-  declare product_thumbnail_id: string | null;
+  declare product_thumbnail: string | null;
 
   @Column({ type: DataType.JSONB, allowNull: false, defaultValue: [] })
   declare product_sizes: unknown[];

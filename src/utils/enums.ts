@@ -495,6 +495,12 @@ export enum Gender {
   FEMALE = 'female',
 }
 
+export enum UploadImageType {
+  CATEGORIES = 'categories',
+  POSTS = 'posts',
+  PRODUCTS = 'products',
+}
+
 export enum Title {
   MR = 'mr',
   MRS = 'mrs',

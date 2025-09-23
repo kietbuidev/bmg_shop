@@ -24,7 +24,7 @@
  *        post_tag:
  *          type: string
  *          nullable: true
- *        thumbnail_id:
+ *        thumbnail:
  *          type: string
  *          nullable: true
  *        gallery:
@@ -75,7 +75,7 @@
  *          type: string
  *        post_tag:
  *          type: string
- *        thumbnail_id:
+ *        thumbnail:
  *          type: string
  *        gallery:
  *          type: array
@@ -113,7 +113,7 @@
  *          type: string
  *        post_tag:
  *          type: string
- *        thumbnail_id:
+ *        thumbnail:
  *          type: string
  *        gallery:
  *          type: array

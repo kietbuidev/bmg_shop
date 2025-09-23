@@ -1,0 +1,35 @@
+VERSION=/v1
+ENVIRONMENT=DEVELOPMENT
+PORT=5001
+
+# DB (PostgreSQL) // local
+# DB_USER=kiet
+# DB_NAME=kaylin_fashion_db
+# DB_PASSWORD=12345678
+# DB_HOST=localhost
+# DB_PORT=5432
+# DB_SSL=false
+
+# DB (PostgreSQL) // Server Neondb
+DB_USER=neondb_owner
+DB_PASSWORD=npg_oUs8lLVi1cWv
+DB_HOST=ep-silent-mode-a1zbfikm-pooler.ap-southeast-1.aws.neon.tech
+DB_PORT=5432
+DB_NAME=neondb
+DB_SSL=true
+
+# Redis
+# REDIS_HOSTS=redis-v2-svc.redis-v2.svc
+# REDIS_PORT=6379
+# REDIS_MASTER_NAME=mymaster
+
+# Timezone
+# TIMEZONE='Asia/Ho_Chi_Minh'
+TIMEZONE='+07:00'
+
+# GG driver
+FIREBASE_SERVICE_ACCOUNT_PATH=./entrypoint.sh
+FIREBASE_STORAGE_BUCKET=
+DRIVE_FOLDER_CATEGORIES=
+DRIVE_FOLDER_POSTS=
+DRIVE_FOLDER_PRODUCTS=

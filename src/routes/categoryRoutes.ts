@@ -83,7 +83,8 @@ export class CategoryRouter {
  *      - in: query
  *        name: parent_id
  *        schema:
- *          type: integer
+ *          type: string
+ *          format: uuid
  *          nullable: true
  *      - in: query
  *        name: is_popular
@@ -120,6 +121,7 @@ export class CategoryRouter {
  *        required: true
  *        schema:
  *          type: string
+ *          format: uuid
  *     responses:
  *      200:
  *        description: Success
@@ -152,8 +154,8 @@ export class CategoryRouter {
  *            name: "Women"
  *            slug: "women"
  *            description: "Category for women's fashion"
- *            parent_id: null
- *            thumbnail_id: "f25f64a6-3ac7-4d26-88f2-ff9d8ae81234"
+ *            parent_id: "b1f0de49-8f5f-4e8c-b6bb-32b10b0aa70c"
+ *            thumbnail: "women/banner-1.jpg"
  *            gallery:
  *              - "women/banner-1.jpg"
  *              - "women/banner-2.jpg"
@@ -190,6 +192,7 @@ export class CategoryRouter {
  *        required: true
  *        schema:
  *          type: string
+ *          format: uuid
  *     requestBody:
  *      required: true
  *      content:
@@ -234,6 +237,7 @@ export class CategoryRouter {
  *        required: true
  *        schema:
  *          type: string
+ *          format: uuid
  *     responses:
  *      200:
  *        description: Deleted

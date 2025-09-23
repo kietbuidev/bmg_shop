@@ -89,6 +89,10 @@ export class CategoryService {
       return null;
     }
 
+    if (parentId === "") {
+      return null;
+    }
+
     if (selfId && parentId === selfId) {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'CATEGORY_PARENT_INVALID');
     }

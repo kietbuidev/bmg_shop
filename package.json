@@ -2,7 +2,7 @@
   "name": "heyotrip-software",
   "version": "1.0.0",
   "main": "server.js",
-  "repository": "https://gitlab.com/pdhong/heyo-api.git",
+  "repository": "",
   "author": "Mirko Martinovic <mirko.martinovic@quantox.com>",
   "license": "MIT",
   "scripts": {
@@ -67,6 +67,7 @@
     "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.2.3",
     "@types/jsonwebtoken": "^9.0.5",
+    "@types/multer": "^2.0.0",
     "@types/node": "^20.11.19",
     "@types/swagger-jsdoc": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.5",

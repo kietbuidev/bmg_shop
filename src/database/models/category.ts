@@ -37,7 +37,7 @@ export default class Category extends Model<Category> {
   declare parent_id: string | null;
 
   @Column({ type: DataType.STRING(255), allowNull: true })
-  declare thumbnail_id: string | null;
+  declare thumbnail: string | null;
 
   @Column({ type: DataType.JSONB, allowNull: false, defaultValue: [] })
   declare gallery: any[];
