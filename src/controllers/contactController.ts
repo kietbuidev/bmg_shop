@@ -3,7 +3,12 @@ import {Service} from 'typedi';
 import {validate as uuidValidate, version as uuidVersion} from 'uuid';
 import BuildResponse from '../utils/buildResponse';
 import ContactService from '../services/contactService';
-import {CreateCustomerContactDto, ContactQueryDto, UpdateContactNoteDto} from '../database/models/dtos/contactDto';
+import {
+  CreateCustomerContactDto,
+  ContactQueryDto,
+  UpdateContactDto,
+  UpdateContactNoteDto,
+} from '../database/models/dtos/contactDto';
 import {CustomError} from '../utils/customError';
 import {HTTPCode} from '../utils/enums';
 
@@ -35,11 +40,16 @@ export class ContactController {
     }
   }
 
-  async updateNote(req: Request, res: Response, next: NextFunction) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
       const id = this.parseId(req.params.id);
-      const payload = req.body as UpdateContactNoteDto;
-      const contact = await this.contactService.updateNote(id, payload);
+      const payload = ((req as any).validated as UpdateContactDto | undefined) ?? (req.body as UpdateContactDto);
+
+      if (payload.status === undefined && payload.note === undefined) {
+        throw new CustomError(HTTPCode.BAD_REQUEST, 'CONTACT_UPDATE_FIELDS_REQUIRED');
+      }
+
+      const contact = await this.contactService.update(id, payload);
       res.status(200).json(
         BuildResponse.updated({
           data: contact,

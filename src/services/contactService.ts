@@ -2,7 +2,12 @@ import {Service} from 'typedi';
 import {FindOptions} from 'sequelize';
 import ContactRepository from '../database/repositories/contact';
 import Contact from '../database/models/contact';
-import {CreateCustomerContactDto, ContactQueryDto, UpdateContactNoteDto} from '../database/models/dtos/contactDto';
+import {
+  CreateCustomerContactDto,
+  ContactQueryDto,
+  UpdateContactDto,
+  UpdateContactNoteDto,
+} from '../database/models/dtos/contactDto';
 import {IPaginateResult} from '../utils/types';
 import {NotFoundError} from '../utils/customError';
 
@@ -23,6 +28,7 @@ export class ContactService {
   }
 
   async create(payload: CreateCustomerContactDto): Promise<Contact> {
+    payload.status = payload.status ?? 'NEW';
     const contact = await this.contactRepository.create(payload as unknown as Contact);
     return this.findByIdOrThrow(contact.id);
   }
@@ -42,6 +48,28 @@ export class ContactService {
 
     const note = payload.note ?? null;
     await this.contactRepository.update(id, {note} as Partial<Contact>);
+
+    return this.findByIdOrThrow(id);
+  }
+
+  async update(id: string, payload: UpdateContactDto): Promise<Contact> {
+    await this.findByIdOrThrow(id);
+
+    const data: Partial<Contact> = {};
+
+    if (payload.note !== undefined) {
+      data.note = payload.note ?? null;
+    }
+
+    if (payload.status !== undefined) {
+      data.status = payload.status;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return this.findByIdOrThrow(id);
+    }
+
+    await this.contactRepository.update(id, data as Partial<Contact>);
 
     return this.findByIdOrThrow(id);
   }

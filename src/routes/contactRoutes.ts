@@ -3,7 +3,12 @@ import type {NextFunction, Request, Response} from 'express';
 import {Service} from 'typedi';
 import ContactController from '../controllers/contactController';
 import {validateDto} from '../middleware/validateDto';
-import {ContactQueryDto, CreateCustomerContactDto, UpdateContactNoteDto} from '../database/models/dtos/contactDto';
+import {
+  ContactQueryDto,
+  CreateCustomerContactDto,
+  UpdateContactDto,
+  UpdateContactNoteDto,
+} from '../database/models/dtos/contactDto';
 
 @Service()
 export class ContactRouter {
@@ -32,10 +37,10 @@ export class ContactRouter {
     );
 
     this.router.put(
-      '/:id/note',
-      validateDto(UpdateContactNoteDto),
+      '/:id',
+      validateDto(UpdateContactDto),
       async (req: Request, res: Response, next: NextFunction) => {
-        await this.contactController.updateNote(req, res, next);
+        await this.contactController.update(req, res, next);
       },
     );
   }
@@ -115,12 +120,12 @@ export default ContactRouter;
 
 /**
  * @openapi
- * '/api/contacts/{id}/note':
+ * '/api/contacts/{id}':
  *  put:
  *     tags:
  *     - Contacts
- *     summary: Update contact note
- *     description: Update internal note for a specific contact
+ *     summary: Update contact
+ *     description: Update contact status, note, or both
  *     parameters:
  *      - $ref: '#/components/parameters/language'
  *      - $ref: '#/components/parameters/platform'
@@ -135,9 +140,10 @@ export default ContactRouter;
  *      content:
  *        application/json:
  *          schema:
- *            $ref: '#/components/schemas/ContactUpdateNoteInput'
+ *            $ref: '#/components/schemas/ContactUpdateInput'
  *          example:
- *            note: "Customer called back, provided additional measurements."
+ *            status: "INPROGRESS"
+ *            note: "Contacted customer, awaiting response."
  *     responses:
  *      200:
  *        description: Updated

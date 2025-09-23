@@ -39,8 +39,11 @@
  *          example: "https://cdn.example.com/attachments/invoice.pdf"
  *        status:
  *          type: string
- *          nullable: true
- *          example: "new"
+ *          enum:
+ *            - NEW
+ *            - INPROGRESS
+ *            - RESOLVED
+ *          example: "NEW"
  *        note:
  *          type: string
  *          nullable: true
@@ -106,6 +109,27 @@
  *        note:
  *          type: string
  *          example: "Customer called back, provided additional measurements."
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    ContactUpdateInput:
+ *      type: object
+ *      properties:
+ *        status:
+ *          type: string
+ *          enum:
+ *            - NEW
+ *            - INPROGRESS
+ *            - RESOLVED
+ *          example: "RESOLVED"
+ *        note:
+ *          type: string
+ *          nullable: true
+ *          example: "Followed up with customer, issue resolved."
+ *      description: At least one property must be provided.
  */
 
 /**

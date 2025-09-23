@@ -1,6 +1,9 @@
 // dtos/customer-contact.dto.ts
-import {IsOptional, IsString, IsEmail, MaxLength, IsInt, Min} from 'class-validator';
+import {IsOptional, IsString, IsEmail, MaxLength, IsInt, Min, IsIn} from 'class-validator';
 import {Transform} from 'class-transformer';
+
+export const CONTACT_STATUS_VALUES = ['NEW', 'INPROGRESS', 'RESOLVED'] as const;
+export type ContactStatus = (typeof CONTACT_STATUS_VALUES)[number];
 
 export class CreateCustomerContactDto {
   @IsString() @MaxLength(255)
@@ -29,6 +32,10 @@ export class CreateCustomerContactDto {
 
   @IsOptional() @IsString()
   attachment?: string;
+
+  @IsOptional()
+  @IsIn(CONTACT_STATUS_VALUES)
+  status?: ContactStatus;
 }
 
 export class ContactQueryDto {
@@ -46,6 +53,16 @@ export class ContactQueryDto {
 }
 
 export class UpdateContactNoteDto {
+  @IsOptional()
+  @IsString()
+  note?: string | null;
+}
+
+export class UpdateContactDto {
+  @IsOptional()
+  @IsIn(CONTACT_STATUS_VALUES)
+  status?: ContactStatus;
+
   @IsOptional()
   @IsString()
   note?: string | null;
