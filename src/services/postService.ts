@@ -154,12 +154,14 @@ export class PostService {
   }
 
   async create(payload: CreatePostDto): Promise<Post> {
-    const slug = await this.resolveSlug(payload.post_title, payload.post_slug ?? null);
+    const title = payload.post_title.trim();
+    const slug = await this.resolveSlug(title);
     const gallery = this.normalizeGallery(payload.gallery, []);
 
     const data = this.sanitizePayload({
       ...payload,
-      post_slug: slug ?? payload.post_slug ?? undefined,
+      post_title: title,
+      post_slug: slug,
       gallery,
       is_active: payload.is_active ?? true,
       is_popular: payload.is_popular ?? false,
@@ -173,12 +175,19 @@ export class PostService {
   async update(id: string, payload: UpdatePostDto): Promise<Post> {
     const current = await this.findByIdOrThrow(id);
 
-    const slug = await this.resolveSlug(payload.post_title ?? current.post_title, payload.post_slug ?? null, id);
+    let title = payload.post_title;
+    if (title !== undefined) {
+      title = title.trim();
+    }
+
+    const baseTitle = title ?? current.post_title;
+    const slug = await this.resolveSlug(baseTitle, undefined, id);
     const gallery = this.normalizeGallery(payload.gallery, undefined);
 
     const data = this.sanitizePayload({
       ...payload,
-      post_slug: slug ?? payload.post_slug,
+      post_title: title,
+      post_slug: slug,
       gallery,
     });
 

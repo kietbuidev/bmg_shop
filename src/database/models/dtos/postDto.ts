@@ -89,10 +89,6 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsString()
-  post_slug?: string | null;
-
-  @IsOptional()
-  @IsString()
   post_description?: string | null;
 
   @IsOptional()
@@ -143,10 +139,6 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   post_title?: string;
-
-  @IsOptional()
-  @IsString()
-  post_slug?: string | null;
 
   @IsOptional()
   @IsString()

@@ -14,6 +14,7 @@
  *          example: Summer Fashion Trends
  *        post_slug:
  *          type: string
+ *          description: URL-friendly identifier automatically generated from the post title.
  *          example: summer-fashion-trends
  *        post_description:
  *          type: string
@@ -66,9 +67,6 @@
  *        post_title:
  *          type: string
  *          example: Summer Fashion Trends
- *        post_slug:
- *          type: string
- *          example: summer-fashion-trends
  *        post_description:
  *          type: string
  *        post_content:
@@ -104,8 +102,6 @@
  *      type: object
  *      properties:
  *        post_title:
- *          type: string
- *        post_slug:
  *          type: string
  *        post_description:
  *          type: string

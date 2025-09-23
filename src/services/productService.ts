@@ -219,7 +219,7 @@ export class ProductService {
     await this.ensureUniqueCode(normalizedCode);
 
     const categoryId = await this.validateCategory(payload.category_id);
-    const slugValue = await this.resolveSlug(normalizedName, payload.slug);
+    const slugValue = await this.resolveSlug(normalizedName);
     const gallery = this.normalizeArray(payload.gallery, []);
     const sizes = this.normalizeArray(payload.sizes, []);
     const colors = this.normalizeArray(payload.colors, []);
@@ -273,17 +273,7 @@ export class ProductService {
     }
 
     const baseName = name ?? current.name;
-    const requestedSlug = typeof payload.slug === 'string' ? payload.slug.trim() : payload.slug;
-    const nameChanged = name !== undefined && name !== current.name;
-
-    // When the name changes and slug is untouched (missing or identical), regenerate slug from the new name
-    const shouldRegenerateSlug = nameChanged && (!requestedSlug || requestedSlug === current.slug);
-
-    const slugValue = await this.resolveSlug(
-      shouldRegenerateSlug ? name : baseName,
-      shouldRegenerateSlug ? undefined : requestedSlug,
-      id,
-    );
+    const slugValue = await this.resolveSlug(baseName, undefined, id);
 
     const data = this.sanitizePayload({
       ...payload,

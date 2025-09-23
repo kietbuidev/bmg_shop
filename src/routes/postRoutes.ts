@@ -143,7 +143,7 @@ export default PostRouter;
  *     tags:
  *     - Posts
  *     summary: Create post
- *     description: Create a new post entry
+ *     description: Create a new post entry. The slug is generated automatically from the post title.
  *     parameters:
  *      - $ref: '#/components/parameters/language'
  *      - $ref: '#/components/parameters/platform'
@@ -176,7 +176,7 @@ export default PostRouter;
  *     tags:
  *     - Posts
  *     summary: Update post
- *     description: Update an existing post by id
+ *     description: Update an existing post by id. If the title changes, the slug is regenerated automatically.
  *     parameters:
  *      - $ref: '#/components/parameters/language'
  *      - $ref: '#/components/parameters/platform'

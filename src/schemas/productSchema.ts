@@ -21,6 +21,7 @@
  *          example: "MD-001"
  *        slug:
  *          type: string
+ *          description: URL-friendly identifier automatically generated from the product name.
  *          example: "minimal-dress"
  *        description:
  *          type: string
@@ -120,9 +121,6 @@
  *        code:
  *          type: string
  *          example: "MD-001"
- *        slug:
- *          type: string
- *          example: "minimal-dress"
  *        description:
  *          type: string
  *          nullable: true
@@ -192,8 +190,6 @@
  *        name:
  *          type: string
  *        code:
- *          type: string
- *        slug:
  *          type: string
  *        description:
  *          type: string

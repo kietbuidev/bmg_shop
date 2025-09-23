@@ -110,11 +110,6 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(255)
-  slug?: string;
-
-  @IsOptional()
-  @IsString()
   description?: string | null;
 
   @IsOptional()
@@ -213,9 +208,6 @@ export class UpdateProductDto {
   @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
   @IsOptional() @IsString() @MaxLength(64)
   code?: string;
-
-  @IsOptional() @IsString() @MaxLength(255)
-  slug?: string;
 
   @IsOptional() @IsString()
   description?: string | null;

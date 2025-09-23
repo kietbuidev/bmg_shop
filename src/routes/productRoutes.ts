@@ -176,7 +176,7 @@ export default ProductRouter;
  *     tags:
  *     - Products
  *     summary: Create product
- *     description: Create a new product
+ *     description: Create a new product. The slug is generated automatically from the provided name.
  *     parameters:
  *      - $ref: '#/components/parameters/language'
  *      - $ref: '#/components/parameters/platform'
@@ -190,11 +190,10 @@ export default ProductRouter;
  *            name: "Minimal Dress"
  *            code: "MD-001"
  *            category_id: null
- *            slug: "minimal-dress"
  *            description: "Elegant minimal dress for summer."
  *            short_description: "Minimal summer dress"
  *            content: "<p>Detailed HTML description</p>"
- *            thumbnail: "a7d4a1c6-3e2f-4b1f-8c53-7f2bc3fb77b0"
+ *            thumbnail: "mg/thumbnail-1.jpg"
  *            gallery:
  *              - "img/gallery-1.jpg"
  *              - "img/gallery-2.jpg"
@@ -233,7 +232,7 @@ export default ProductRouter;
  *     tags:
  *     - Products
  *     summary: Update product
- *     description: Update an existing product
+ *     description: Update an existing product. If the name changes, the slug is regenerated automatically to match.
  *     parameters:
  *      - $ref: '#/components/parameters/language'
  *      - $ref: '#/components/parameters/platform'
