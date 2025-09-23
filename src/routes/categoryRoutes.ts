@@ -152,7 +152,6 @@ export class CategoryRouter {
  *            $ref: '#/components/schemas/CategoryCreateInput'
  *          example:
  *            name: "Women"
- *            slug: "women"
  *            description: "Category for women's fashion"
  *            parent_id: "b1f0de49-8f5f-4e8c-b6bb-32b10b0aa70c"
  *            thumbnail: "women/banner-1.jpg"

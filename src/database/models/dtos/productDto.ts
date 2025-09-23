@@ -91,15 +91,18 @@ const toArray = (value: unknown, fallback: unknown[] | undefined): unknown[] | u
 const DECIMAL_0_2 = /^-?\d+(\.\d{1,2})?$/;
 
 export class CreateProductDto {
-  @IsOptional()
-  @Transform(({value}) => toNullableString(value))
-  category_id?: string | null;
+  @Transform(({value}) => (value === undefined || value === null ? value : String(value)))
+  @IsNotEmpty()
+  @IsUUID('4', {message: 'category_id must be a valid UUID v4'})
+  category_id!: string;
 
+  @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   name!: string;
 
+  @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsNotEmpty()
   @MaxLength(64)
@@ -199,13 +202,15 @@ export class CreateProductDto {
 
 export class UpdateProductDto {
   @IsOptional()
-  @Transform(({value}) => toNullableString(value))
-  @IsUUID('4', { each: false, message: 'category_id must be a valid UUID v4' })
-  category_id?: string | null;
+  @Transform(({value}) => (value === undefined ? undefined : String(value)))
+  @IsUUID('4', {each: false, message: 'category_id must be a valid UUID v4'})
+  category_id?: string;
 
+  @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
   @IsOptional() @IsString() @MaxLength(255)
   name?: string;
 
+  @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
   @IsOptional() @IsString() @MaxLength(64)
   code?: string;
 

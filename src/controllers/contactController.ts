@@ -28,7 +28,8 @@ export class ContactController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const payload = req.body as CreateCustomerContactDto;
+      const payload = ((req as any).validated as CreateCustomerContactDto | undefined) ??
+        (req.body as CreateCustomerContactDto);
       const contact = await this.contactService.create(payload);
       res.status(201).json(
         BuildResponse.created({

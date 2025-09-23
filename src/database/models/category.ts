@@ -4,6 +4,7 @@ import {
   BelongsTo, HasMany, CreatedAt, UpdatedAt, DeletedAt, DefaultScope, Scopes, AfterFind,
   Default
 } from 'sequelize-typescript';
+import Product from './product';
 
 
 @DefaultScope(() => ({
@@ -70,4 +71,7 @@ export default class Category extends Model<Category> {
 
   @HasMany(() => Category, 'parent_id')
   children?: Category[];
+
+  @HasMany(() => Product, 'category_id')
+  products?: Product[];
 }

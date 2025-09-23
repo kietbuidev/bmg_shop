@@ -21,8 +21,8 @@ export default class Product extends Model<Product> {
   declare id: string;
 
   @ForeignKey(() => Category)
-  @Column({type: DataType.UUIDV4, allowNull: true})
-  declare category_id: string | null;
+  @Column({type: DataType.UUIDV4, allowNull: false})
+  declare category_id: string;
 
   @Column({type: DataType.STRING(255), allowNull: false})
   declare name: string;

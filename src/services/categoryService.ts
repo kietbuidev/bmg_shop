@@ -49,20 +49,20 @@ export class CategoryService {
     return [input];
   }
 
-  private async resolveSlug(name?: string | null, requested?: string | null, excludeId?: string): Promise<string | undefined> {
-    const source = (requested ?? name ?? '').trim();
+  private async resolveSlug(name: string, excludeId?: string): Promise<string> {
+    const source = name.trim();
     if (!source) {
-      return undefined;
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'CATEGORY_NAME_REQUIRED');
     }
 
     const base = slug(source, {lower: true});
     if (!base) {
-      return undefined;
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'CATEGORY_SLUG_INVALID');
     }
 
     let candidate = base;
     let suffix = 1;
-    const model = this.categoryRepository.getModel().scope('withInactive');
+    const model = this.categoryRepository.getModel().scope(null);
 
     while (true) {
       const where: Record<string, unknown> = {slug: candidate};
@@ -72,7 +72,7 @@ export class CategoryService {
         };
       }
 
-      const existing = await model.findOne({where});
+      const existing = await model.findOne({where, paranoid: false});
       if (!existing) {
         return candidate;
       }
@@ -97,7 +97,7 @@ export class CategoryService {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'CATEGORY_PARENT_INVALID');
     }
 
-    const parent = await this.categoryRepository.getModel().scope('withInactive').findByPk(parentId);
+    const parent = await this.categoryRepository.getModel().scope(null).findByPk(parentId);
     if (!parent) {
       throw new NotFoundError('PARENT_CATEGORY_NOT_FOUND');
     }
@@ -108,7 +108,7 @@ export class CategoryService {
   private async findByIdOrThrow(id: string): Promise<Category> {
     const category = await this.categoryRepository
       .getModel()
-      .scope('withInactive')
+      .scope(null)
       .findByPk(id);
 
     if (!category) {
@@ -140,34 +140,36 @@ export class CategoryService {
 
     const options: FindOptions = {
       where,
+      paranoid: true,
       order: [
+        ['deleted_at', 'ASC'],
         ['priority', 'DESC'],
         ['name', 'ASC'],
       ],
     };
 
-      const pageNumber = Number(page) || 1;
-      const limitNumber = Number(limit) || 10;
-      const offset = pageNumber > 1 ? (pageNumber - 1) * limitNumber : 0;
+    const pageNumber = Number(page) || 1;
+    const limitNumber = Number(limit) || 10;
+    const offset = pageNumber > 1 ? (pageNumber - 1) * limitNumber : 0;
 
-      const scopedModel = this.categoryRepository.getModel().scope('withInactive');
-      const {count, rows} = await scopedModel.findAndCountAll({
-        ...options,
-        offset,
-        limit: limitNumber,
-      });
+    const scopedModel = this.categoryRepository.getModel().scope(null);
+    const {count, rows} = await scopedModel.findAndCountAll({
+      ...options,
+      offset,
+      limit: limitNumber,
+    });
+ 
+    const total_page = Math.ceil(count / limitNumber || 1);
 
-      const total_page = Math.ceil(count / limitNumber || 1);
-
-      return {
-        pagination: {
-          total_page,
-          per_page: limitNumber,
-          current_page: pageNumber,
-          count,
-        },
-        rows: rows as Category[],
-      };
+    return {
+      pagination: {
+        total_page,
+        per_page: limitNumber,
+        current_page: pageNumber,
+        count,
+      },
+      rows: rows as Category[],
+    };
   }
 
   async getById(id: string): Promise<Category> {
@@ -175,12 +177,14 @@ export class CategoryService {
   }
 
   async create(payload: CreateCategoryDto): Promise<Category> {
+    const normalizedName = payload.name.trim();
     const parentId = await this.validateParent(payload.parent_id ?? null);
-    const slug = await this.resolveSlug(payload.name, payload.slug);
+    const slug = await this.resolveSlug(normalizedName);
     const gallery = this.normalizeGallery(payload.gallery);
 
     const data = this.sanitizePayload({
       ...payload,
+      name: normalizedName,
       parent_id: parentId,
       slug,
       gallery,
@@ -198,10 +202,23 @@ export class CategoryService {
 
     const parentId = await this.validateParent(payload.parent_id, id);
     const gallery = payload.gallery !== undefined ? this.normalizeGallery(payload.gallery) : undefined;
-    const slug = await this.resolveSlug(payload.name ?? current.name, payload.slug, id);
+
+    let name = payload.name;
+    let slug: string | undefined;
+
+    if (name !== undefined) {
+      name = name.trim();
+      if (!name) {
+        throw new CustomError(HTTPCode.BAD_REQUEST, 'CATEGORY_NAME_REQUIRED');
+      }
+      if (name !== current.name) {
+        slug = await this.resolveSlug(name, id);
+      }
+    }
 
     const data = this.sanitizePayload({
       ...payload,
+      name,
       parent_id: parentId,
       gallery,
       slug,

@@ -9,18 +9,13 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { String } from 'lodash';
 
 export class CreateCategoryDto {
+  @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   name: string;
-
-  @IsString()
-  @IsOptional()
-  @MaxLength(255)
-  slug?: string;
 
   @IsString()
   @IsOptional()
@@ -30,7 +25,7 @@ export class CreateCategoryDto {
   @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
   parent_id?: string | null;
 
-  @IsOptional()
+  @IsNotEmpty()
   @Transform(({value}) => (value === undefined || value === null || value === '' ? null : String(value)))
   thumbnail?: string | null;
 
@@ -79,15 +74,12 @@ export class CreateCategoryDto {
 }
 
 export class UpdateCategoryDto {
+  @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsOptional()
+  @IsNotEmpty()
   @MaxLength(255)
   name?: string;
-
-  @IsString()
-  @IsOptional()
-  @MaxLength(255)
-  slug?: string;
 
   @IsString()
   @IsOptional()

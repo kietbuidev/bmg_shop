@@ -12,7 +12,6 @@
  *        category_id:
  *          type: string
  *          format: uuid
- *          nullable: true
  *          example: "1a2b3c4d-5e6f-7a8b-9c0d-ef1234567890"
  *        name:
  *          type: string
@@ -108,13 +107,13 @@
  *    ProductCreateInput:
  *      type: object
  *      required:
+ *        - category_id
  *        - name
  *        - code
  *      properties:
  *        category_id:
  *          type: string
  *          format: uuid
- *          nullable: true
  *        name:
  *          type: string
  *          example: "Minimal Dress"
@@ -190,7 +189,6 @@
  *        category_id:
  *          type: string
  *          format: uuid
- *          nullable: true
  *        name:
  *          type: string
  *        code:

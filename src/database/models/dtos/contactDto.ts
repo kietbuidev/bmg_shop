@@ -1,39 +1,43 @@
 // dtos/customer-contact.dto.ts
-import {IsOptional, IsString, IsEmail, MaxLength, IsInt, Min, IsIn} from 'class-validator';
+import {IsOptional, IsString, IsEmail, MaxLength, IsInt, Min, IsIn, IsNotEmpty} from 'class-validator';
 import {Transform} from 'class-transformer';
 
 export const CONTACT_STATUS_VALUES = ['NEW', 'INPROGRESS', 'RESOLVED'] as const;
 export type ContactStatus = (typeof CONTACT_STATUS_VALUES)[number];
 
 export class CreateCustomerContactDto {
-  @IsString() @MaxLength(255)
+  @IsString() 
+  @MaxLength(255)
   full_name!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString() 
   @MaxLength(32)
   phone?: string;
 
-  @IsOptional() 
+  @IsNotEmpty() 
   @IsString() 
   @MaxLength(255)
   address?: string;
 
-  @IsOptional() @IsEmail()
+  @IsNotEmpty() 
+  @IsEmail()
   email?: string;
 
-  @IsOptional() 
+  @IsNotEmpty() 
   @IsString()
   @MaxLength(255)
   subject?: string;
 
-  @IsOptional() @IsString()
+  @IsNotEmpty() 
+  @IsString()
   message?: string;
 
   @IsOptional() @IsString()
   attachment?: string;
 
   @IsOptional()
+  @Transform(({value}) => (typeof value === 'string' ? value.trim().toUpperCase() : value))
   @IsIn(CONTACT_STATUS_VALUES)
   status?: ContactStatus;
 }
@@ -60,6 +64,7 @@ export class UpdateContactNoteDto {
 
 export class UpdateContactDto {
   @IsOptional()
+  @Transform(({value}) => (typeof value === 'string' ? value.trim().toUpperCase() : value))
   @IsIn(CONTACT_STATUS_VALUES)
   status?: ContactStatus;
 

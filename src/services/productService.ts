@@ -57,17 +57,29 @@ export class ProductService {
     return [input];
   }
 
-  private async validateCategory(categoryId?: string | null): Promise<string | null | undefined> {
+  private async ensureUniqueCode(code: string, excludeId?: string): Promise<void> {
+    const model = this.productRepository.getModel().scope(null);
+    const where: Record<string, unknown> = {code};
+
+    if (excludeId) {
+      where.id = {
+        [Op.ne]: excludeId,
+      };
+    }
+
+    const existing = await model.findOne({where, paranoid: false});
+    if (existing) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_CODE_DUPLICATED');
+    }
+  }
+
+  private async validateCategory(categoryId?: string): Promise<string | undefined> {
     if (categoryId === undefined) {
       return undefined;
     }
 
-    if (categoryId === null) {
-      return null;
-    }
-
-    if (categoryId === "") {
-      return null;
+    if (!categoryId) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_CATEGORY_REQUIRED');
     }
 
     const category = await this.categoryRepository.getModel().scope('withInactive').findByPk(categoryId);
@@ -201,14 +213,21 @@ export class ProductService {
   }
 
   async create(payload: CreateProductDto): Promise<Product> {
-    const categoryId = await this.validateCategory(payload.category_id ?? null);
-    const slugValue = await this.resolveSlug(payload.name, payload.slug);
+    const normalizedName = payload.name.trim();
+    const normalizedCode = payload.code.trim();
+
+    await this.ensureUniqueCode(normalizedCode);
+
+    const categoryId = await this.validateCategory(payload.category_id);
+    const slugValue = await this.resolveSlug(normalizedName, payload.slug);
     const gallery = this.normalizeArray(payload.gallery, []);
     const sizes = this.normalizeArray(payload.sizes, []);
     const colors = this.normalizeArray(payload.colors, []);
 
     const data = this.sanitizePayload({
       ...payload,
+      name: normalizedName,
+      code: normalizedCode,
       category_id: categoryId,
       slug: slugValue,
       gallery,
@@ -233,10 +252,33 @@ export class ProductService {
     const gallery = this.normalizeArray(payload.gallery, undefined);
     const sizes = this.normalizeArray(payload.sizes, undefined);
     const colors = this.normalizeArray(payload.colors, undefined);
-    const slugValue = await this.resolveSlug(payload.name ?? current.name, payload.slug, id);
+
+    let name = payload.name;
+    if (name !== undefined) {
+      name = name.trim();
+      if (!name) {
+        throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_NAME_REQUIRED');
+      }
+    }
+
+    let code = payload.code;
+    if (code !== undefined) {
+      code = code.trim();
+      if (!code) {
+        throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_CODE_REQUIRED');
+      }
+      if (code !== current.code) {
+        await this.ensureUniqueCode(code, id);
+      }
+    }
+
+    const baseName = name ?? current.name;
+    const slugValue = await this.resolveSlug(baseName, payload.slug, id);
 
     const data = this.sanitizePayload({
       ...payload,
+      name,
+      code,
       category_id: categoryId,
       gallery,
       sizes,

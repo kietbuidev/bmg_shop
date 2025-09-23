@@ -54,6 +54,10 @@
  *        updated_at:
  *          type: string
  *          format: date-time
+ *        deleted_at:
+ *          type: string
+ *          format: date-time
+ *          nullable: true
  */
 
 /**
@@ -64,13 +68,11 @@
  *      type: object
  *      required:
  *        - name
+ *      description: Slug is generated automatically from the category name.
  *      properties:
  *        name:
  *          type: string
  *          example: Accessories
- *        slug:
- *          type: string
- *          example: accessories
  *        description:
  *          type: string
  *        parent_id:
@@ -108,10 +110,9 @@
  *  schemas:
  *    CategoryUpdateInput:
  *      type: object
+ *      description: Slug is generated automatically from the category name.
  *      properties:
  *        name:
- *          type: string
- *        slug:
  *          type: string
  *        description:
  *          type: string
