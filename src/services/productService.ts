@@ -273,7 +273,17 @@ export class ProductService {
     }
 
     const baseName = name ?? current.name;
-    const slugValue = await this.resolveSlug(baseName, payload.slug, id);
+    const requestedSlug = typeof payload.slug === 'string' ? payload.slug.trim() : payload.slug;
+    const nameChanged = name !== undefined && name !== current.name;
+
+    // When the name changes and slug is untouched (missing or identical), regenerate slug from the new name
+    const shouldRegenerateSlug = nameChanged && (!requestedSlug || requestedSlug === current.slug);
+
+    const slugValue = await this.resolveSlug(
+      shouldRegenerateSlug ? name : baseName,
+      shouldRegenerateSlug ? undefined : requestedSlug,
+      id,
+    );
 
     const data = this.sanitizePayload({
       ...payload,
