@@ -100,7 +100,7 @@ export class CreatePostDto {
   @Transform(({value}) => toNullableString(value))
   post_tag?: string | null;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @Transform(({value}) => toNullableString(value))
   thumbnail?: string | null;
@@ -153,7 +153,7 @@ export class UpdatePostDto {
   @Transform(({value}) => toNullableString(value))
   post_tag?: string | null;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @Transform(({value}) => toNullableString(value))
   thumbnail?: string | null;

@@ -120,7 +120,7 @@ export class CreateProductDto {
   @IsString()
   content?: string | null;
 
-  @IsOptional()
+  @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))
   thumbnail?: string | null;
 
@@ -218,7 +218,7 @@ export class UpdateProductDto {
   @IsOptional() @IsString()
   content?: string | null;
 
-  @IsOptional()
+  @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))
   thumbnail?: string | null;
 

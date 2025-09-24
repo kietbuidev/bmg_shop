@@ -103,6 +103,7 @@ export class SystemService {
           role: 'reader',
           type: 'anyone',
         },
+        supportsAllDrives: true,
       });
 
       const detail = await this.drive.files.get({
