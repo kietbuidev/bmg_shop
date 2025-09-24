@@ -35,9 +35,6 @@ export default class OrderItem extends Model<OrderItem> {
   @Column({ type: DataType.STRING(255), allowNull: true })
   declare product_thumbnail: string | null;
 
-  @Column({ type: DataType.JSONB, allowNull: false, defaultValue: [] })
-  declare product_sizes: unknown[];
-
   @Column({ type: DataType.TEXT, allowNull: true })
   declare selected_size: string | null;
 

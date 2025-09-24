@@ -1,5 +1,5 @@
 import {Service} from 'typedi';
-import {Transaction, Op} from 'sequelize';
+import {Transaction, Op, WhereOptions, FindOptions} from 'sequelize';
 import {randomUUID} from 'crypto';
 import sequelize from '../database';
 import Order from '../database/models/order';
@@ -9,9 +9,10 @@ import Customer from '../database/models/customer';
 import OrderRepository from '../database/repositories/order';
 import CustomerRepository from '../database/repositories/customer';
 import ProductRepository from '../database/repositories/product';
-import {CreateOrderDto, CreateOrderItemDto} from '../database/models/dtos/orderDto';
-import {CustomError} from '../utils/customError';
+import {CreateOrderDto, CreateOrderItemDto, OrderListQueryDto} from '../database/models/dtos/orderDto';
+import {CustomError, NotFoundError} from '../utils/customError';
 import {HTTPCode} from '../utils/enums';
+import {IPaginateResult} from '../utils/types';
 
 interface CalculatedItem {
   product: Product;
@@ -49,6 +50,8 @@ const toNullableString = (value: string | null | undefined): string | null => {
   return trimmed.length ? trimmed : null;
 };
 
+const ORDER_STATUS_SET = new Set(['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'FAILED', 'DRAFT']);
+
 @Service()
 export class OrderService {
   private readonly orderRepository: OrderRepository;
@@ -62,8 +65,18 @@ export class OrderService {
   }
 
   private generateOrderCode(): string {
-    const unique = randomUUID().replace(/-/g, '').toUpperCase().slice(0, 28);
-    return `OD${unique}`;
+    const now = new Date();
+
+    const pad2 = (value: number) => value.toString().padStart(2, '0');
+
+    const day = pad2(now.getDate());
+    const year = pad2(now.getFullYear() % 100);
+    const month = pad2(now.getMonth() + 1);
+    const hours = pad2(now.getHours());
+    const minutes = pad2(now.getMinutes());
+    const seconds = pad2(now.getSeconds());
+
+    return `${day}${year}${month}-BMG-${hours}${minutes}${seconds}`;
   }
 
   private async resolveCustomer(data: CreateOrderDto['customer'], transaction: Transaction): Promise<Customer> {
@@ -216,6 +229,58 @@ export class OrderService {
 
       return order;
     });
+  }
+
+  async list(query: OrderListQueryDto): Promise<IPaginateResult<Order>> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const requestedStatus = typeof query.status === 'string' ? query.status.trim().toUpperCase() : undefined;
+
+    const where: WhereOptions<Order> = {};
+    if (requestedStatus && requestedStatus !== 'ALL') {
+      where.status = requestedStatus;
+    }
+
+    const options: FindOptions = {
+      where,
+      include: [
+        {model: Customer, as: 'customer'},
+        {model: OrderItem, as: 'items'},
+      ],
+      order: [['created_at', 'DESC']],
+    };
+
+    return this.orderRepository.findAndPaginate(options, {page, limit});
+  }
+
+  async updateStatus(id: string, status: string): Promise<Order> {
+    const normalizedStatus = status.trim().toUpperCase();
+
+    if (!ORDER_STATUS_SET.has(normalizedStatus)) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'ORDER_STATUS_INVALID');
+    }
+
+    const order = await this.orderRepository.getById(id, {
+      include: [
+        {model: Customer, as: 'customer'},
+        {model: OrderItem, as: 'items'},
+      ],
+    });
+
+    if (!order) {
+      throw new NotFoundError('ORDER_NOT_FOUND');
+    }
+
+    order.status = normalizedStatus;
+    await order.save();
+    await order.reload({
+      include: [
+        {model: Customer, as: 'customer'},
+        {model: OrderItem, as: 'items'},
+      ],
+    });
+
+    return order;
   }
 }
 

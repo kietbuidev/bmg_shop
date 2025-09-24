@@ -1,7 +1,9 @@
 import {Type} from 'class-transformer';
+import {Transform} from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -10,6 +12,29 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+
+const ORDER_STATUS_VALUES = ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'FAILED', 'DRAFT'] as const;
+
+const toOptionalUppercaseStatus = (value: unknown): string | undefined => {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const normalized = value.trim().toUpperCase();
+  return normalized.length > 0 ? normalized : undefined;
+};
+
+const toRequiredUppercaseStatus = (value: unknown): string => {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  return value.trim().toUpperCase();
+};
 
 export class CreateOrderItemDto {
   @IsUUID()
@@ -62,3 +87,38 @@ export class CreateOrderDto {
   @Type(() => CreateOrderItemDto)
   items!: CreateOrderItemDto[];
 }
+
+export class OrderListQueryDto {
+  @IsOptional()
+  @Transform(({value}) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed >= 1 ? Math.trunc(parsed) : undefined;
+  })
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Transform(({value}) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed >= 1 ? Math.trunc(parsed) : undefined;
+  })
+  @IsInt()
+  @Min(1)
+  limit?: number;
+
+  @IsOptional()
+  @Transform(({value}) => toOptionalUppercaseStatus(value))
+  @IsIn([...ORDER_STATUS_VALUES, 'ALL'], {message: `status must be one of: ${[...ORDER_STATUS_VALUES, 'ALL'].join(', ')}`})
+  status?: string;
+}
+
+export class UpdateOrderStatusDto {
+  @Transform(({value}) => toRequiredUppercaseStatus(value))
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(ORDER_STATUS_VALUES, {message: `status must be one of: ${ORDER_STATUS_VALUES.join(', ')}`})
+  status!: (typeof ORDER_STATUS_VALUES)[number];
+}
+
+export const ORDER_STATUS_FILTER_VALUES = ORDER_STATUS_VALUES;

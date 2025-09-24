@@ -3,7 +3,7 @@ import type {NextFunction, Request, Response} from 'express';
 import {Service} from 'typedi';
 import OrderController from '../controllers/orderController';
 import {validateDto} from '../middleware/validateDto';
-import {CreateOrderDto} from '../database/models/dtos/orderDto';
+import {CreateOrderDto, OrderListQueryDto, UpdateOrderStatusDto} from '../database/models/dtos/orderDto';
 
 @Service()
 export class OrderRouter {
@@ -15,11 +15,27 @@ export class OrderRouter {
   }
 
   private initRoutes() {
+    this.router.get(
+      '/',
+      validateDto(OrderListQueryDto),
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.orderController.list(req, res, next);
+      },
+    );
+
     this.router.post(
       '/',
       validateDto(CreateOrderDto),
       async (req: Request, res: Response, next: NextFunction) => {
         await this.orderController.create(req, res, next);
+      },
+    );
+
+    this.router.patch(
+      '/:id/status',
+      validateDto(UpdateOrderStatusDto),
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.orderController.updateStatus(req, res, next);
       },
     );
   }
@@ -34,6 +50,65 @@ export default OrderRouter;
 /**
  * @openapi
  * '/api/orders':
+ *  get:
+ *     tags:
+ *     - Orders
+ *     summary: List orders
+ *     description: Retrieve orders with pagination and optional status filter
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *          example: 1
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *          example: 10
+ *      - in: query
+ *        name: status
+ *        schema:
+ *          type: string
+ *          example: PENDING
+ *          enum:
+ *            - PENDING
+ *            - PROCESSING
+ *            - COMPLETED
+ *            - CANCELLED
+ *            - EXPIRED
+ *            - FAILED
+ *            - DRAFT
+ *            - ALL
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                code:
+ *                  type: integer
+ *                message:
+ *                  type: string
+ *                rows:
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schemas/Order'
+ *                pagination:
+ *                  type: object
+ *                  properties:
+ *                    total_page:
+ *                      type: integer
+ *                    per_page:
+ *                      type: integer
+ *                    current_page:
+ *                      type: integer
+ *                    count:
+ *                      type: integer
  *  post:
  *     tags:
  *     - Orders
@@ -72,4 +147,51 @@ export default OrderRouter;
  *              $ref: '#/components/schemas/OrderDetailResponse'
  *      400:
  *        description: Validation or business error
+ *
+ * '/api/orders/{id}/status':
+ *  patch:
+ *     tags:
+ *     - Orders
+ *     summary: Update order status
+ *     description: Update the status of an order by id
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: string
+ *          format: uuid
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required:
+ *              - status
+ *            properties:
+ *              status:
+ *                type: string
+ *                enum:
+ *                  - PENDING
+ *                  - PROCESSING
+ *                  - COMPLETED
+ *                  - CANCELLED
+ *                  - EXPIRED
+ *                  - FAILED
+ *                  - DRAFT
+ *                example: COMPLETED
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/OrderDetailResponse'
+ *      400:
+ *        description: Validation error
+ *      404:
+ *        description: Order not found
  */
