@@ -91,10 +91,6 @@ export default PostRouter;
  *        schema:
  *          type: boolean
  *      - in: query
- *        name: status
- *        schema:
- *          type: string
- *      - in: query
  *        name: search
  *        schema:
  *          type: string
@@ -156,7 +152,13 @@ export default PostRouter;
  *          example:
  *            post_title: "Summer Fashion Trends"
  *            post_description: "Highlights from the latest runway shows"
+ *            post_content: "<p>Highlights from the latest runway shows with styling tips.</p>"
  *            is_active: true
+ *            thumbnail: "img/blog/summer-thumb.jpg"
+ *            post_tag: "fashion,summer,style"
+ *            meta_title: "Summer Fashion Trends | BMG"
+ *            meta_keyword: "fashion,summer,style"
+ *            meta_description: "Top summer fashion trends for this season."
  *            gallery:
  *              - "img/blog/summer-1.jpg"
  *              - "img/blog/summer-2.jpg"
@@ -194,8 +196,12 @@ export default PostRouter;
  *            $ref: '#/components/schemas/PostUpdateInput'
  *          example:
  *            post_title: "Updated summer trends"
- *            status: "published"
+ *            post_content: "<p>Updated summer trends content.</p>"
  *            is_popular: true
+ *            post_tag: "summer,trends"
+ *            meta_title: "Updated Summer Fashion Trends"
+ *            meta_description: "Refreshed overview of the latest trends."
+ *            thumbnail: "img/blog/updated-summer-thumb.jpg"
  *     responses:
  *      200:
  *        description: Updated

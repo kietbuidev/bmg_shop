@@ -94,7 +94,7 @@ export class PostService {
   }
 
   async list(query: PostQueryDto): Promise<IPaginateResult<Post>> {
-    const {page = 1, limit = 10, is_active, is_popular, status, search} = query;
+    const {page = 1, limit = 10, is_active, is_popular, search} = query;
 
     const where: {[key: string]: unknown; [key: symbol]: unknown} = {};
 
@@ -104,10 +104,6 @@ export class PostService {
 
     if (is_popular !== undefined) {
       where.is_popular = is_popular;
-    }
-
-    if (status) {
-      where.status = status;
     }
 
     if (search) {

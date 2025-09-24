@@ -37,8 +37,14 @@ export default class Post extends Model<Post> {
   @Column({type: DataType.INTEGER, allowNull: false})
   declare priority: number;
 
-  @Column({type: DataType.STRING(50), allowNull: true})
-  declare status: string;
+  @Column({type: DataType.STRING(255), allowNull: true})
+  declare meta_title: string | null;
+
+  @Column({type: DataType.TEXT, allowNull: true})
+  declare meta_keyword: string | null;
+
+  @Column({type: DataType.TEXT, allowNull: true})
+  declare meta_description: string | null;
 
   // Vitual
 

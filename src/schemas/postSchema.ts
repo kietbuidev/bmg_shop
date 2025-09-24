@@ -22,9 +22,11 @@
  *        post_content:
  *          type: string
  *          nullable: true
+ *          example: "<p>Highlights from the latest runway shows with styling tips.</p>"
  *        post_tag:
  *          type: string
  *          nullable: true
+ *          example: "fashion,summer,style"
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -44,9 +46,18 @@
  *        status:
  *          type: string
  *          nullable: true
- *        author:
- *          type: integer
- *          example: 0
+ *        meta_title:
+ *          type: string
+ *          nullable: true
+ *          example: "Summer Fashion Trends | BMG"
+ *        meta_keyword:
+ *          type: string
+ *          nullable: true
+ *          example: "fashion,summer,style"
+ *        meta_description:
+ *          type: string
+ *          nullable: true
+ *          example: "Top summer fashion trends for this season."
  *        created_at:
  *          type: string
  *          format: date-time
@@ -71,8 +82,10 @@
  *          type: string
  *        post_content:
  *          type: string
+ *          example: "<p>Highlights from the latest runway shows with styling tips.</p>"
  *        post_tag:
  *          type: string
+ *          example: "fashion,summer,style"
  *        thumbnail:
  *          type: string
  *        gallery:
@@ -90,8 +103,12 @@
  *          example: 0
  *        status:
  *          type: string
- *        author:
- *          type: integer
+ *        meta_title:
+ *          type: string
+ *        meta_keyword:
+ *          type: string
+ *        meta_description:
+ *          type: string
  */
 
 /**
@@ -107,8 +124,10 @@
  *          type: string
  *        post_content:
  *          type: string
+ *          example: "<p>Updated summer trends content.</p>"
  *        post_tag:
  *          type: string
+ *          example: "summer,trends"
  *        thumbnail:
  *          type: string
  *        gallery:
@@ -123,8 +142,12 @@
  *          type: integer
  *        status:
  *          type: string
- *        author:
- *          type: integer
+ *        meta_title:
+ *          type: string
+ *        meta_keyword:
+ *          type: string
+ *        meta_description:
+ *          type: string
  */
 
 /**

@@ -17,13 +17,6 @@ const toNullableString = (value: unknown): string | null => {
   return String(value);
 };
 
-const toOptionalString = (value: unknown): string | undefined => {
-  if (value === undefined || value === null || value === '') {
-    return undefined;
-  }
-  return String(value);
-};
-
 const toBoolean = (value: unknown, fallback?: boolean): boolean | undefined => {
   if (value === undefined || value === null || value === '') {
     return fallback;
@@ -130,9 +123,20 @@ export class CreatePostDto {
   status?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => toNumber(value, 0))
-  @IsInt()
-  author?: number;
+  @IsString()
+  @MaxLength(255)
+  @Transform(({value}) => toNullableString(value))
+  meta_title?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({value}) => toNullableString(value))
+  meta_keyword?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({value}) => toNullableString(value))
+  meta_description?: string | null;
 }
 
 export class UpdatePostDto {
@@ -183,9 +187,20 @@ export class UpdatePostDto {
   status?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => toNumber(value, undefined))
-  @IsInt()
-  author?: number;
+  @IsString()
+  @MaxLength(255)
+  @Transform(({value}) => toNullableString(value))
+  meta_title?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({value}) => toNullableString(value))
+  meta_keyword?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({value}) => toNullableString(value))
+  meta_description?: string | null;
 }
 
 export class PostQueryDto {
