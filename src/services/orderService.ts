@@ -50,7 +50,18 @@ const toNullableString = (value: string | null | undefined): string | null => {
   return trimmed.length ? trimmed : null;
 };
 
-const ORDER_STATUS_SET = new Set(['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'FAILED', 'DRAFT']);
+const ORDER_STATUS_SET = new Set([
+  'PENDING',
+  'CONFIRMED',
+  'PROCESSING',
+  'PACKING',
+  'SHIPPING',
+  'DELIVERED',
+  'COMPLETED',
+  'CANCELLED',
+  'FAILED',
+  'REFUNDED',
+]);
 
 @Service()
 export class OrderService {

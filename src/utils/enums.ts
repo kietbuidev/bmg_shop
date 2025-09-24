@@ -166,16 +166,16 @@ export enum SourceType {
 }
 
 export enum OrderStatus {
-  DRAFT = 'draft',
-  PROCESSING = 'processing',
-  // CONFIRMED = 'confirmed',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
-  EXPIRED = 'expired',
-  FAILED = 'failed',
-  PENDING = 'pending',
-  ALL = 'all',
-  DELETED = 'deleted',
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  PROCESSING = 'PROCESSING',
+  PACKING = 'PACKING',
+  SHIPPING = 'SHIPPING',
+  DELIVERED = 'DELIVERED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
 }
 
 export enum PaymentType {

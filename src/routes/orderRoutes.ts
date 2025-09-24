@@ -75,12 +75,15 @@ export default OrderRouter;
  *          example: PENDING
  *          enum:
  *            - PENDING
+ *            - CONFIRMED
  *            - PROCESSING
+ *            - PACKING
+ *            - SHIPPING
+ *            - DELIVERED
  *            - COMPLETED
  *            - CANCELLED
- *            - EXPIRED
  *            - FAILED
- *            - DRAFT
+ *            - REFUNDED
  *            - ALL
  *     responses:
  *      200:
@@ -176,13 +179,16 @@ export default OrderRouter;
  *                type: string
  *                enum:
  *                  - PENDING
+ *                  - CONFIRMED
  *                  - PROCESSING
+ *                  - PACKING
+ *                  - SHIPPING
+ *                  - DELIVERED
  *                  - COMPLETED
  *                  - CANCELLED
- *                  - EXPIRED
  *                  - FAILED
- *                  - DRAFT
- *                example: COMPLETED
+ *                  - REFUNDED
+ *                example: SHIPPING
  *     responses:
  *      200:
  *        description: Success

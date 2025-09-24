@@ -13,7 +13,18 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-const ORDER_STATUS_VALUES = ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'FAILED', 'DRAFT'] as const;
+const ORDER_STATUS_VALUES = [
+  'PENDING',
+  'CONFIRMED',
+  'PROCESSING',
+  'PACKING',
+  'SHIPPING',
+  'DELIVERED',
+  'COMPLETED',
+  'CANCELLED',
+  'FAILED',
+  'REFUNDED',
+] as const;
 
 const toOptionalUppercaseStatus = (value: unknown): string | undefined => {
   if (value === undefined || value === null || value === '') {
