@@ -207,7 +207,6 @@ export class OrderService {
         product_code: item.product.code,
         product_name: item.product.name,
         product_thumbnail: item.product.thumbnail ?? null,
-        product_sizes: Array.isArray(item.product.sizes) ? item.product.sizes : [],
         selected_size: toNullableString(item.payload.selected_size),
         selected_color: toNullableString(item.payload.selected_color),
         unit_currency: item.unitCurrency,

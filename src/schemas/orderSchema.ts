@@ -64,10 +64,6 @@
  *          type: string
  *          nullable: true
  *          example: "https://cdn.example.com/products/minimal-dress.jpg"
- *        product_sizes:
- *          type: array
- *          items:
- *            type: string
  *        selected_size:
  *          type: string
  *          nullable: true
