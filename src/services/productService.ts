@@ -156,7 +156,7 @@ export class ProductService {
         },
       ],
       order: [
-        ['priority', 'DESC'],
+        ['priority', 'ASC'],
         ['name', 'ASC'],
       ],
     };
