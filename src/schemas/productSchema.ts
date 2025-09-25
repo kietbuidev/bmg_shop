@@ -40,6 +40,10 @@
  *          type: string
  *          nullable: true
  *          example: "Casual"
+ *        status:
+ *          type: string
+ *          nullable: true
+ *          example: "published"
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -144,6 +148,9 @@
  *        style:
  *          type: string
  *          nullable: true
+ *        status:
+ *          type: string
+ *          nullable: true
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -218,6 +225,9 @@
  *          type: string
  *          nullable: true
  *        style:
+ *          type: string
+ *          nullable: true
+ *        status:
  *          type: string
  *          nullable: true
  *        thumbnail:

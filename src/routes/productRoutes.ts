@@ -195,6 +195,7 @@ export default ProductRouter;
  *            content: "<p>Detailed HTML description</p>"
  *            material: "Cotton"
  *            style: "Casual"
+ *            status: "published"
  *            thumbnail: "mg/thumbnail-1.jpg"
  *            gallery:
  *              - "img/gallery-1.jpg"
@@ -257,6 +258,7 @@ export default ProductRouter;
  *            percent: "30"
  *            material: "Linen Blend"
  *            style: "Summer"
+ *            status: "draft"
  *            colors:
  *              - "red"
  *              - "white"

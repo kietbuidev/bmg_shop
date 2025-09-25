@@ -238,6 +238,7 @@ export class ProductService {
     const colors = this.normalizeArray(payload.colors, []);
     const material = this.normalizeNullableString(payload.material);
     const style = this.normalizeNullableString(payload.style);
+    const status = this.normalizeNullableString(payload.status);
 
     const data = this.sanitizePayload({
       ...payload,
@@ -250,6 +251,7 @@ export class ProductService {
       colors,
       material,
       style,
+      status,
       regular_price: payload.regular_price ?? '0',
       sale_price: payload.sale_price ?? '0',
       percent: payload.percent ?? '0',
@@ -271,6 +273,7 @@ export class ProductService {
     const colors = this.normalizeArray(payload.colors, undefined);
     const material = this.normalizeNullableString(payload.material);
     const style = this.normalizeNullableString(payload.style);
+    const status = this.normalizeNullableString(payload.status);
 
     let name = payload.name;
     if (name !== undefined) {
@@ -304,6 +307,7 @@ export class ProductService {
       colors,
       material,
       style,
+      status,
       slug: slugValue,
     });
 

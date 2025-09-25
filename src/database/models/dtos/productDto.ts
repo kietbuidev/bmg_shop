@@ -132,6 +132,12 @@ export class CreateProductDto {
   @Transform(({value}) => toNullableString(value))
   style?: string | null;
 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @Transform(({value}) => toNullableString(value))
+  status?: string | null;
+
   @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))
   thumbnail?: string | null;
@@ -241,6 +247,12 @@ export class UpdateProductDto {
   @MaxLength(255)
   @Transform(({value}) => (value === undefined ? undefined : toNullableString(value)))
   style?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @Transform(({value}) => (value === undefined ? undefined : toNullableString(value)))
+  status?: string | null;
 
   @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))

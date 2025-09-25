@@ -49,6 +49,9 @@ export default class Product extends Model<Product> {
   declare style: string | null;
 
   @Column({type: DataType.STRING(255), allowNull: true})
+  declare status: string | null;
+
+  @Column({type: DataType.STRING(255), allowNull: true})
   declare thumbnail: string | null;
 
   @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
