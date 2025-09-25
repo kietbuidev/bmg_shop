@@ -24,7 +24,7 @@ const logFormat = process.env.LOG_FORMAT || 'short';
 
 // Add a list of allowed origins.
 // If you have more origins you would like to add, you can add them to the array below.
-const allowedOrigins = ['http://localhost:3000', 'https://sb-heyotrip-v2.hhllglobal.com', 'https://uat-heyotrip-v2.hhllglobal.com', 'https://heyotrip.com', '*'];
+const allowedOrigins = ['http://localhost:3000', 'https://bmgshop-production.up.railway.app', '*'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins,
