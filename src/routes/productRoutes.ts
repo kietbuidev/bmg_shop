@@ -193,6 +193,8 @@ export default ProductRouter;
  *            description: "Elegant minimal dress for summer."
  *            short_description: "Minimal summer dress"
  *            content: "<p>Detailed HTML description</p>"
+ *            material: "Cotton"
+ *            style: "Casual"
  *            thumbnail: "mg/thumbnail-1.jpg"
  *            gallery:
  *              - "img/gallery-1.jpg"
@@ -253,6 +255,8 @@ export default ProductRouter;
  *            description: "Updated description for the minimal dress."
  *            sale_price: "219000"
  *            percent: "30"
+ *            material: "Linen Blend"
+ *            style: "Summer"
  *            colors:
  *              - "red"
  *              - "white"

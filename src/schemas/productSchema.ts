@@ -32,6 +32,14 @@
  *        content:
  *          type: string
  *          nullable: true
+ *        material:
+ *          type: string
+ *          nullable: true
+ *          example: "Cotton"
+ *        style:
+ *          type: string
+ *          nullable: true
+ *          example: "Casual"
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -130,6 +138,12 @@
  *        content:
  *          type: string
  *          nullable: true
+ *        material:
+ *          type: string
+ *          nullable: true
+ *        style:
+ *          type: string
+ *          nullable: true
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -198,6 +212,12 @@
  *          type: string
  *          nullable: true
  *        content:
+ *          type: string
+ *          nullable: true
+ *        material:
+ *          type: string
+ *          nullable: true
+ *        style:
  *          type: string
  *          nullable: true
  *        thumbnail:

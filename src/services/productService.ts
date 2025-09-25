@@ -57,6 +57,19 @@ export class ProductService {
     return [input];
   }
 
+  private normalizeNullableString(input: string | null | undefined): string | null | undefined {
+    if (input === undefined) {
+      return undefined;
+    }
+
+    if (input === null) {
+      return null;
+    }
+
+    const trimmed = input.trim();
+    return trimmed ? trimmed : null;
+  }
+
   private async ensureUniqueCode(code: string, excludeId?: string): Promise<void> {
     const model = this.productRepository.getModel().scope(null);
     const where: Record<string, unknown> = {code};
@@ -223,6 +236,8 @@ export class ProductService {
     const gallery = this.normalizeArray(payload.gallery, []);
     const sizes = this.normalizeArray(payload.sizes, []);
     const colors = this.normalizeArray(payload.colors, []);
+    const material = this.normalizeNullableString(payload.material);
+    const style = this.normalizeNullableString(payload.style);
 
     const data = this.sanitizePayload({
       ...payload,
@@ -233,6 +248,8 @@ export class ProductService {
       gallery,
       sizes,
       colors,
+      material,
+      style,
       regular_price: payload.regular_price ?? '0',
       sale_price: payload.sale_price ?? '0',
       percent: payload.percent ?? '0',
@@ -252,6 +269,8 @@ export class ProductService {
     const gallery = this.normalizeArray(payload.gallery, undefined);
     const sizes = this.normalizeArray(payload.sizes, undefined);
     const colors = this.normalizeArray(payload.colors, undefined);
+    const material = this.normalizeNullableString(payload.material);
+    const style = this.normalizeNullableString(payload.style);
 
     let name = payload.name;
     if (name !== undefined) {
@@ -283,6 +302,8 @@ export class ProductService {
       gallery,
       sizes,
       colors,
+      material,
+      style,
       slug: slugValue,
     });
 
