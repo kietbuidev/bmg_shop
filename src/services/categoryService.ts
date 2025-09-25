@@ -143,7 +143,7 @@ export class CategoryService {
       paranoid: true,
       order: [
         ['deleted_at', 'ASC'],
-        ['priority', 'DESC'],
+        ['priority', 'ASC'],
         ['name', 'ASC'],
       ],
     };

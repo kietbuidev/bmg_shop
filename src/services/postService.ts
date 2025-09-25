@@ -117,7 +117,7 @@ export class PostService {
     const options: FindOptions = {
       where,
       order: [
-        ['priority', 'DESC'],
+        ['priority', 'ASC'],
         ['created_at', 'DESC'],
       ],
     };
