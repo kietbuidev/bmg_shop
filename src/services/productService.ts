@@ -236,7 +236,7 @@ export class ProductService {
     const gallery = this.normalizeArray(payload.gallery, []);
     const sizes = this.normalizeArray(payload.sizes, []);
     const colors = this.normalizeArray(payload.colors, []);
-    const material = this.normalizeNullableString(payload.material);
+    const material = this.normalizeArray(payload.material, []);
     const style = this.normalizeNullableString(payload.style);
     const status = this.normalizeNullableString(payload.status);
 
@@ -271,7 +271,7 @@ export class ProductService {
     const gallery = this.normalizeArray(payload.gallery, undefined);
     const sizes = this.normalizeArray(payload.sizes, undefined);
     const colors = this.normalizeArray(payload.colors, undefined);
-    const material = this.normalizeNullableString(payload.material);
+    const material = this.normalizeArray(payload.material, undefined);
     const style = this.normalizeNullableString(payload.style);
     const status = this.normalizeNullableString(payload.status);
 

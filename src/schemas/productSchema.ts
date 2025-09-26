@@ -33,9 +33,12 @@
  *          type: string
  *          nullable: true
  *        material:
- *          type: string
- *          nullable: true
- *          example: "Cotton"
+ *          type: array
+ *          items:
+ *            type: string
+ *          example:
+ *            - "Cotton"
+ *            - "Linen"
  *        style:
  *          type: string
  *          nullable: true
@@ -143,8 +146,9 @@
  *          type: string
  *          nullable: true
  *        material:
- *          type: string
- *          nullable: true
+ *          type: array
+ *          items:
+ *            type: string
  *        style:
  *          type: string
  *          nullable: true
@@ -222,8 +226,9 @@
  *          type: string
  *          nullable: true
  *        material:
- *          type: string
- *          nullable: true
+ *          type: array
+ *          items:
+ *            type: string
  *        style:
  *          type: string
  *          nullable: true

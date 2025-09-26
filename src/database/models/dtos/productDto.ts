@@ -121,10 +121,10 @@ export class CreateProductDto {
   content?: string | null;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  @Transform(({value}) => toNullableString(value))
-  material?: string | null;
+  @IsArray()
+  @IsString({each: true})
+  @Transform(({value}) => toArray(value, []))
+  material?: string[];
 
   @IsOptional()
   @IsString()
@@ -236,11 +236,9 @@ export class UpdateProductDto {
   @IsOptional() @IsString()
   content?: string | null;
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  @Transform(({value}) => (value === undefined ? undefined : toNullableString(value)))
-  material?: string | null;
+  @IsOptional() @IsArray() @IsString({each: true})
+  @Transform(({value}) => toArray(value, undefined))
+  material?: string[];
 
   @IsOptional()
   @IsString()

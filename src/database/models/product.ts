@@ -43,9 +43,6 @@ export default class Product extends Model<Product> {
   declare content: string | null;
 
   @Column({type: DataType.STRING(255), allowNull: true})
-  declare material: string | null;
-
-  @Column({type: DataType.STRING(255), allowNull: true})
   declare style: string | null;
 
   @Column({type: DataType.STRING(255), allowNull: true})
@@ -74,6 +71,9 @@ export default class Product extends Model<Product> {
 
   @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
   declare colors: (number | string)[];
+
+  @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
+  declare material: (number | string)[];
 
   @Column({type: DataType.BIGINT, allowNull: false, defaultValue: 0})
   declare view_count: number;
