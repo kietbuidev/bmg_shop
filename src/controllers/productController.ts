@@ -39,10 +39,41 @@ export class ProductController {
     }
   }
 
+  async listByCategorySlug(req: Request, res: Response, next: NextFunction) {
+    try {
+      const categorySlug = this.parseSlug(req.params.slug, 'INVALID_CATEGORY_SLUG');
+      const query = req.query as unknown;
+      const products = await this.productService.listByCategorySlug(categorySlug, query);
+
+      res.status(200).json(
+        BuildResponse.get({
+          data: products,
+        }),
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async detail(req: Request, res: Response, next: NextFunction) {
     try {
       const id = this.parseId(req.params.id, 'INVALID_PRODUCT_ID');
       const product = await this.productService.getById(id, true);
+
+      res.status(200).json(
+        BuildResponse.get({
+          data: product,
+        }),
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async detailBySlug(req: Request, res: Response, next: NextFunction) {
+    try {
+      const productSlug = this.parseSlug(req.params.slug, 'INVALID_PRODUCT_SLUG');
+      const product = await this.productService.getBySlug(productSlug, true);
 
       res.status(200).json(
         BuildResponse.get({
@@ -112,6 +143,16 @@ export class ProductController {
     }
 
     return id;
+  }
+
+  private parseSlug(slugParam: string, errorCode: string): string {
+    const slug = slugParam?.trim();
+
+    if (!slug) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, errorCode);
+    }
+
+    return slug;
   }
 }
 

@@ -142,6 +142,42 @@ export class ProductService {
     return product;
   }
 
+  private async findBySlugOrThrow(slugValue: string): Promise<Product> {
+    const trimmedSlug = slugValue.trim();
+    const product = await this.productRepository
+      .getModel()
+      .scope(['withInactive', {method: ['bySlug', trimmedSlug]}])
+      .findOne({
+        include: [
+          {
+            model: Category,
+            as: 'category',
+            attributes: ['id', 'name', 'slug', 'description', 'thumbnail', 'gallery', 'priority'],
+          },
+        ],
+      });
+
+    if (!product) {
+      throw new NotFoundError('PRODUCT_NOT_FOUND');
+    }
+
+    return product;
+  }
+
+  private async findCategoryBySlugOrThrow(slugValue: string): Promise<Category> {
+    const trimmedSlug = slugValue.trim();
+    const category = await this.categoryRepository
+      .getModel()
+      .scope(['withInactive', {method: ['bySlug', trimmedSlug]}])
+      .findOne();
+
+    if (!category) {
+      throw new NotFoundError('CATEGORY_NOT_FOUND');
+    }
+
+    return category;
+  }
+
   async list(query: ProductQueryDto): Promise<IPaginateResult<Product>> {
     const {page = 1, limit = 10, category_id, is_popular, search} = query;
 
@@ -214,8 +250,25 @@ export class ProductService {
       });
   }
 
+  async listByCategorySlug(categorySlug: string, query: {}): Promise<Product[]> {
+    const category = await this.findCategoryBySlugOrThrow(categorySlug);
+
+    return this.listByCategory(category.id, query);
+  }
+
   async getById(id: string, incrementView: boolean = false): Promise<Product> {
     const product = await this.findByIdOrThrow(id);
+
+    if (incrementView) {
+      await product.increment('view_count', {by: 1});
+      await product.reload();
+    }
+
+    return product;
+  }
+
+  async getBySlug(productSlug: string, incrementView: boolean = false): Promise<Product> {
+    const product = await this.findBySlugOrThrow(productSlug);
 
     if (incrementView) {
       await product.increment('view_count', {by: 1});

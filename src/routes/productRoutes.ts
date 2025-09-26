@@ -24,9 +24,23 @@ export class ProductRouter {
     );
 
     this.router.get(
+      '/category/slug/:slug',
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.productController.listByCategorySlug(req, res, next);
+      },
+    );
+
+    this.router.get(
       '/category/:categoryId',
       async (req: Request, res: Response, next: NextFunction) => {
         await this.productController.listByCategory(req, res, next);
+      },
+    );
+
+    this.router.get(
+      '/slug/:slug',
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.productController.detailBySlug(req, res, next);
       },
     );
 
@@ -143,6 +157,34 @@ export default ProductRouter;
 
 /**
  * @openapi
+ * '/api/products/category/slug/{slug}':
+ *  get:
+ *     tags:
+ *     - Products
+ *     summary: List products by category slug
+ *     description: Retrieve products filtered by category slug
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: slug
+ *        required: true
+ *        schema:
+ *          type: string
+ *          example: nu-gu
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ProductListByCategoryResponse'
+ *      404:
+ *        description: Category not found
+ */
+
+/**
+ * @openapi
  * '/api/products/{id}':
  *  get:
  *     tags:
@@ -158,6 +200,34 @@ export default ProductRouter;
  *        schema:
  *          type: string
  *          format: uuid
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ProductDetailResponse'
+ *      404:
+ *        description: Product not found
+ */
+
+/**
+ * @openapi
+ * '/api/products/slug/{slug}':
+ *  get:
+ *     tags:
+ *     - Products
+ *     summary: Get product detail by slug
+ *     description: Retrieve product detail by slug and increment view count
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: slug
+ *        required: true
+ *        schema:
+ *          type: string
+ *          example: vay-midi-den
  *     responses:
  *      200:
  *        description: Success
