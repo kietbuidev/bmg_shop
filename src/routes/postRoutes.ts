@@ -24,6 +24,13 @@ export class PostRouter {
     );
 
     this.router.get(
+      '/slug/:slug',
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.postController.detailBySlug(req, res, next);
+      },
+    );
+
+    this.router.get(
       '/:id',
       async (req: Request, res: Response, next: NextFunction) => {
         await this.postController.detail(req, res, next);
@@ -102,6 +109,34 @@ export default PostRouter;
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/PostListResponse'
+ */
+
+/**
+ * @openapi
+ * '/api/posts/slug/{slug}':
+ *  get:
+ *     tags:
+ *     - Posts
+ *     summary: Get post detail by slug
+ *     description: Retrieve a post by its slug
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: slug
+ *        required: true
+ *        schema:
+ *          type: string
+ *          example: summer-fashion-trends
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/PostDetailResponse'
+ *      404:
+ *        description: Post not found
  */
 
 /**

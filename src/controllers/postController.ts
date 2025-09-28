@@ -37,6 +37,21 @@ export class PostController {
     }
   }
 
+  async detailBySlug(req: Request, res: Response, next: NextFunction) {
+    try {
+      const slug = this.parseSlug(req.params.slug, 'INVALID_POST_SLUG');
+      const post = await this.postService.getBySlug(slug);
+
+      res.status(200).json(
+        BuildResponse.get({
+          data: post,
+        }),
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async create(req: Request, res: Response, next: NextFunction) {
     try {
       const payload = req.body as CreatePostDto;
@@ -95,6 +110,16 @@ export class PostController {
     }
 
     return id;
+  }
+
+  private parseSlug(slugParam: string, errorCode: string): string {
+    const slug = slugParam?.trim();
+
+    if (!slug) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, errorCode);
+    }
+
+    return slug;
   }
 }
 

@@ -149,6 +149,20 @@ export class PostService {
     return this.findByIdOrThrow(id);
   }
 
+  async getBySlug(slug: string): Promise<Post> {
+    const normalized = slug?.trim();
+    if (!normalized) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_POST_SLUG');
+    }
+
+    const post = await this.postRepository.getByKey('post_slug', normalized);
+    if (!post) {
+      throw new NotFoundError('POST_NOT_FOUND');
+    }
+
+    return post;
+  }
+
   async create(payload: CreatePostDto): Promise<Post> {
     const title = payload.post_title.trim();
     const slug = await this.resolveSlug(title);
