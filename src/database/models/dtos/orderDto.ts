@@ -74,11 +74,11 @@ export class CreateOrderCustomerDto {
   @IsString()
   email?: string | null;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   phone?: string | null;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   address?: string | null;
 
