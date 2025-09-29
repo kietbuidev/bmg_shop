@@ -156,7 +156,7 @@ export class ProductService {
           },
         ],
       });
-
+      console.log(1);
     if (!product) {
       throw new NotFoundError('PRODUCT_NOT_FOUND');
     }
