@@ -467,12 +467,6 @@
  *        password:
  *          type: string
  *          default: Admin123@
- *        device_token:
- *          type: number
- *          default: 1
- *        fcm_token:
- *          type: number
- *          default: 1
  */
 
 /**

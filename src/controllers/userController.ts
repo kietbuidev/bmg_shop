@@ -7,14 +7,10 @@ import {Service} from 'typedi';
 import BuildResponse from '../utils/buildResponse';
 import {
   CheckExistDto,
-  DeleteUserDto,
   LoginDto,
-  loginSocialDto,
   RegisterDto,
   UpdatePasswordDto,
   UpdateUserDto,
-  UserContactDto,
-  VerifyCodeDto,
 } from '../database/models/dtos/userDto';
 
 @Service()
@@ -85,6 +81,7 @@ export class UserController {
 
       res.status(200).json(BuildResponse.get({data: user}));
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }
