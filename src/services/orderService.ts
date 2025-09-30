@@ -260,7 +260,32 @@ export class OrderService {
       order: [['created_at', 'DESC']],
     };
 
-    return this.orderRepository.findAndPaginate(options, {page, limit});
+    const pageNumber = Number(page) || 1;
+    const limitNumber = Number(limit) || 10;
+    const offset = pageNumber > 1 ? (pageNumber - 1) * limitNumber : 0;
+
+    const model = this.orderRepository.getModel();
+    const [rows, total] = await Promise.all([
+      model.findAll({
+        ...options,
+        offset,
+        limit: limitNumber,
+        subQuery: false,
+      }),
+      model.count({where}),
+    ]);
+
+    const totalPage = Math.ceil(total / limitNumber || 1);
+
+    return {
+      pagination: {
+        total_page: totalPage,
+        per_page: limitNumber,
+        current_page: pageNumber,
+        count: total,
+      },
+      rows: rows as Order[],
+    };
   }
 
   async updateStatus(id: string, status: string): Promise<Order> {
