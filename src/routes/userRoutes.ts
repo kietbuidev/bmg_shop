@@ -57,6 +57,47 @@ export class UserRouter {
 
 /**
  * @openapi
+ * '/api/users/notifications':
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: List user notifications
+ *     description: Retrieve notifications of the authenticated user with pagination and unread summary.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/page'
+ *       - $ref: '#/components/parameters/limit'
+ *     responses:
+ *       200:
+ *         description: Notifications retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserNotificationListResponse'
+ *       401:
+ *         description: Unauthorized
+ *
+ * '/api/users/notifications/read':
+ *   patch:
+ *     tags:
+ *       - Users
+ *     summary: Mark notifications as read
+ *     description: Update the last check timestamp so all notifications become read.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Notifications marked as read successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserNotificationReadResponse'
+ *       401:
+ *         description: Unauthorized
+ */
+/**
+ * @openapi
  * '/api/users/password':
  *   put:
  *     tags:

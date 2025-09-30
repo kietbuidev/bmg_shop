@@ -592,6 +592,98 @@
  * @openapi
  * components:
  *  schemas:
+ *    UserNotification:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *        user_from:
+ *          type: string
+ *          nullable: true
+ *        user_to:
+ *          type: string
+ *        title:
+ *          type: string
+ *        message:
+ *          type: string
+ *        type:
+ *          type: string
+ *        post_id:
+ *          type: string
+ *          nullable: true
+ *        is_new:
+ *          type: boolean
+ *        is_read:
+ *          type: boolean
+ *        created_at:
+ *          type: string
+ *          format: date-time
+ *        updated_at:
+ *          type: string
+ *          format: date-time
+ *    UserNotificationListResponse:
+ *      type: object
+ *      properties:
+ *        code:
+ *          type: number
+ *          example: 200
+ *        message:
+ *          type: string
+ *          example: data has been received!
+ *        data:
+ *          type: object
+ *          properties:
+ *            rows:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/UserNotification'
+ *            pagination:
+ *              type: object
+ *              properties:
+ *                total_page:
+ *                  type: integer
+ *                  example: 1
+ *                per_page:
+ *                  type: integer
+ *                  example: 10
+ *                current_page:
+ *                  type: integer
+ *                  example: 1
+ *                count:
+ *                  type: integer
+ *                  example: 1
+ *            summay_status:
+ *              type: object
+ *              properties:
+ *                unread_count:
+ *                  type: integer
+ *                  example: 0
+ *                has_new:
+ *                  type: boolean
+ *                  example: false
+ *                last_check:
+ *                  type: string
+ *                  format: date-time
+ *                  nullable: true
+ *    UserNotificationReadResponse:
+ *      type: object
+ *      properties:
+ *        code:
+ *          type: number
+ *          example: 200
+ *        message:
+ *          type: string
+ *          example: the data has been updated!
+ *        data:
+ *          type: boolean
+ *          example: true
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
  *    ResendOTPResponse:
  *      type: object
  *      properties:
