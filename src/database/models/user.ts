@@ -44,10 +44,10 @@ export default class User extends Model<User> {
   @Column({type: DataType.TEXT, allowNull: true})
   declare device_token: string | null;
 
-  @Column({type: DataType.STRING(50), allowNull: true})
+  @Column({type: DataType.TEXT, allowNull: true})
   declare remember_token: string | null;
 
-  @Column({type: DataType.STRING(250), allowNull: true})
+  @Column({type: DataType.TEXT, allowNull: true})
   declare refresh_token: string | null;
 
   @CreatedAt
