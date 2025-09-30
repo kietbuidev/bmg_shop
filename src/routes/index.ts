@@ -5,11 +5,16 @@ import {PostRouter} from './postRoutes';
 import {ContactRouter} from './contactRoutes';
 import {OrderRouter} from './orderRoutes';
 import {SystemRouter} from './systemRoutes';
+import {UserRouter} from './userRoutes';
 import Container from 'typedi';
 
 const router = Router();
 
 const defaultRoutes = [
+  {
+    path: '/users',
+    route: Container.get(UserRouter).getRouter(),
+  },
   {
     path: '/categories',
     route: Container.get(CategoryRouter).getRouter(),

@@ -132,6 +132,32 @@ export class UpdatePasswordDto {
   new_confirm_password: string;
 }
 
+export class UpdateUserDto {
+  @IsOptional()
+  @IsString()
+  first_name?: string;
+
+  @IsOptional()
+  @IsString()
+  last_name?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  phone_code?: string;
+
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+  @IsOptional()
+  @IsString()
+  address?: string;
+}
+
 export class DeleteUserDto {
   @IsString()
   @IsNotEmpty()

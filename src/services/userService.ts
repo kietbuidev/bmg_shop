@@ -9,15 +9,7 @@ import {ConfigDefault, HTTPCode, StatusActive} from '../utils/enums';
 import {IConfig, IPaginateResult, IRequestQuery} from '../utils/types';
 import authJwt from '../middleware/authJwt';
 import configJwt from '../config/jwt';
-import {
-  RegisterDto,
-  LoginDto,
-  loginSocialDto,
-  VerifyCodeDto,
-  ResetPasswordDto,
-  UpdatePasswordDto,
-  DeleteUserDto,
-} from '../database/models/dtos/userDto';
+import {RegisterDto, LoginDto, UpdatePasswordDto, DeleteUserDto} from '../database/models/dtos/userDto';
 
 interface AuthTokens {
   access_token: string;
@@ -77,10 +69,7 @@ export class UserService {
 
   private async issueTokens(user: User, extras?: {device_token?: string | null; fcm_token?: string | null}): Promise<AuthTokens> {
     const payload = this.buildPayload(user);
-    const [access, refresh] = await Promise.all([
-      authJwt.signAccessToken(payload),
-      authJwt.signRefreshToken(String(user.id)),
-    ]);
+    const [access, refresh] = await Promise.all([authJwt.signAccessToken(payload), authJwt.signRefreshToken(String(user.id))]);
 
     await this.userRepository.update(user.id, {
       remember_token: access as string,
@@ -119,37 +108,21 @@ export class UserService {
       },
     });
 
-    const hashedPassword = await this.hashPassword(registerUser.password);
-
-    let user: User;
     if (existing) {
-      if (existing.status !== StatusActive.Off) {
-        throw new CustomError(HTTPCode.BAD_REQUEST, 'ACCOUNT_ALREADY_EXISTS');
-      }
-
-      await this.userRepository.update(existing.id, {
-        first_name: registerUser.first_name,
-        last_name: registerUser.last_name,
-        phone: registerUser.phone,
-        phone_code: registerUser.phone_code,
-        country: registerUser.country,
-        password: hashedPassword,
-        status: StatusActive.On,
-      } as Partial<User>);
-      const updated = await this.userRepository.getById(existing.id);
-      user = updated ?? existing;
-    } else {
-      user = await this.userRepository.create({
-        first_name: registerUser.first_name,
-        last_name: registerUser.last_name,
-        email: registerUser.email,
-        phone: registerUser.phone,
-        phone_code: registerUser.phone_code,
-        country: registerUser.country,
-        password: hashedPassword,
-        status: StatusActive.On,
-      } as unknown as User);
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'ACCOUNT_ALREADY_EXISTS');
     }
+
+    const hashedPassword = await this.hashPassword(registerUser.password);
+    const user: User = await this.userRepository.create({
+      first_name: registerUser.first_name,
+      last_name: registerUser.last_name,
+      email: registerUser.email,
+      phone: registerUser.phone,
+      phone_code: registerUser.phone_code,
+      country: registerUser.country,
+      password: hashedPassword,
+      status: StatusActive.On,
+    } as unknown as User);
 
     return this.sanitizeUser(user);
   }
@@ -194,9 +167,6 @@ export class UserService {
     });
   }
 
-  async loginSocial(): Promise<never> {
-    throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'SOCIAL_LOGIN_NOT_AVAILABLE');
-  }
 
   async logout(authHeader: string): Promise<boolean> {
     if (!authHeader) {
@@ -215,7 +185,6 @@ export class UserService {
           remember_token: null,
           refresh_token: null,
           device_token: null,
-          fcm_token: null,
         } as Partial<User>);
       }
     } catch (error) {
@@ -223,18 +192,6 @@ export class UserService {
     }
 
     return true;
-  }
-
-  async sendCodeVerify(): Promise<never> {
-    throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'VERIFICATION_NOT_AVAILABLE');
-  }
-
-  async verifyCode(): Promise<never> {
-    throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'VERIFICATION_NOT_AVAILABLE');
-  }
-
-  async resetPassword(): Promise<never> {
-    throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'RESET_PASSWORD_NOT_AVAILABLE');
   }
 
   async updatePassword(config: IConfig, updatePassword: UpdatePasswordDto): Promise<boolean> {
@@ -281,52 +238,40 @@ export class UserService {
       phone: userDto.phone ?? user.phone,
       phone_code: userDto.phone_code ?? user.phone_code,
       country: userDto.country ?? user.country,
-      birthday: userDto.birthday ?? user.birthday,
       address: userDto.address ?? user.address,
-      title: userDto.title ?? user.title,
     } as Partial<User>);
 
     const updated = await this.userRepository.getById(user.id);
     return this.sanitizeUser(updated ?? user);
   }
 
-  async uploadAvatarUser(): Promise<never> {
-    throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'UPLOAD_AVATAR_NOT_AVAILABLE');
-  }
+  // async uploadAvatarUser(): Promise<never> {
+  //   throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'UPLOAD_AVATAR_NOT_AVAILABLE');
+  // }
 
-  async deleteAvatarUser(): Promise<boolean> {
-    throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'DELETE_AVATAR_NOT_AVAILABLE');
-  }
+  // async deleteAvatarUser(): Promise<boolean> {
+  //   throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'DELETE_AVATAR_NOT_AVAILABLE');
+  // }
 
-  async updateFcmTokenUser(config: IConfig, fcmToken: string): Promise<boolean> {
-    const normalised = this.normalizeConfig(config);
-    if (!normalised.user_id) {
-      throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
-    }
+  // async deleteUser(config: IConfig, body: DeleteUserDto): Promise<boolean> {
+  //   const normalised = this.normalizeConfig(config);
+  //   if (!normalised.user_id) {
+  //     throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
+  //   }
 
-    await this.userRepository.update(normalised.user_id, {fcm_token: fcmToken} as Partial<User>);
-    return true;
-  }
+  //   const user = await this.userRepository.getById(normalised.user_id);
+  //   if (!user) {
+  //     throw new NotFoundError('ACCOUNT_NOT_FOUND');
+  //   }
 
-  async deleteUser(config: IConfig, body: DeleteUserDto): Promise<boolean> {
-    const normalised = this.normalizeConfig(config);
-    if (!normalised.user_id) {
-      throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
-    }
+  //   const matches = await this.comparePassword(body.password, user.password);
+  //   if (!matches) {
+  //     throw new CustomError(HTTPCode.INVALID, 'INVALID_PASSWORD');
+  //   }
 
-    const user = await this.userRepository.getById(normalised.user_id);
-    if (!user) {
-      throw new NotFoundError('ACCOUNT_NOT_FOUND');
-    }
-
-    const matches = await this.comparePassword(body.password, user.password);
-    if (!matches) {
-      throw new CustomError(HTTPCode.INVALID, 'INVALID_PASSWORD');
-    }
-
-    await this.userRepository.delete(user.id);
-    return true;
-  }
+  //   await this.userRepository.delete(user.id);
+  //   return true;
+  // }
 
   async getUserById(config: IConfig, id: number): Promise<Record<string, unknown>> {
     this.normalizeConfig(config);
@@ -337,50 +282,29 @@ export class UserService {
     return this.sanitizeUser(user);
   }
 
-  async getContact(): Promise<unknown[]> {
-    return [];
-  }
+  // async refreshToken(refreshToken: string): Promise<AuthTokens> {
+  //   if (!refreshToken) {
+  //     throw new CustomError(HTTPCode.BAD_REQUEST, 'REFRESH_TOKEN_REQUIRED');
+  //   }
 
-  async refreshToken(refreshToken: string): Promise<AuthTokens> {
-    if (!refreshToken) {
-      throw new CustomError(HTTPCode.BAD_REQUEST, 'REFRESH_TOKEN_REQUIRED');
-    }
+  //   try {
+  //     jwt.verify(refreshToken, configJwt.secret);
+  //   } catch (error) {
+  //     throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
+  //   }
 
-    try {
-      jwt.verify(refreshToken, configJwt.secret);
-    } catch (error) {
-      throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
-    }
+  //   const user = await this.userRepository.getByOne({
+  //     where: {
+  //       refresh_token: refreshToken,
+  //     },
+  //   });
 
-    const user = await this.userRepository.getByOne({
-      where: {
-        refresh_token: refreshToken,
-      },
-    });
+  //   if (!user) {
+  //     throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
+  //   }
 
-    if (!user) {
-      throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
-    }
-
-    return this.issueTokens(user);
-  }
-
-  async getLocation(config: IConfig, ipAddress: string | string[] | undefined): Promise<Record<string, unknown>> {
-    const normalised = this.normalizeConfig(config);
-    const ip = Array.isArray(ipAddress) ? ipAddress[0] : ipAddress;
-    return {
-      ip: ip ?? null,
-      country: normalised.country,
-    };
-  }
-
-  async getTotalNotifications(): Promise<number> {
-    return 0;
-  }
-
-  async getLatestNotificationById(): Promise<unknown[]> {
-    return [];
-  }
+  //   return this.issueTokens(user);
+  // }
 
   async getNotificationAndPaginateById(_config: IConfig, _id: number, query: IRequestQuery): Promise<IPaginateResult<unknown>> {
     const page = Number(query?.page ?? 1);
@@ -394,25 +318,5 @@ export class UserService {
         total_page: 0,
       },
     };
-  }
-
-  async markReadNotification(): Promise<boolean> {
-    return true;
-  }
-
-  async getLoyaltyById(): Promise<Record<string, unknown>> {
-    return {};
-  }
-
-  async getCoinsById(): Promise<unknown[]> {
-    return [];
-  }
-
-  async getTierForUser(): Promise<unknown[]> {
-    return [];
-  }
-
-  async getTierPerks(): Promise<unknown[]> {
-    return [];
   }
 }

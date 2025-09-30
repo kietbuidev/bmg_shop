@@ -7,8 +7,6 @@ const signAccessToken = (payloadToken: any) => {
       userId: payloadToken.user_id,
       full_name: payloadToken.full_name,
       avatar: payloadToken.avatar,
-      tier: payloadToken.tier,
-      alias: payloadToken.alias,
       email: payloadToken.email,
     };
     const secret = configJwt.secret;

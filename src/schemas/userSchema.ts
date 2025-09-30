@@ -368,6 +368,45 @@
  * @openapi
  * components:
  *  schemas:
+ *    UserUpdatePasswordInput:
+ *      type: object
+ *      required:
+ *        - new_password
+ *        - new_confirm_password
+ *      properties:
+ *        password:
+ *          type: string
+ *          description: Current password
+ *        new_password:
+ *          type: string
+ *          description: New password to set
+ *        new_confirm_password:
+ *          type: string
+ *          description: Confirmation of the new password
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    UserUpdatePasswordResponse:
+ *      type: object
+ *      properties:
+ *        code:
+ *          type: number
+ *          example: 200
+ *        message:
+ *          type: string
+ *          example: the data has been updated!
+ *        data:
+ *          type: boolean
+ *          example: true
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
  *    UpdateUserInput:
  *      type: object
  *      properties:
