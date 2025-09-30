@@ -280,8 +280,8 @@
  *          type: number
  *          default: 2
  *        user_id:
- *          type: number
- *          default: 28
+ *          type: string
+ *          default: "3f94a3a8-1d22-4b43-8b9c-1234567890ab"
  */
 
 /**
@@ -298,8 +298,8 @@
  *          type: string
  *          default: 123456
  *        user_id:
- *          type: number
- *          default: 28
+ *          type: string
+ *          default: "3f94a3a8-1d22-4b43-8b9c-1234567890ab"
  */
 
 /**
@@ -342,8 +342,8 @@
  *          type: string
  *          default: Admin123
  *        user_id:
- *          type: number
- *          default: 28
+ *          type: string
+ *          default: "3f94a3a8-1d22-4b43-8b9c-1234567890ab"
  */
 
 /**
@@ -357,8 +357,8 @@
  *        - token_id
  *      properties:
  *        user_id:
- *          type: number
- *          default:
+ *          type: string
+ *          default: "3f94a3a8-1d22-4b43-8b9c-1234567890ab"
  *        token_id:
  *          type: string
  *          default:
@@ -481,12 +481,6 @@
  *        provider:
  *          type: string
  *          default: Facebook
- *        device_token:
- *          type: number
- *          default: 1
- *        fcm_token:
- *          type: number
- *          default: 1
  */
 
 /**
@@ -518,12 +512,40 @@
  *          type: object
  *          properties:
  *            id:
- *              type: number
+ *              type: string
  *            first_name:
  *              type: string
  *            last_name:
  *              type: string
  *            email:
+ *              type: string
+ *    UserProfileResponse:
+ *      type: object
+ *      properties:
+ *        code:
+ *          type: number
+ *          default: 200
+ *        message:
+ *          type: string
+ *          default: Success
+ *        data:
+ *          type: object
+ *          properties:
+ *            id:
+ *              type: string
+ *            first_name:
+ *              type: string
+ *            last_name:
+ *              type: string
+ *            email:
+ *              type: string
+ *            phone:
+ *              type: string
+ *            phone_code:
+ *              type: string
+ *            country:
+ *              type: string
+ *            address:
  *              type: string
  */
 

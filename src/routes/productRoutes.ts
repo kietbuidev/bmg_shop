@@ -114,6 +114,11 @@ export default ProductRouter;
  *          type: boolean
  *          example: true
  *      - in: query
+ *        name: status
+ *        schema:
+ *          type: string
+ *          example: published
+ *      - in: query
  *        name: search
  *        schema:
  *          type: string

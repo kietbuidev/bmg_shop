@@ -26,17 +26,17 @@ export interface IConfig {
   currency: string;
   country: string;
   platform: string;
-  user_id?: number;
+  user_id?: string;
   x_api_key?: string;
 }
 
 export interface TokenUserPayload {
-  id: number;
+  id: string;
   // role: RoleType;
 }
 
 export interface TokenData {
-  id: number;
+  id: string;
   // role: RoleType;
   iat: string;
   exp: string;

@@ -17,29 +17,22 @@ import {
 export class UserController {
   constructor(private userService: UserService ) {}
 
-  private getUserIdFromRequest(req: RequestCustom): number | undefined {
-    const tokenUser = req.user as unknown as {userId?: number} | undefined;
+  private getUserIdFromRequest(req: RequestCustom): string | undefined {
+    const tokenUser = req.user as unknown as {userId?: string | number} | undefined;
     if (tokenUser?.userId !== undefined && tokenUser?.userId !== null) {
-      const parsed = Number(tokenUser.userId);
-      if (!Number.isNaN(parsed)) {
-        return parsed;
-      }
+      return String(tokenUser.userId);
     }
 
     const headerValue = (req.headers['user_id'] ?? req.headers['user-id']) as string | string[] | undefined;
     if (Array.isArray(headerValue)) {
       const [first] = headerValue;
-      const parsed = Number(first);
-      if (!Number.isNaN(parsed)) {
-        return parsed;
+      if (first && first.trim().length > 0) {
+        return first.trim();
       }
     }
 
-    if (typeof headerValue === 'string') {
-      const parsed = Number(headerValue);
-      if (!Number.isNaN(parsed)) {
-        return parsed;
-      }
+    if (typeof headerValue === 'string' && headerValue.trim().length > 0) {
+      return headerValue.trim();
     }
 
     return undefined;
@@ -56,6 +49,22 @@ export class UserController {
           data: user,
         }),
       );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCurrentUser(req: RequestCustom, res: Response, next: NextFunction) {
+    try {
+      const userId = this.getUserIdFromRequest(req);
+      const config = {
+        ...(req.headers as unknown as IConfig),
+        user_id: userId,
+      };
+
+      const user = await this.userService.getCurrentUser(config);
+
+      res.status(200).json(BuildResponse.get({data: user}));
     } catch (error) {
       next(error);
     }

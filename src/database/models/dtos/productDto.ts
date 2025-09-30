@@ -341,6 +341,14 @@ export class ProductQueryDto {
   @IsBoolean()
   is_popular?: boolean;
 
+  @IsOptional()
+  @Transform(({value}) => {
+    const str = toOptionalString(value);
+    return str ? str.trim() : str;
+  })
+  @IsString()
+  status?: string;
+
   @IsOptional() @IsString()
   search?: string;
 }

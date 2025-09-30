@@ -179,7 +179,7 @@ export class ProductService {
   }
 
   async list(query: ProductQueryDto): Promise<IPaginateResult<Product>> {
-    const {page = 1, limit = 10, category_id, is_popular, search} = query;
+    const {page = 1, limit = 10, category_id, is_popular, status, search} = query;
 
     const where: {[key: string]: unknown; [key: symbol]: unknown} = {};
 
@@ -189,6 +189,10 @@ export class ProductService {
 
     if (is_popular !== undefined) {
       where.is_popular = is_popular;
+    }
+
+    if (status) {
+      where.status = status;
     }
 
     if (search) {

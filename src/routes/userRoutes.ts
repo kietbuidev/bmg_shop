@@ -28,6 +28,10 @@ export class UserRouter {
     this.router.post('/login', validateDto(LoginDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
       await this.userController.login(req, res, next);
     });
+
+    this.router.get('/me', authenticateUserToken, async (req: RequestCustom, res: Response, next: NextFunction) => {
+      await this.userController.getCurrentUser(req, res, next);
+    });
     
     this.router.put('/password', authenticateUserToken, validateDto(UpdatePasswordDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
       await this.userController.updatePassword(req, res, next);
@@ -91,6 +95,25 @@ export class UserRouter {
  *               $ref: '#/components/schemas/UpdateUserOutput'
  *       400:
  *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ */
+/**
+ * @openapi
+ * '/api/users/me':
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Retrieve authenticated user profile
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserProfileResponse'
  *       401:
  *         description: Unauthorized
  */

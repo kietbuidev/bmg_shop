@@ -179,9 +179,9 @@ export class UserService {
     }
 
     try {
-      const decoded = jwt.verify(token, configJwt.secret) as {userId?: number};
+      const decoded = jwt.verify(token, configJwt.secret) as {userId?: string | number};
       if (decoded?.userId) {
-        await this.userRepository.update(decoded.userId, {
+        await this.userRepository.update(String(decoded.userId), {
           remember_token: null,
           refresh_token: null,
           device_token: null,
@@ -192,6 +192,20 @@ export class UserService {
     }
 
     return true;
+  }
+
+  async getCurrentUser(config: IConfig): Promise<Record<string, unknown>> {
+    const normalized = this.normalizeConfig(config);
+    if (!normalized.user_id) {
+      throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
+    }
+
+    const user = await this.userRepository.getById(normalized.user_id);
+    if (!user) {
+      throw new NotFoundError('ACCOUNT_NOT_FOUND');
+    }
+
+    return this.sanitizeUser(user);
   }
 
   async updatePassword(config: IConfig, updatePassword: UpdatePasswordDto): Promise<boolean> {

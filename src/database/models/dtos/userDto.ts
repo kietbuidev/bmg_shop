@@ -171,7 +171,7 @@ export class CheckExistDto {
 }
 
 export class UserContactDto {
-  user_id?: number;
+  user_id?: string;
   key?: string;
   title: string;
   first_name: string;
@@ -183,7 +183,7 @@ export class UserContactDto {
 }
 
 export class UserPassengerDto {
-  user_id: number;
+  user_id: string;
   title: string;
   first_name: string;
   last_name: string;
