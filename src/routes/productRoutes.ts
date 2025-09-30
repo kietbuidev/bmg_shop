@@ -275,9 +275,9 @@ export default ProductRouter;
  *            colors:
  *              - "red"
  *              - "black"
- *            regular_price: "299000"
- *            sale_price: "249000"
- *            percent: "20"
+ *            regular_price: 299000
+ *            sale_price: 249000
+ *            percent: 20
  *            currency: "VND"
  *            sizes:
  *              - "S"
@@ -326,8 +326,8 @@ export default ProductRouter;
  *          example:
  *            name: "Minimal Dress (Updated)"
  *            description: "Updated description for the minimal dress."
- *            sale_price: "219000"
- *            percent: "30"
+ *            sale_price: 219000
+ *            percent: 30
  *            material:
  *              - "Linen"
  *              - "Viscose"

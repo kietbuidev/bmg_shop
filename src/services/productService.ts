@@ -305,9 +305,9 @@ export class ProductService {
       material,
       style,
       status,
-      regular_price: payload.regular_price ?? '0',
-      sale_price: payload.sale_price ?? '0',
-      percent: payload.percent ?? '0',
+      regular_price: payload.regular_price ?? 0,
+      sale_price: payload.sale_price ?? 0,
+      percent: payload.percent ?? 0,
       currency: payload.currency ?? 'VND',
       is_active: payload.is_active ?? true,
       is_popular: payload.is_popular ?? false,
@@ -363,7 +363,6 @@ export class ProductService {
       status,
       slug: slugValue,
     });
-
     const [affected] = await this.productRepository.update(id, data as Partial<Product>);
     if (!affected) {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'PRODUCT_NOT_UPDATED');

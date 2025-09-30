@@ -115,7 +115,7 @@ export abstract class BaseRepository<T extends Model> {
       [idKeyName]: idValue,
     } as WhereOptions<T>;
 
-    return this.model.update(
+    return this.model.unscoped().update(
       {
         ...data,
       },
@@ -132,7 +132,7 @@ export abstract class BaseRepository<T extends Model> {
       id: idValue,
     } as WhereOptions<T>;
 
-    return this.model.update(
+    return this.model.unscoped().update(
       {
         ...data,
       },
@@ -145,7 +145,7 @@ export abstract class BaseRepository<T extends Model> {
   async updateBulk<U>(data: Partial<T>, options?: FindOptions): Promise<[affectedCount: number]> {
     const whereClause = options as WhereOptions<T>;
 
-    return this.model.update(
+    return this.model.unscoped().update(
       {
         ...data,
       },

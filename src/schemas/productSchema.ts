@@ -74,14 +74,14 @@
  *            - "M"
  *            - "L"
  *        regular_price:
- *          type: string
- *          example: "299000.00"
+ *          type: number
+ *          example: 299000.0
  *        sale_price:
- *          type: string
- *          example: "249000.00"
+ *          type: number
+ *          example: 249000.0
  *        percent:
- *          type: string
- *          example: "20.00"
+ *          type: number
+ *          example: 20.0
  *        currency:
  *          type: string
  *          example: "VND"
@@ -171,14 +171,14 @@
  *          items:
  *            type: string
  *        regular_price:
- *          type: string
- *          example: "299000"
+ *          type: number
+ *          example: 299000
  *        sale_price:
- *          type: string
- *          example: "249000"
+ *          type: number
+ *          example: 249000
  *        percent:
- *          type: string
- *          example: "20"
+ *          type: number
+ *          example: 20
  *        currency:
  *          type: string
  *          example: "VND"
@@ -251,11 +251,11 @@
  *          items:
  *            type: string
  *        regular_price:
- *          type: string
+ *          type: number
  *        sale_price:
- *          type: string
+ *          type: number
  *        percent:
- *          type: string
+ *          type: number
  *        currency:
  *          type: string
  *        is_active:

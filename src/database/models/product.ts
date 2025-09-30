@@ -55,13 +55,13 @@ export default class Product extends Model<Product> {
   declare gallery: any[];
 
   @Column({type: DataType.DECIMAL(12, 2), allowNull: false, defaultValue: 0})
-  declare regular_price: string;
+  declare regular_price: number;
 
   @Column({type: DataType.DECIMAL(12, 2), allowNull: false, defaultValue: 0})
-  declare sale_price: string;
+  declare sale_price: number;
 
   @Column({type: DataType.DECIMAL(12, 2), allowNull: false, defaultValue: 0})
-  declare percent: string;
+  declare percent: number;
 
   @Column({type: DataType.STRING(8), allowNull: false, defaultValue: 'VND'})
   declare currency: string;

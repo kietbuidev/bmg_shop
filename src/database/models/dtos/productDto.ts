@@ -4,10 +4,10 @@ import {
   IsBoolean,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
-  Matches,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -48,16 +48,22 @@ const toBooleanWithDefault = (value: unknown, defaultValue?: boolean): boolean |
   return Boolean(value);
 };
 
-const toDecimalString = (value: unknown, defaultValue?: string): string | undefined => {
+const toDecimalNumber = (value: unknown, defaultValue?: number): number | undefined => {
   if (value === undefined || value === null || value === '') {
     return defaultValue;
   }
 
   if (typeof value === 'number') {
-    return value.toString();
+    return value;
   }
 
-  return String(value);
+  const normalized = typeof value === 'string' ? value.trim().replace(/,/g, '') : value;
+  const parsed = Number(normalized);
+  if (Number.isNaN(parsed)) {
+    return Number.NaN;
+  }
+
+  return parsed;
 };
 
 const toArray = (value: unknown, fallback: unknown[] | undefined): unknown[] | undefined => {
@@ -87,8 +93,6 @@ const toArray = (value: unknown, fallback: unknown[] | undefined): unknown[] | u
 
   return [value];
 };
-
-const DECIMAL_0_2 = /^-?\d+(\.\d{1,2})?$/;
 
 export class CreateProductDto {
   @Transform(({value}) => (value === undefined || value === null ? value : String(value)))
@@ -154,19 +158,19 @@ export class CreateProductDto {
   colors?: string[];
 
   @IsOptional()
-  @IsString()
-  @Transform(({value}) => toDecimalString(value, '0'))
-  regular_price?: string;
+  @Transform(({value}) => toDecimalNumber(value, 0))
+  @IsNumber({allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2}, {message: 'regular_price must be decimal with max 2 digits'})
+  regular_price?: number;
 
   @IsOptional()
-  @IsString()
-  @Transform(({value}) => toDecimalString(value, '0'))
-  sale_price?: string;
+  @Transform(({value}) => toDecimalNumber(value, 0))
+  @IsNumber({allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2}, {message: 'sale_price must be decimal with max 2 digits'})
+  sale_price?: number;
 
   @IsOptional()
-  @IsString()
-  @Transform(({value}) => toDecimalString(value, '0'))
-  percent?: string;
+  @Transform(({value}) => toDecimalNumber(value, 0))
+  @IsNumber({allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2}, {message: 'percent must be decimal with max 2 digits'})
+  percent?: number;
 
   @IsOptional()
   @IsString()
@@ -264,20 +268,20 @@ export class UpdateProductDto {
   @Transform(({value}) => toArray(value, undefined))
   colors?: string[];
 
-  @IsOptional() @IsString()
-  @Transform(({value}) => toDecimalString(value, undefined))
-  @Matches(DECIMAL_0_2, { message: 'regular_price must be decimal with max 2 digits' })
-  regular_price?: string;
+  @IsOptional()
+  @Transform(({value}) => toDecimalNumber(value, undefined))
+  @IsNumber({allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2}, {message: 'regular_price must be decimal with max 2 digits'})
+  regular_price?: number;
 
-  @IsOptional() @IsString()
-  @Transform(({value}) => toDecimalString(value, undefined))
-  @Matches(DECIMAL_0_2, { message: 'sale_price must be decimal with max 2 digits' })
-  sale_price?: string;
+  @IsOptional()
+  @Transform(({value}) => toDecimalNumber(value, undefined))
+  @IsNumber({allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2}, {message: 'sale_price must be decimal with max 2 digits'})
+  sale_price?: number;
 
-  @IsOptional() @IsString()
-  @Transform(({value}) => toDecimalString(value, undefined))
-  @Matches(DECIMAL_0_2, { message: 'percent must be decimal with max 2 digits' })
-  percent?: string;
+  @IsOptional()
+  @Transform(({value}) => toDecimalNumber(value, undefined))
+  @IsNumber({allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2}, {message: 'percent must be decimal with max 2 digits'})
+  percent?: number;
 
   @IsOptional() @IsString() @MaxLength(8)
   currency?: string;

@@ -6,7 +6,8 @@ export const CONTACT_STATUS_VALUES = ['NEW', 'INPROGRESS', 'RESOLVED'] as const;
 export type ContactStatus = (typeof CONTACT_STATUS_VALUES)[number];
 
 export class CreateCustomerContactDto {
-  @IsString() 
+  @IsNotEmpty()
+  @IsString()
   @MaxLength(255)
   full_name!: string;
 
@@ -15,12 +16,12 @@ export class CreateCustomerContactDto {
   @MaxLength(32)
   phone?: string;
 
-  @IsNotEmpty() 
+  @IsOptional() 
   @IsString() 
   @MaxLength(255)
   address?: string;
 
-  @IsNotEmpty() 
+  @IsOptional() 
   @IsEmail()
   email?: string;
 
