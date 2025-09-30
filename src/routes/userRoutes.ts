@@ -32,13 +32,21 @@ export class UserRouter {
     this.router.get('/me', authenticateUserToken, async (req: RequestCustom, res: Response, next: NextFunction) => {
       await this.userController.getCurrentUser(req, res, next);
     });
-    
+
     this.router.put('/password', authenticateUserToken, validateDto(UpdatePasswordDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
       await this.userController.updatePassword(req, res, next);
     });
 
     this.router.patch('/profile', authenticateUserToken, validateDto(UpdateUserDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
       await this.userController.updateUser(req, res, next);
+    });
+
+    this.router.get('/notifications', authenticateUserToken, async (req: RequestCustom, res: Response, next: NextFunction) => {
+      await this.userController.getNotifications(req, res, next);
+    });
+
+    this.router.patch('/notifications/read', authenticateUserToken, async (req: RequestCustom, res: Response, next: NextFunction) => {
+      await this.userController.markNotificationsAsRead(req, res, next);
     });
   }
 

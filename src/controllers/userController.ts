@@ -95,6 +95,42 @@ export class UserController {
     }
   }
 
+  async getNotifications(req: RequestCustom, res: Response, next: NextFunction) {
+    try {
+      const userId = this.getUserIdFromRequest(req);
+      const config = {
+        ...(req.headers as unknown as IConfig),
+        user_id: userId,
+      };
+      const query: IRequestQuery = {
+        page: req.query?.page ? Number(req.query.page) : undefined,
+        limit: req.query?.limit ? Number(req.query.limit) : undefined,
+      };
+
+      const notifications = await this.userService.getNotificationAndPaginateById(config, userId ?? '', query);
+
+      res.status(200).json(BuildResponse.get({data: notifications}));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async markNotificationsAsRead(req: RequestCustom, res: Response, next: NextFunction) {
+    try {
+      const userId = this.getUserIdFromRequest(req);
+      const config = {
+        ...(req.headers as unknown as IConfig),
+        user_id: userId,
+      };
+
+      const updated = await this.userService.markNotificationsAsRead(config);
+
+      res.status(200).json(BuildResponse.updated({data: updated}));
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updatePassword(req: RequestCustom, res: Response, next: NextFunction) {
     try {
       const userId = this.getUserIdFromRequest(req);

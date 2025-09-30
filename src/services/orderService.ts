@@ -11,8 +11,9 @@ import CustomerRepository from '../database/repositories/customer';
 import ProductRepository from '../database/repositories/product';
 import {CreateOrderDto, CreateOrderItemDto, OrderListQueryDto} from '../database/models/dtos/orderDto';
 import {CustomError, NotFoundError} from '../utils/customError';
-import {HTTPCode} from '../utils/enums';
+import {HTTPCode, NotificationType} from '../utils/enums';
 import {IPaginateResult} from '../utils/types';
+import NotificationBroadcaster from './notificationBroadcaster';
 
 interface CalculatedItem {
   product: Product;
@@ -62,11 +63,13 @@ export class OrderService {
   private readonly orderRepository: OrderRepository;
   private readonly customerRepository: CustomerRepository;
   private readonly productRepository: ProductRepository;
+  private readonly notificationBroadcaster: NotificationBroadcaster;
 
-  constructor() {
+  constructor(notificationBroadcaster: NotificationBroadcaster) {
     this.orderRepository = new OrderRepository();
     this.customerRepository = new CustomerRepository();
     this.productRepository = new ProductRepository();
+    this.notificationBroadcaster = notificationBroadcaster;
   }
 
   private generateOrderCode(): string {
@@ -177,7 +180,7 @@ export class OrderService {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'ORDER_ITEMS_REQUIRED');
     }
 
-    return sequelize.transaction(async (transaction) => {
+    const order = await sequelize.transaction(async (transaction) => {
       const customer = await this.resolveCustomer(payload.customer, transaction);
       const productMap = await this.resolveProducts(payload.items, transaction);
       const calculated = this.calculateItems(payload.items, productMap);
@@ -233,6 +236,14 @@ export class OrderService {
 
       return order;
     });
+
+    await this.notificationBroadcaster.notifyAllUsers({
+      title: 'Đơn hàng mới',
+      message: `Đơn hàng ${order.order_code} vừa được tạo với tổng tiền ${order.total_amount}.`,
+      type: NotificationType.ORDER,
+    });
+
+    return order;
   }
 
   async list(query: OrderListQueryDto): Promise<IPaginateResult<Order>> {

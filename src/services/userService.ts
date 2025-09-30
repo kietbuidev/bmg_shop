@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {Op} from 'sequelize';
 import User from '../database/models/user';
+import NotificationModel from '../database/models/notification';
 import UserRepository from '../database/repositories/user';
+import NotificationRepository from '../database/repositories/notification';
 import {CustomError, NotFoundError} from '../utils/customError';
 import {ConfigDefault, HTTPCode, StatusActive} from '../utils/enums';
 import {IConfig, IPaginateResult, IRequestQuery} from '../utils/types';
@@ -16,12 +18,19 @@ interface AuthTokens {
   refresh_token: string;
 }
 
+type NotificationResponse = Record<string, unknown> & {
+  is_new: boolean;
+  is_read: boolean;
+};
+
 @Service()
 export class UserService {
   private readonly userRepository: UserRepository;
+  private readonly notificationRepository: NotificationRepository;
 
   constructor() {
     this.userRepository = new UserRepository();
+    this.notificationRepository = new NotificationRepository();
   }
 
   private normalizeConfig(partial: Partial<IConfig> | undefined): IConfig {
@@ -320,17 +329,71 @@ export class UserService {
   //   return this.issueTokens(user);
   // }
 
-  async getNotificationAndPaginateById(_config: IConfig, _id: number, query: IRequestQuery): Promise<IPaginateResult<unknown>> {
-    const page = Number(query?.page ?? 1);
-    const limit = Number(query?.limit ?? 10);
+  private computeNotificationReadState(notification: NotificationModel, lastCheck: Date | null): boolean {
+    if (!lastCheck) {
+      return true;
+    }
+    const createdAt = notification.created_at instanceof Date ? notification.created_at : new Date(notification.created_at);
+    return createdAt > lastCheck;
+  }
+
+  async getNotificationAndPaginateById(config: IConfig, id: string | number, query: IRequestQuery): Promise<IPaginateResult<Record<string, unknown>>> {
+    const normalised = this.normalizeConfig(config);
+    const targetId = id ?? normalised.user_id;
+
+    if (!targetId) {
+      throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
+    }
+
+    const user = await this.userRepository.getById(String(targetId));
+    if (!user) {
+      throw new NotFoundError('ACCOUNT_NOT_FOUND');
+    }
+
+    const result = await this.notificationRepository.findAndPaginate(
+      {
+        where: {
+          user_to: String(targetId),
+        },
+        order: [['created_at', 'DESC']],
+      },
+      query,
+    );
+
+    const lastCheck = user.last_check_notifcation ? new Date(user.last_check_notifcation) : null;
+    const rows = result.rows.map<NotificationResponse>((notification) => {
+      const plain = notification.toJSON() as unknown as Record<string, unknown>;
+      const isNew = this.computeNotificationReadState(notification, lastCheck);
+      return {
+        ...plain,
+        is_new: isNew,
+        is_read: !isNew,
+      };
+    });
+
+    const unreadCount = rows.filter((row) => row.is_new).length;
+
     return {
-      rows: [],
-      pagination: {
-        count: 0,
-        current_page: page,
-        per_page: limit,
-        total_page: 0,
+      rows,
+      pagination: result.pagination,
+      summay_status: {
+        unread_count: unreadCount,
+        has_new: unreadCount > 0,
+        last_check: lastCheck,
       },
     };
+  }
+
+  async markNotificationsAsRead(config: IConfig): Promise<boolean> {
+    const normalised = this.normalizeConfig(config);
+    if (!normalised.user_id) {
+      throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
+    }
+
+    await this.userRepository.update(normalised.user_id, {
+      last_check_notifcation: new Date(),
+    } as Partial<User>);
+
+    return true;
   }
 }

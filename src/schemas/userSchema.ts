@@ -422,15 +422,6 @@
  *        phone_code:
  *          type: string
  *          default: +84
- *        birthday:
- *          type: string
- *          format: date
- *        title:
- *          type: string
- *          default: Mr
- *        gender:
- *          type: string
- *          default: Female
  *        country:
  *          type: string
  *          default: vi
@@ -452,6 +443,32 @@
  *        message:
  *          type: string
  *          default: Updated user successfully!
+ *        data:
+ *          type: object
+ *          properties:
+ *            id:
+ *              type: string
+ *            first_name:
+ *              type: string
+ *            last_name:
+ *              type: string
+ *            email:
+ *              type: string
+ *            phone:
+ *              type: string
+ *            phone_code:
+ *              type: string
+ *            country:
+ *              type: string
+ *            address:
+ *              type: string
+ *            avatar:
+ *              type: string
+ *              nullable: true
+ *            last_check_notifcation:
+ *              type: string
+ *              format: date-time
+ *              nullable: true
  */
 
 /**
