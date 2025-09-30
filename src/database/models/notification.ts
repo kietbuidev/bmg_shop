@@ -2,7 +2,7 @@ import {Table, Column, Model, DataType, CreatedAt, UpdatedAt, PrimaryKey, HasOne
 import Order from './order';
 
 @Table({tableName: 'notification'})
-export default class NotificationModel extends Model<NotificationModel> {
+export default class Notification extends Model<Notification> {
    @PrimaryKey
    @Default(DataType.UUIDV4)
    @Column(DataType.UUID)

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {Op} from 'sequelize';
 import User from '../database/models/user';
-import NotificationModel from '../database/models/notification';
+import Notification from '../database/models/notification';
 import UserRepository from '../database/repositories/user';
 import NotificationRepository from '../database/repositories/notification';
 import {CustomError, NotFoundError} from '../utils/customError';
@@ -329,7 +329,7 @@ export class UserService {
   //   return this.issueTokens(user);
   // }
 
-  private computeNotificationReadState(notification: NotificationModel, lastCheck: Date | null): boolean {
+  private computeNotificationReadState(notification: Notification, lastCheck: Date | null): boolean {
     if (!lastCheck) {
       return true;
     }

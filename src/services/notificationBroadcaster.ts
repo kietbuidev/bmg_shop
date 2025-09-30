@@ -1,7 +1,7 @@
 import {Service} from 'typedi';
 import NotificationRepository from '../database/repositories/notification';
 import UserRepository from '../database/repositories/user';
-import NotificationModel from '../database/models/notification';
+import Notification from '../database/models/notification';
 import User from '../database/models/user';
 import {NotificationType} from '../utils/enums';
 
@@ -31,7 +31,7 @@ export class NotificationBroadcaster {
     return String(idValue);
   }
 
-  async notifyAllUsers(payload: BroadcastPayload): Promise<NotificationModel[]> {
+  async notifyAllUsers(payload: BroadcastPayload): Promise<Notification[]> {
     const users = await this.userRepository.findByOptions({attributes: ['id']});
     if (!users.length) {
       return [];

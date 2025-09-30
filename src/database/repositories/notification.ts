@@ -1,9 +1,9 @@
-import NotificationModel from '../models/notification';
+import Notification from '../models/notification';
 import {BaseRepository} from './_base';
 
-export class NotificationRepository extends BaseRepository<NotificationModel> {
+export class NotificationRepository extends BaseRepository<Notification> {
   constructor() {
-    super(NotificationModel);
+    super(Notification);
   }
 }
 
