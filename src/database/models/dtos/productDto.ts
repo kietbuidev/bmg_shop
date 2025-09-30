@@ -1,4 +1,5 @@
 import {Transform} from 'class-transformer';
+import {ProductStatus} from '../../../utils/enums';
 import {
   IsArray,
   IsBoolean,
@@ -13,8 +14,7 @@ import {
   Min,
 } from 'class-validator';
 
-const PRODUCT_STATUS_VALUES = ['NEW', 'BEST_SELLER', 'SALE_OFF', 'NORMAL'] as const;
-type ProductStatus = typeof PRODUCT_STATUS_VALUES[number];
+const PRODUCT_STATUS_VALUES = Object.values(ProductStatus) as ProductStatus[];
 
 const toNullableString = (value: unknown): string | null => {
   if (value === undefined || value === null || value === '') {
@@ -37,7 +37,7 @@ const toOptionalUpperStatus = (value: unknown): ProductStatus | undefined => {
   }
 
   const normalized = raw.trim().toUpperCase();
-  return normalized as ProductStatus;
+  return PRODUCT_STATUS_VALUES.includes(normalized as ProductStatus) ? (normalized as ProductStatus) : undefined;
 };
 
 const toBooleanWithDefault = (value: unknown, defaultValue?: boolean): boolean | undefined => {

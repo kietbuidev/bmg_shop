@@ -1,9 +1,10 @@
 // dtos/customer-contact.dto.ts
 import {IsOptional, IsString, IsEmail, MaxLength, IsInt, Min, IsIn, IsNotEmpty} from 'class-validator';
 import {Transform} from 'class-transformer';
+import {ContactStatus as ContactStatusEnum} from '../../../utils/enums';
 
-export const CONTACT_STATUS_VALUES = ['NEW', 'INPROGRESS', 'RESOLVED'] as const;
-export type ContactStatus = (typeof CONTACT_STATUS_VALUES)[number];
+export const CONTACT_STATUS_VALUES = Object.values(ContactStatusEnum) as ContactStatusEnum[];
+export type ContactStatus = ContactStatusEnum;
 
 export class CreateCustomerContactDto {
   @IsNotEmpty()

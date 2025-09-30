@@ -16,6 +16,52 @@ export class AnalyticsController {
         }),
       );
     } catch (error) {
+            console.log(error);
+
+      next(error);
+    }
+  }
+
+  async getProductAnalytics(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await this.analyticsService.getProductAnalytics();
+      res.status(200).json(
+        BuildResponse.get({
+          data,
+        }),
+      );
+    } catch (error) {
+            console.log(error);
+
+      next(error);
+    }
+  }
+
+  async getPostAnalytics(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await this.analyticsService.getPostAnalytics();
+      res.status(200).json(
+        BuildResponse.get({
+          data,
+        }),
+      );
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
+  async getContactAnalytics(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await this.analyticsService.getContactAnalytics();
+      res.status(200).json(
+        BuildResponse.get({
+          data,
+        }),
+      );
+    } catch (error) {
+            console.log(error);
+
       next(error);
     }
   }

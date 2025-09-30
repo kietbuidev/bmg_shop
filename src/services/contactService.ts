@@ -10,6 +10,7 @@ import {
 } from '../database/models/dtos/contactDto';
 import {IPaginateResult} from '../utils/types';
 import {NotFoundError} from '../utils/customError';
+import { ContactStatus } from '../utils/enums';
 
 @Service()
 export class ContactService {
@@ -28,7 +29,7 @@ export class ContactService {
   }
 
   async create(payload: CreateCustomerContactDto): Promise<Contact> {
-    payload.status = payload.status ?? 'NEW';
+    payload.status = payload.status ?? ContactStatus.NEW;
     const contact = await this.contactRepository.create(payload as unknown as Contact);
     return this.findByIdOrThrow(contact.id);
   }

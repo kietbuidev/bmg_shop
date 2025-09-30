@@ -106,6 +106,19 @@ export enum StatusMulti {
   Trash = 'trash',
 }
 
+export enum ProductStatus {
+  NEW = 'NEW',
+  BEST_SELLER = 'BEST_SELLER',
+  SALE_OFF = 'SALE_OFF',
+  NORMAL = 'NORMAL',
+}
+
+export enum ContactStatus {
+  NEW = 'NEW',
+  INPROGRESS = 'INPROGRESS',
+  RESOLVED = 'RESOLVED',
+}
+
 export enum TrackingStatus {
   Waiting = 'waiting',
   Done = 'done',
