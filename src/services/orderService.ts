@@ -54,13 +54,7 @@ const ORDER_STATUS_SET = new Set([
   'PENDING',
   'CONFIRMED',
   'PROCESSING',
-  'PACKING',
-  'SHIPPING',
-  'DELIVERED',
   'COMPLETED',
-  'CANCELLED',
-  'FAILED',
-  'REFUNDED',
 ]);
 
 @Service()

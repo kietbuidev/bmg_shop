@@ -77,13 +77,7 @@ export default OrderRouter;
  *            - PENDING
  *            - CONFIRMED
  *            - PROCESSING
- *            - PACKING
- *            - SHIPPING
- *            - DELIVERED
  *            - COMPLETED
- *            - CANCELLED
- *            - FAILED
- *            - REFUNDED
  *            - ALL
  *     responses:
  *      200:
@@ -181,14 +175,8 @@ export default OrderRouter;
  *                  - PENDING
  *                  - CONFIRMED
  *                  - PROCESSING
- *                  - PACKING
- *                  - SHIPPING
- *                  - DELIVERED
  *                  - COMPLETED
- *                  - CANCELLED
- *                  - FAILED
- *                  - REFUNDED
- *                example: SHIPPING
+ *                example: PROCESSING
  *     responses:
  *      200:
  *        description: Success

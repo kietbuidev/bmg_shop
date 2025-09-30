@@ -17,13 +17,7 @@ const ORDER_STATUS_VALUES = [
   'PENDING',
   'CONFIRMED',
   'PROCESSING',
-  'PACKING',
-  'SHIPPING',
-  'DELIVERED',
   'COMPLETED',
-  'CANCELLED',
-  'FAILED',
-  'REFUNDED',
 ] as const;
 
 const toOptionalUppercaseStatus = (value: unknown): string | undefined => {
