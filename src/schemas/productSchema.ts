@@ -46,7 +46,12 @@
  *        status:
  *          type: string
  *          nullable: true
- *          example: "published"
+ *          enum:
+ *            - NEW
+ *            - BEST_SELLER
+ *            - SALE_OFF
+ *            - NORMAL
+ *          example: "NEW"
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -155,6 +160,12 @@
  *        status:
  *          type: string
  *          nullable: true
+ *          enum:
+ *            - NEW
+ *            - BEST_SELLER
+ *            - SALE_OFF
+ *            - NORMAL
+ *          example: "NEW"
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -235,6 +246,11 @@
  *        status:
  *          type: string
  *          nullable: true
+ *          enum:
+ *            - NEW
+ *            - BEST_SELLER
+ *            - SALE_OFF
+ *            - NORMAL
  *        thumbnail:
  *          type: string
  *          nullable: true

@@ -2,6 +2,7 @@ import {Transform} from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -11,6 +12,9 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+
+const PRODUCT_STATUS_VALUES = ['NEW', 'BEST_SELLER', 'SALE_OFF', 'NORMAL'] as const;
+type ProductStatus = typeof PRODUCT_STATUS_VALUES[number];
 
 const toNullableString = (value: unknown): string | null => {
   if (value === undefined || value === null || value === '') {
@@ -24,6 +28,16 @@ const toOptionalString = (value: unknown): string | undefined => {
     return undefined;
   }
   return String(value);
+};
+
+const toOptionalUpperStatus = (value: unknown): ProductStatus | undefined => {
+  const raw = toOptionalString(value);
+  if (!raw) {
+    return undefined;
+  }
+
+  const normalized = raw.trim().toUpperCase();
+  return normalized as ProductStatus;
 };
 
 const toBooleanWithDefault = (value: unknown, defaultValue?: boolean): boolean | undefined => {
@@ -137,10 +151,9 @@ export class CreateProductDto {
   style?: string | null;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  @Transform(({value}) => toNullableString(value))
-  status?: string | null;
+  @Transform(({value}) => toOptionalUpperStatus(value))
+  @IsIn(PRODUCT_STATUS_VALUES, {message: 'status must be one of NEW, BEST_SELLER, SALE_OFF, NORMAL'})
+  status?: ProductStatus;
 
   @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))
@@ -251,10 +264,9 @@ export class UpdateProductDto {
   style?: string | null;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  @Transform(({value}) => (value === undefined ? undefined : toNullableString(value)))
-  status?: string | null;
+  @Transform(({value}) => (value === undefined ? undefined : toOptionalUpperStatus(value)))
+  @IsIn(PRODUCT_STATUS_VALUES, {message: 'status must be one of NEW, BEST_SELLER, SALE_OFF, NORMAL'})
+  status?: ProductStatus;
 
   @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))
@@ -337,17 +349,9 @@ export class ProductQueryDto {
   category_id?: string;
 
   @IsOptional()
-  @Transform(({value}) => toBooleanWithDefault(value, undefined))
-  @IsBoolean()
-  is_popular?: boolean;
-
-  @IsOptional()
-  @Transform(({value}) => {
-    const str = toOptionalString(value);
-    return str ? str.trim() : str;
-  })
-  @IsString()
-  status?: string;
+  @Transform(({value}) => toOptionalUpperStatus(value))
+  @IsIn(PRODUCT_STATUS_VALUES, {message: 'status must be one of NEW, BEST_SELLER, SALE_OFF, NORMAL'})
+  status?: ProductStatus;
 
   @IsOptional() @IsString()
   search?: string;

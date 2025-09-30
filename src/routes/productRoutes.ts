@@ -109,15 +109,15 @@ export default ProductRouter;
  *          type: string
  *          format: uuid
  *      - in: query
- *        name: is_popular
- *        schema:
- *          type: boolean
- *          example: true
- *      - in: query
  *        name: status
  *        schema:
  *          type: string
- *          example: published
+ *          enum:
+ *            - NEW
+ *            - BEST_SELLER
+ *            - SALE_OFF
+ *            - NORMAL
+ *          example: NEW
  *      - in: query
  *        name: search
  *        schema:
@@ -272,7 +272,7 @@ export default ProductRouter;
  *              - "Cotton"
  *              - "Linen"
  *            style: "Casual"
- *            status: "published"
+ *            status: "NEW"
  *            thumbnail: "mg/thumbnail-1.jpg"
  *            gallery:
  *              - "img/gallery-1.jpg"
@@ -337,7 +337,7 @@ export default ProductRouter;
  *              - "Linen"
  *              - "Viscose"
  *            style: "Summer"
- *            status: "draft"
+ *            status: "SALE_OFF"
  *            colors:
  *              - "red"
  *              - "white"
