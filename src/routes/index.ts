@@ -4,6 +4,7 @@ import {ProductRouter} from './productRoutes';
 import {PostRouter} from './postRoutes';
 import {ContactRouter} from './contactRoutes';
 import {OrderRouter} from './orderRoutes';
+import {AnalyticsRouter} from './analyticsRoutes';
 import {SystemRouter} from './systemRoutes';
 import {UserRouter} from './userRoutes';
 import Container from 'typedi';
@@ -34,6 +35,10 @@ const defaultRoutes = [
   {
     path: '/orders',
     route: Container.get(OrderRouter).getRouter(),
+  },
+  {
+    path: '/analytics',
+    route: Container.get(AnalyticsRouter).getRouter(),
   },
   {
     path: '/system',
