@@ -5,7 +5,7 @@ import {RequestCustom} from '../utils/types';
 import {Service} from 'typedi';
 import {validateDto} from '../middleware/validateDto';
 import {authenticateUserToken} from '../middleware/authenticateToken';
-import {RegisterDto, LoginDto, CheckExistDto, UpdatePasswordDto, UpdateUserDto} from '../database/models/dtos/userDto';
+import {RegisterDto, LoginDto, RefreshTokenDto, CheckExistDto, UpdatePasswordDto, UpdateUserDto} from '../database/models/dtos/userDto';
 
 @Service()
 export class UserRouter {
@@ -27,6 +27,10 @@ export class UserRouter {
 
     this.router.post('/login', validateDto(LoginDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
       await this.userController.login(req, res, next);
+    });
+
+    this.router.post('/refresh-token', validateDto(RefreshTokenDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
+      await this.userController.refreshToken(req, res, next);
     });
 
     this.router.get('/me', authenticateUserToken, async (req: RequestCustom, res: Response, next: NextFunction) => {
@@ -203,6 +207,31 @@ export class UserRouter {
  *     responses:
  *       200:
  *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginResponse'
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ */
+/**
+ * @openapi
+ * '/api/users/refresh-token':
+ *   post:
+ *     tags:
+ *       - Users
+ *     summary: Issue a new access token using a refresh token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RefreshTokenInput'
+ *     responses:
+ *       200:
+ *         description: Tokens refreshed successfully
  *         content:
  *           application/json:
  *             schema:

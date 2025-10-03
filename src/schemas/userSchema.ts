@@ -507,7 +507,7 @@
  *    RefreshTokenInput:
  *      type: object
  *      properties:
- *        refreshToken:
+ *        refresh_token:
  *          type: string
  *          default: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiOTU2YjA4NmQtZjIyZC00M2EzLTg5NjYtNzdkNDEyNTU1YzNlIiwicm9sZSI6IkFkbWluIiwiaWF0IjoxNjY4MDcyNTgwLCJleHAiOjE2NzA2NjQ1ODB9.SvjLLf7EW3xQdQcltjxa3u645YhrKVi_FczCazcl4kI
  */

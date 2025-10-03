@@ -9,6 +9,7 @@ import {
   CheckExistDto,
   LoginDto,
   RegisterDto,
+  RefreshTokenDto,
   UpdatePasswordDto,
   UpdateUserDto,
 } from '../database/models/dtos/userDto';
@@ -91,6 +92,17 @@ export class UserController {
       res.status(200).json(BuildResponse.get({data: user}));
     } catch (error) {
       console.log(error);
+      next(error);
+    }
+  }
+
+  async refreshToken(req: RequestCustom, res: Response, next: NextFunction) {
+    try {
+      const body = req.body as RefreshTokenDto;
+      const tokens = await this.userService.refreshToken(body.refresh_token);
+
+      res.status(200).json(BuildResponse.get({data: tokens}));
+    } catch (error) {
       next(error);
     }
   }

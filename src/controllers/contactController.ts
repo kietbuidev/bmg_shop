@@ -37,6 +37,7 @@ export class ContactController {
         }),
       );
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }

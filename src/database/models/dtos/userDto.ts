@@ -64,6 +64,12 @@ export class LoginDto {
   fcm_token?: string | null;
 }
 
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  refresh_token: string;
+}
+
 export class loginSocialDto {
   @IsString()
   @IsNotEmpty()

@@ -305,29 +305,35 @@ export class UserService {
     return this.sanitizeUser(user);
   }
 
-  // async refreshToken(refreshToken: string): Promise<AuthTokens> {
-  //   if (!refreshToken) {
-  //     throw new CustomError(HTTPCode.BAD_REQUEST, 'REFRESH_TOKEN_REQUIRED');
-  //   }
+  async refreshToken(refreshToken: string): Promise<AuthTokens> {
+    if (!refreshToken) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'REFRESH_TOKEN_REQUIRED');
+    }
 
-  //   try {
-  //     jwt.verify(refreshToken, configJwt.secret);
-  //   } catch (error) {
-  //     throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
-  //   }
+    let decoded: {userId?: string | number} | null = null;
+    try {
+      decoded = jwt.verify(refreshToken, configJwt.secret) as {userId?: string | number};
+    } catch (error) {
+      throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
+    }
 
-  //   const user = await this.userRepository.getByOne({
-  //     where: {
-  //       refresh_token: refreshToken,
-  //     },
-  //   });
+    if (!decoded?.userId) {
+      throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
+    }
 
-  //   if (!user) {
-  //     throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
-  //   }
+    const user = await this.userRepository.getByOne({
+      where: {
+        id: decoded.userId,
+        refresh_token: refreshToken,
+      },
+    });
 
-  //   return this.issueTokens(user);
-  // }
+    if (!user || user.status === StatusActive.Off) {
+      throw new CustomError(HTTPCode.UNAUTHORIZE, 'INVALID_REFRESH_TOKEN');
+    }
+
+    return this.issueTokens(user);
+  }
 
   private computeNotificationReadState(notification: Notification, lastCheck: Date | null): boolean {
     if (!lastCheck) {
