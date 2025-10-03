@@ -5,7 +5,7 @@ import {Service} from 'typedi';
 import CounterController from '../controllers/counterController';
 import SystemController from '../controllers/systemController';
 import {validateDto} from '../middleware/validateDto';
-import {CreateCounterDto} from '../database/models/dtos/counterDto';
+import {CreateCounterDto, GetCounterChartQueryDto} from '../database/models/dtos/counterDto';
 import {UploadImageDto} from '../database/models/dtos/systemDto';
 import {google, drive_v3} from 'googleapis';
 
@@ -28,6 +28,14 @@ export class SystemRouter {
       validateDto(CreateCounterDto),
       async (req: Request, res: Response, next: NextFunction) => {
         await this.counterController.create(req, res, next);
+      },
+    );
+
+    this.router.get(
+      '/counter/chart',
+      validateDto(GetCounterChartQueryDto),
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.counterController.chart(req, res, next);
       },
     );
 
@@ -77,6 +85,36 @@ export default SystemRouter;
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/CounterDetailResponse'
+ * '/api/system/counter/chart':
+ *  get:
+ *     tags:
+ *     - System
+ *     summary: Visitor counter chart
+ *     description: Retrieve aggregated visitor statistics for chart visualizations.
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: query
+ *        name: start_date
+ *        schema:
+ *          type: string
+ *          format: date
+ *        required: false
+ *        description: ISO date (YYYY-MM-DD) marking the beginning of the range (inclusive).
+ *      - in: query
+ *        name: end_date
+ *        schema:
+ *          type: string
+ *          format: date
+ *        required: false
+ *        description: ISO date (YYYY-MM-DD) marking the end of the range (inclusive).
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/CounterChartResponse'
  */
 /**
  * @openapi

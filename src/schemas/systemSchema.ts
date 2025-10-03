@@ -75,6 +75,99 @@
  * @openapi
  * components:
  *  schemas:
+ *    CounterChartDailyEntry:
+ *      type: object
+ *      properties:
+ *        date:
+ *          type: string
+ *          format: date
+ *          example: "2024-02-18"
+ *        total:
+ *          type: integer
+ *          example: 124
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    CounterChartDistributionEntry:
+ *      type: object
+ *      properties:
+ *        value:
+ *          type: string
+ *          example: "iOS"
+ *        total:
+ *          type: integer
+ *          example: 87
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    CounterChartSummary:
+ *      type: object
+ *      properties:
+ *        total_visits:
+ *          type: integer
+ *          example: 430
+ *        unique_ips:
+ *          type: integer
+ *          example: 295
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    CounterChartResponse:
+ *      type: object
+ *      properties:
+ *        code:
+ *          type: integer
+ *          example: 200
+ *        message:
+ *          type: string
+ *          example: "data has been retrieved!"
+ *        data:
+ *          type: object
+ *          properties:
+ *            filters:
+ *              type: object
+ *              properties:
+ *                start_date:
+ *                  type: string
+ *                  nullable: true
+ *                  example: "2024-02-01T00:00:00.000Z"
+ *                end_date:
+ *                  type: string
+ *                  nullable: true
+ *                  example: "2024-02-18T23:59:59.999Z"
+ *            summary:
+ *              $ref: '#/components/schemas/CounterChartSummary'
+ *            daily_visits:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/CounterChartDailyEntry'
+ *            os_distribution:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/CounterChartDistributionEntry'
+ *            browser_distribution:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/CounterChartDistributionEntry'
+ *            device_distribution:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/CounterChartDistributionEntry'
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
  *    UploadImageResponse:
  *      type: object
  *      properties:

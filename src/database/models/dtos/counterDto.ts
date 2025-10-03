@@ -1,4 +1,4 @@
-import {IsIP, IsOptional, IsString, MaxLength} from 'class-validator';
+import {IsDateString, IsIP, IsOptional, IsString, MaxLength} from 'class-validator';
 
 export class CreateCounterDto {
   @IsOptional()
@@ -20,4 +20,14 @@ export class CreateCounterDto {
   @IsString()
   @MaxLength(255)
   device?: string | null;
+}
+
+export class GetCounterChartQueryDto {
+  @IsOptional()
+  @IsDateString()
+  start_date?: string;
+
+  @IsOptional()
+  @IsDateString()
+  end_date?: string;
 }

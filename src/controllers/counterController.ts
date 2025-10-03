@@ -1,8 +1,8 @@
 import type {NextFunction, Request, Response} from 'express';
 import {Service} from 'typedi';
 import BuildResponse from '../utils/buildResponse';
-import CounterService from '../services/counterService';
-import {CreateCounterDto} from '../database/models/dtos/counterDto';
+import CounterService, {type CounterChartResponse} from '../services/counterService';
+import {CreateCounterDto, GetCounterChartQueryDto} from '../database/models/dtos/counterDto';
 
 @Service()
 export class CounterController {
@@ -21,6 +21,21 @@ export class CounterController {
       res.status(201).json(
         BuildResponse.created({
           data: counter,
+        }),
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async chart(req: Request, res: Response, next: NextFunction) {
+    try {
+      const payload = ((req as any).validated ?? req.query) as GetCounterChartQueryDto;
+      const chart: CounterChartResponse = await this.counterService.getChartData(payload);
+
+      res.status(200).json(
+        BuildResponse.get({
+          data: chart,
         }),
       );
     } catch (error) {
