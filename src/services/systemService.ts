@@ -108,7 +108,8 @@ export class SystemService {
 
       const detail = await this.drive.files.get({
         fileId,
-        fields: 'id, name, mimeType, size, webViewLink, webContentLink',
+        fields: 'id, name, mimeType, size, webViewLink, webContentLink, imageMediaMetadata/width, imageMediaMetadata/height',
+        supportsAllDrives: true,
       });
 
       return {
@@ -116,6 +117,8 @@ export class SystemService {
         name: detail.data.name ?? fileName,
         mimeType: detail.data.mimeType ?? contentType,
         size: detail.data.size ? Number(detail.data.size) : buffer.length,
+        width: detail.data.imageMediaMetadata?.width,
+        height: detail.data.imageMediaMetadata?.height,
         webViewLink: detail.data.webViewLink,
         downloadLink: detail.data.webContentLink,
       };
