@@ -27,9 +27,9 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 RUN if [ -f package-lock.json ]; then \
-      npm ci --omit=dev; \
+      npm ci --omit=dev --ignore-scripts; \
     else \
-      npm install --omit=dev; \
+      npm install --omit=dev --ignore-scripts; \
     fi
 
 # ---------- runner ----------
