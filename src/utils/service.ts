@@ -1,7 +1,7 @@
 import {random} from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment-timezone';
-import {ServiceType, ProviderCode, ExpiredBookingHotelClient, ExpiredBookingFlightClient, ExpiredBookingHotelAdmin, ExpiredBookingFlightAdmin, HTTPCode} from './enums';
+import {ExpiredBookingHotelClient, ExpiredBookingFlightClient, ExpiredBookingHotelAdmin, ExpiredBookingFlightAdmin, HTTPCode} from './enums';
 import bcrypt from 'bcrypt';
 // import Constants from '../config/constantConfig';
 import axios from 'axios';
@@ -20,20 +20,6 @@ const secretKey = 'vOVH6sdmpNWj&U*(%$H^dxs0(Llq#$G^';
 //   } else return image;
 // };
 
-export const createOrderCode = async function (type = ServiceType.HOTEL, vendor: string = ProviderCode.TRAVELPORT) {
-  let orderType = 2;
-  if (type === ServiceType.HOTEL) orderType = 1;
-  let orderCode = '';
-  let currentDate = moment().format('DDMMYYYY'); // 'DDMMYYYYHHmmss'
-
-  let randomCode = random(123456, 456789);
-
-  orderCode = `${currentDate}-HY-F-${vendor}-${randomCode}`;
-  if (type === ServiceType.HOTEL) {
-    orderCode = `${currentDate}-HY-H-${vendor}-${randomCode}`;
-  }
-  return orderCode;
-};
 
 export const getCardTypeByNumber = function (cardNumber: string) {
   if (/^4\d{6,}$/.test(cardNumber)) {
@@ -143,19 +129,6 @@ export function formatDateTime(date = new Date(), tmz = 420) {
 export function timeToNumber(str) {
   let arrs = str.split(':');
   return Number(arrs[0]) * 60 + Number(arrs[1]);
-}
-
-export function expiredBookingHotelAdmin(timestamp: any, providerCode = '') {
-  let duration = 0;
-  let dateNow = moment(new Date());
-  let expiredBooking = moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
-  let expiredBookingSeconds: any = moment.duration(dateNow.diff(expiredBooking)).asSeconds();
-  if (parseInt(expiredBookingSeconds) > 0) {
-    // let expireBookingHotel = providerCode === ProviderCode.TRAVELPORT ? Constants.EXPIRED_BOOKING_HOTEL.TVP : Constants.EXPIRED_BOOKING_HOTEL.AMADEUS;
-    let expireBookingHotel = providerCode === ProviderCode.TRAVELPORT ? ExpiredBookingHotelAdmin.TVP : ExpiredBookingHotelAdmin.AMADEUS;
-    duration = expireBookingHotel - expiredBookingSeconds;
-  }
-  return duration;
 }
 
 export function expiredBookingHotelClient(timestamp: any) {

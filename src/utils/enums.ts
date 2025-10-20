@@ -414,3 +414,16 @@ export enum ShareType {
   HOTEL = 'Hotel',
   FLIGHT = 'FLIGHT',
 }
+
+export enum OrderStatus {
+  DRAFT = 'draft',
+  PROCESSING = 'processing',
+  // CONFIRMED = 'confirmed',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  EXPIRED = 'expired',
+  FAILED = 'failed',
+  PENDING = 'pending',
+  ALL = 'all',
+  DELETED = 'deleted',
+}
