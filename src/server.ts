@@ -34,6 +34,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ---------- Health check (KHÔNG phụ thuộc DB) ----------
+app.get('/', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+    env: NODE_ENV,
+  });
+});
 app.get('/healthz', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
