@@ -88,7 +88,7 @@ const startServer = async () => {
   try {
     await connectDatabase();
 
-    httpServer.listen(PORT, () => {
+    httpServer.listen(PORT, '0.0.0.0', () => {
       console.log(`========== ENV: ${PORT} ============`);
       console.log(`🚀 App listening on the port ${PORT}`);
       console.log(`=================================`);
