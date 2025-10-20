@@ -6,10 +6,9 @@
   "author": "Mirko Martinovic <mirko.martinovic@quantox.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "postinstall": "npm run build",
+    "build": "tsc && npm run",
     "dev": "tsnd --respawn src/server.ts --watch",
+    "start": "node dist/server.js",
     "test": "jest --runInBand",
     "lint:fix": "npm run lint -- --quiet --fix",
     "lint": "eslint -c .eslintrc.js \"./src/**/*.+(js|ts)\"",

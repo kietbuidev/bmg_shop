@@ -1,11 +1,18 @@
-ARG NODE_BASE=public.ecr.aws/docker/library/node:18-alpine
+# syntax=docker/dockerfile:1
+ARG NODE_VERSION=20
 
-# ---------- deps ----------
-FROM ${NODE_BASE} AS deps
+# ---------- deps (cài deps cho build) ----------
+FROM node:${NODE_VERSION}-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ tzdata
 COPY package.json package-lock.json* ./
-RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
+
+# nếu có lock -> npm ci ; nếu không -> npm install
+RUN if [ -f package-lock.json ]; then \
+      npm ci; \
+    else \
+      npm install; \
+    fi
 
 # ---------- build (ts -> dist) ----------
 FROM deps AS build
@@ -14,34 +21,38 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-# ---------- prod-deps (runtime deps) ----------
-FROM ${NODE_BASE} AS prod-deps
+# ---------- prod-deps (chỉ deps runtime) ----------
+FROM node:${NODE_VERSION}-alpine AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN if [ -f package-lock.json ]; then npm ci --omit=dev --ignore-scripts; else npm install --omit=dev --ignore-scripts; fi
+
+RUN if [ -f package-lock.json ]; then \
+      npm ci --omit=dev; \
+    else \
+      npm install --omit=dev; \
+    fi
 
 # ---------- runner ----------
-FROM ${NODE_BASE} AS runner
+FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
+
 RUN apk add --no-cache tzdata
 
 ENV NODE_ENV=production
-ENV TZ=Asia/Ho_Chi_Minh
-ENV PORT=8000
-ENV HEALTH_PATH=/healthz
+ENV PORT=3000
 
-# copy runtime files
+# copy deps runtime + build output
 COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+COPY --from=build     /app/dist         ./dist
 COPY package.json ./
 
-RUN mkdir -p /app/logs /app/src/logs && chown -R node:node /app
-USER node
+# tạo thư mục logs riêng (ngoài dist) và gán quyền cho user node
+RUN mkdir -p /app/logs && chown -R node:node /app
 
-EXPOSE 8000
+USER node
+EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
-  CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||8000)+(process.env.HEALTH_PATH||'/healthz'),r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
+  CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||3000),r=>{if(r.statusCode<500)process.exit(0);process.exit(1)}).on('error',()=>process.exit(1))"
 
-# NOTE: nếu dự án bạn là NestJS entry thường là dist/main.js
 CMD ["node", "dist/server.js"]
