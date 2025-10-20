@@ -45,6 +45,7 @@ RUN apk add --no-cache tzdata
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./
+COPY docker/env/.env.develop ./.env
 
 # Prepare writable directories for logs
 RUN mkdir -p /app/logs && chown -R node:node /app
