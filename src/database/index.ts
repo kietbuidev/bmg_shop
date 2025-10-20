@@ -42,13 +42,28 @@ const sequelize = new Sequelize({
   },
 });
 
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const connectDatabase = async (): Promise<void> => {
-  try {
-    await sequelize.authenticate();
-    logger.info('Database connection established');
-  } catch (error) {
-    logger.error('Unable to connect to the database', error);
-    throw error;
+  const maxRetries = Number(process.env.DB_CONNECT_RETRIES ?? 5);
+  const retryDelayMs = Number(process.env.DB_CONNECT_RETRY_DELAY_MS ?? 5000);
+
+  for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
+    try {
+      await sequelize.authenticate();
+      logger.info('Database connection established');
+      return;
+    } catch (error) {
+      const isLastAttempt = attempt === maxRetries;
+      logger.error(`Unable to connect to the database (attempt ${attempt}/${maxRetries})`, error as Error);
+
+      if (isLastAttempt) {
+        throw error;
+      }
+
+      logger.warn(`Retrying database connection in ${retryDelayMs}ms...`);
+      await sleep(retryDelayMs);
+    }
   }
 };
 
