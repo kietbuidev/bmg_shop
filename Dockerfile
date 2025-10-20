@@ -58,7 +58,7 @@ COPY --chown=node:node package.json ./
 
 # KHÔNG copy .env vào image. Truyền qua -e hoặc --env-file khi run.
 # Nếu cần thư mục logs
-RUN mkdir -p /app/logs && chown -R node:node /app/logs
+RUN mkdir -p /app/logs && chown -R node:node /app
 
 USER node
 
