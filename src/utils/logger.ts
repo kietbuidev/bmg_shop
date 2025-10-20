@@ -29,12 +29,16 @@ const candidateDirs: string[] = [];
 if (process.env.LOG_DIR) candidateDirs.push(resolve(process.env.LOG_DIR));
 
 // 1) Nếu chạy trong container: ưu tiên /app/logs trước tiên ✅
-if (isRunningInContainer) candidateDirs.push('/app/logs');
-
-// 2) Khi chạy local: src/logs, rồi dist/logs
 const srcLogsDir = resolve(process.cwd(), 'src/logs');
 const compiledLogsDir = resolve(__dirname, '../logs');
-candidateDirs.push(srcLogsDir);
+
+if (isRunningInContainer) {
+  candidateDirs.push('/app/logs');
+} else {
+  candidateDirs.push(srcLogsDir);
+}
+
+// dist/logs hữu ích khi chạy bằng build output
 if (!candidateDirs.includes(compiledLogsDir)) candidateDirs.push(compiledLogsDir);
 
 // 3) Fallback cuối cùng luôn ghi được (Heroku/Render…)
