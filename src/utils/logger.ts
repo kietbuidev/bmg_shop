@@ -3,15 +3,65 @@ import {join, resolve} from 'path';
 import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 
-// logs dir
-const logDir: string = resolve(__dirname, process.env.LOG_DIR || '../logs');
+const logFormat = winston.format.printf(({timestamp, level, message}) => `${timestamp} ${level}: ${message}`);
 
-if (!existsSync(logDir)) {
-  mkdirSync(logDir, {recursive: true});
+const ensureDir = (dir: string): boolean => {
+  try {
+    if (!existsSync(dir)) {
+      mkdirSync(dir, {recursive: true});
+    }
+    return true;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn(`Logger: unable to access ${dir}. Skipping.`, error);
+    return false;
+  }
+};
+
+const candidateDirs: string[] = [];
+
+if (process.env.LOG_DIR) {
+  candidateDirs.push(resolve(process.env.LOG_DIR));
 }
 
-// Define log format
-const logFormat = winston.format.printf(({timestamp, level, message}) => `${timestamp} ${level}: ${message}`);
+candidateDirs.push(resolve(__dirname, '../logs'));
+candidateDirs.push('/tmp/bmg-logs');
+
+const logDir = candidateDirs.find((dir) => ensureDir(dir));
+
+const buildFileTransport = (level: 'debug' | 'error'): winstonDaily | null => {
+  if (!logDir) {
+    return null;
+  }
+
+  return new winstonDaily({
+    level,
+    datePattern: 'YYYY-MM-DD',
+    dirname: join(logDir, level),
+    filename: '%DATE%.log',
+    maxFiles: 30,
+    handleExceptions: level === 'error',
+    json: false,
+    zippedArchive: true,
+  });
+};
+
+const transports: winston.transport[] = [
+  new winston.transports.Console({
+    format: winston.format.combine(winston.format.colorize(), winston.format.splat(), logFormat),
+  }),
+];
+
+const debugTransport = buildFileTransport('debug');
+const errorTransport = buildFileTransport('error');
+
+if (debugTransport) {
+  transports.push(debugTransport);
+}
+
+if (errorTransport) {
+  transports.push(errorTransport);
+}
 
 /*
  * Log Level
@@ -25,37 +75,7 @@ const logger = winston.createLogger({
     winston.format.splat(),
     logFormat,
   ),
-  transports: [
-    // debug log setting
-    new winstonDaily({
-      level: 'debug',
-      datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/debug', // log file /logs/debug/*.log in save
-      filename: `%DATE%.log`,
-      maxFiles: 30, // 30 Days saved
-      json: false,
-      zippedArchive: true,
-    }),
-    // error log setting
-    new winstonDaily({
-      level: 'error',
-      datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/error', // log file /logs/error/*.log in save
-      filename: `%DATE%.log`,
-      maxFiles: 30, // 30 Days saved
-      handleExceptions: true,
-      json: false,
-      zippedArchive: true,
-    }),
-    // console log
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.splat(),
-        logFormat
-      )
-    })
-  ],
+  transports,
 });
 
 // logger.add(
