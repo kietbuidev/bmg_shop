@@ -16,7 +16,7 @@ import {connectDatabase} from './database';
 require('dotenv').config();
 
 const VERSION = process.env.VERSION || '';
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 8000;
 const NODE_ENV = process.env.NODE_ENV || 'localhost';
 
 const app = express();
@@ -24,7 +24,7 @@ const logFormat = process.env.LOG_FORMAT || 'short';
 
 // Add a list of allowed origins.
 // If you have more origins you would like to add, you can add them to the array below.
-const allowedOrigins = ['http://localhost:3000', 'https://bmgshop-production.up.railway.app', 'http://192.168.0.115:3000', 'https://bmg-admin-shop.vercel.app', '*'];
+const allowedOrigins = ['http://localhost:8000', 'https://bmgshop-production.up.railway.app', 'http://192.168.0.115:8000', 'https://bmg-admin-shop.vercel.app', '*'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins,
