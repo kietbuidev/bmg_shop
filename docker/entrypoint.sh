@@ -23,4 +23,5 @@ else
   load_env_file "$FALLBACK_ENV"
 fi
 
+# Quan trọng: chuyển quyền điều khiển cho lệnh CMD
 exec "$@"

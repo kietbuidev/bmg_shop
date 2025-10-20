@@ -1,115 +1,100 @@
+// service.ts
 import 'reflect-metadata';
+import express, { Request, Response, NextFunction } from 'express';
+import http from 'http';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
-import express, {Request, Response, NextFunction} from 'express';
-import http from 'http';
+import morgan from 'morgan';
+
 import swaggerDocs from './utils/swagger';
 import routes from './routes';
 import errorMiddleware from './middleware/error';
-// import {RedisClient} from './config/redis';
-import morgan from 'morgan';
-import {logger, stream} from './utils/logger';
-import path from 'path';
-import {NotFoundError} from './utils/customError';
-import {connectDatabase} from './database';
+import { NotFoundError } from './utils/customError';
+import { logger, stream } from './utils/logger';
+import { connectDatabase } from './database';
 
 require('dotenv').config();
 
 const VERSION = process.env.VERSION || '';
-const PORT = Number(process.env.PORT) || 3000;
-const NODE_ENV = process.env.NODE_ENV || 'localhost';
+const PORT = Number(process.env.PORT) || 8000; // Koyeb sẽ set PORT, 8000 là fallback an toàn
+const NODE_ENV = process.env.NODE_ENV || 'production';
+const LOG_FORMAT = process.env.LOG_FORMAT || 'short';
 
 const app = express();
-const logFormat = process.env.LOG_FORMAT || 'short';
+const server = http.createServer(app);
 
-// Add a list of allowed origins.
-// If you have more origins you would like to add, you can add them to the array below.
-const allowedOrigins = ['http://localhost:3000', 'https://bmgshop-production.up.railway.app', 'http://192.168.0.115:3000', 'https://bmg-admin-shop.vercel.app', '*'];
-
-const options: cors.CorsOptions = {
-  origin: allowedOrigins,
-};
-
-// Then pass these options to cors:
-app.use(cors(options));
-app.use(helmet());
-app.use(morgan(logFormat, {stream}));
-// app.use(express.json());
-
-// Upload limit Image
-app.use(express.json({limit: '10mb'}));
-app.use(express.urlencoded({extended: true, limit: '10mb'}));
-
-// GET IP
+// ---------- Middlewares cơ bản ----------
 app.set('trust proxy', true);
-
-// use the static file
+app.use(cors({ origin: true, credentials: true })); // allow all; sửa theo nhu cầu thực tế
+app.use(helmet());
+app.use(morgan(LOG_FORMAT, { stream }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.json());
-
-const httpServer = http.createServer(app);
-
+// ---------- Health check (KHÔNG phụ thuộc DB) ----------
 app.get('/healthz', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
     uptime: process.uptime(),
     timestamp: Date.now(),
+    env: NODE_ENV,
   });
 });
 
-// Connect to Redis
-// const redisInstance = new RedisClient();
-// redisInstance.connect().catch((error) => {
-//   logger.error(`Redis connection error: ${error}`);
-// });
-
-app.get(`${VERSION}/api/`, (req: Request, res: Response) => {
-  res.status(200).send('Congratulations! API is working!');
-});
-
-app.get(`/api/`, (req: Request, res: Response) => {
-  res.status(200).send('Congratulations! API is working!');
-});
-
-app.use('/robots.txt', (req, res, next) => {
-  const error = new NotFoundError('Access to robots.txt is forbidden');
-  next(error);
-});
+// ---------- Routes ----------
+app.get(`${VERSION}/api/`, (_req, res) => res.status(200).send('Congratulations! API is working!'));
+app.get(`/api/`, (_req, res) => res.status(200).send('Congratulations! API is working!'));
 
 app.use(`${VERSION}/api`, routes);
 app.use(`/api`, routes);
 
-
+// ---------- Swagger ----------
 swaggerDocs(app);
 
-//Error handler must be last app.use!!
-app.use((req: Request, res: Response, next: NextFunction) => {
+// ---------- 404 + Error handler ----------
+app.use((req: Request, _res: Response, next: NextFunction) => {
   const message = `Route ${req.originalUrl} not found`;
   logger.warn(message);
   next(new NotFoundError(message));
 });
-
 app.use(errorMiddleware);
 
-const startServer = async () => {
-  try {
-    await connectDatabase();
+// ---------- Start-up: mở cổng trước, connect DB sau ----------
+let started = false;
+const startServer = () => {
+  if (started) return;
+  started = true;
 
-    httpServer.listen(PORT, '0.0.0.0', () => {
-      console.log(`========== ENV: ${PORT} ============`);
-      console.log(`🚀 App listening on the port ${PORT}`);
-      console.log(`=================================`);
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`=================================`);
+    console.log(` ENV: ${NODE_ENV}`);
+    console.log(` 🚀 App listening on PORT ${PORT}`);
+    console.log(`=================================`);
+    logger.info(`🚀 App listening on PORT ${PORT}`);
 
-      logger.info(`=================================`);
-      logger.info(`======= ENV: ${NODE_ENV} =======`);
-      logger.info(`🚀 App listening on the port ${PORT}`);
-      logger.info(`=================================`);
-    });
-  } catch (error) {
-    logger.error('Failed to connect to the database. Shutting down...', error as Error);
-    process.exit(1);
-  }
+    // kết nối DB nền (không chặn health check)
+    connectDatabase()
+      .then(() => logger.info('✅ Database connection established'))
+      .catch((err) => {
+        logger.error('❌ Failed to connect DB', err as Error);
+        // tuỳ nhu cầu: có thể retry/backoff; không nên process.exit(1) ngay để qua được health check
+      });
+  });
 };
 
 startServer();
+
+// ---------- Graceful shutdown ----------
+const shutdown = (signal: string) => {
+  logger.info(`Received ${signal}. Closing server...`);
+  server.close(() => {
+    logger.info('HTTP server closed.');
+    process.exit(0);
+  });
+};
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+export default app;
