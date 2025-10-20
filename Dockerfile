@@ -59,5 +59,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||3000),r=>{if(r.statusCode<500)process.exit(0);process.exit(1)}).on('error',()=>process.exit(1))"
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+# ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "dist/server.js"]
