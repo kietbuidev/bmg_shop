@@ -11,47 +11,6 @@ export enum MethodType {
   DELETE = 'DELETE',
 }
 
-export enum CacheKeys {
-  // Global
-  Option = 'heyo_option',
-  Language = 'heyo_language',
-  Currency = 'heyo_curency',
-  Country = 'heyo_country',
-  CurrencyExchange = 'heyo_curency_exchange',
-  Crypto = 'heyo_crypto',
-  Term = 'heyo_term',
-  Location = 'heyo_location',
-  Area = 'heyo_area',
-  City = 'heyo_city',
-  Airport = 'heyo_airport',
-  Hotel = 'heyo_hotel',
-  HotelAvailability = 'heyo_hotel_availability',
-  Room = 'heyo_room',
-  RoomAvailability = 'heyo_room_availability',
-  Flight = 'heyo_flight',
-  Page = 'heyo_page',
-  Post = 'heyo_post',
-  PostCategory = 'heyo_post_category',
-  Coupon = 'heyo_coupon',
-  Aircraft = 'heyo_aircraft',
-  Airline = 'heyo_airline',
-  Airplane = 'heyo_airplane',
-  Faq = 'heyo_faq',
-  CoinRewards = 'heyo_coin_rewards',
-  Tier = 'heyo_tier',
-  // Session
-  Order = 'session_order',
-  FlightSession = 'session_flight',
-  BaggageSession = 'session_baggage',
-  MealSession = 'session_meal',
-  SeatSession = 'session_seat',
-  OptionService = 'option_service',
-}
-
-export enum Tenant {
-  HYT = 'HYT',
-  FMT = 'FMT',
-}
 
 export enum RoleType {
   Admin = 1,
@@ -148,64 +107,14 @@ export enum WhyChooseHeyotrip {
   Off = 'off',
 }
 
-export enum ProviderCode {
-  HEYO = 'HEYO',
-  // Service
-  TRAVELPORT = '1G',
-  AMADEUS = '1A',
-  HOPHILONG = 'HPL',
-  // Payment
-  FMCPAY = 'FMCPay',
-  APPOTAPAY = 'AppotaPay',
-  STRIPE = 'Stripe',
-}
 
 export enum TimeOut {
   EXPIRED_TIME_SECONDS = 890, // sescond == 14:50 minute
 }
 
-export enum ServiceType {
-  HOTEL = 'hotel',
-  HOTEL_AVAILIBILITY = 'hotel availibility',
-  HOTEL_AVAILIBILITY_OPTION = 'hotel availibility option',
-  FLIGHT = 'flight',
-  POST = 'post',
-  ACCOUNT = 'account'
-}
-
-export enum SourceType {
-  CRONJOB_HOTEL_AVAILIBILITY = 'cronjob_hotel availibility',
-  SEARCH_HOTEL_AVAILIBILITY = 'search_hotel availibility',
-}
-
-export enum OrderStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-}
-
-export enum PaymentType {
-  PREPAYMENT = 'prepayment',
-  DEPOSIT = 'deposit',
-  GUARANTEE = 'guarantee',
-  NOGUARANTEE = 'noguarantee',
-}
-
 export enum PaymentTypeCode {
   GUARANTEE = 1,
   PREPAYMENT = 2, //or Deposit
-}
-
-export enum PaymentStatus {
-  UNPAID = 'unpaid',
-  PAY_AT_PROPERTY = 'pay_at_property',
-  PAID = 'paid',
-  FAILED = 'failed',
-  EXPIRED = 'expired',
-  TRANSFERRED = 'transferred',
-  REFUNDING = 'refunding',
-  REFUNDED = 'refunded',
 }
 
 export enum PaymentMethod {
@@ -218,14 +127,6 @@ export enum PaymentMethod {
 export enum StatusSendEmail {
   SUCESSS = 1,
   FAILURE = 0,
-}
-
-export enum MailCcBooking {
-  HOTEL = 'Hotel@Heyotrip.com',
-  FLIGHT = 'Flight@Heyotrip.com',
-  SUPPORT = 'support@heyotrip.com',
-  SERVICE = 'customerservice@heyotrip.com',
-  DEVELOP = 'developer@heyotrip.com'
 }
 
 export enum CustomerStatus {
@@ -246,73 +147,11 @@ export enum StatusActived {
   STATUS_ACTIVED = 2,
 }
 
-export enum DefaultStatus {
-  ACTIVE = 2,
-  BLOCK = 1,
-  DELETE = 0,
-}
-
-export enum CouponTypeCode {
-  SpecialCampaign = 1,
-  PromotionCode = 2,
-}
-
 export enum CouponType {
   Special = 'special',
   Promotion = 'promotion',
   Unique = 'unique',
   Partner = 'partner',
-}
-
-export enum TicketStatus {
-  NotIssued = 'NotIssued',
-  Ticketing = 'Ticketing',
-}
-
-export enum HotelTravelPort {
-  Hot = 'http://www.travelport.com/schema/hotel_v50_0',
-  Com = 'http://www.travelport.com/schema/common_v50_0',
-  Univ = 'http://www.travelport.com/schema/universal_v50_0',
-  Hotel = 'http://www.travelport.com/schema/hotel_v50_0',
-  Xmlns = 'http://www.travelport.com/schema/hotel_v50_0',
-  Gds = 'http://www.travelport.com/schema/gdsQueue_v50_0',
-  OriginApplication = 'UAPI',
-  SoapEnv = 'http://schemas.xmlsoap.org/soap/envelope/',
-  ProviderCode = '1G',
-  AvailableHotelsOnly = 'true',
-  ReturnAmenities = 'true',
-  LocationType = 'Airport',
-  DistanceValue = 1,
-  DistanceUnits = 'KM',
-  RateRuleDetail = 'Complete',
-  PreferredCurrency = 'VND',
-  AgeChild = 7,
-  TravelerType = 'ADT',
-}
-
-export enum FlightTravelPort {
-  XmlnsSoapenv = 'http://schemas.xmlsoap.org/soap/envelope/',
-  LowFareSearchReqXmlns = 'http://www.travelport.com/schema/air_v42_0',
-  Xmlns = 'http://www.travelport.com/schema/common_v42_0',
-  Univ = 'http://www.travelport.com/schema/universal_v42_0',
-  Air = 'http://www.travelport.com/schema/air_v42_0',
-  Com = 'http://www.travelport.com/schema/common_v42_0',
-  Gds = 'http://www.travelport.com/schema/gdsQueue_v42_0',
-  OriginApplication = 'UAPI',
-  Adult = 'ADT',
-  Children = 'CNN',
-  Infant = 'INF',
-  QueueSelector = 61,
-  TraceId = 'trace',
-}
-
-export enum FlightHoPhiLong {
-  language = 'vi',
-}
-
-export enum HotelTravelPortReservationQueue {
-  TraceId = 'trace',
-  QueueSelector = 67,
 }
 
 export enum HotelTravelPortMedia {
@@ -331,15 +170,6 @@ export enum SubdirectoryTravelPort {
   FlightService = 'AirService',
 }
 
-// export enum SubdirectoryAmadeus {
-//   ActionDetail = 'OTA_HotelDescriptiveInfoRQ_07.1_1A2007A',
-//   ActionSearch = 'Hotel_MultiSingleAvailability_10.0',
-//   ActionEnhancedPricing = 'Hotel_EnhancedPricing_2.0',
-//   ActionPNR = 'PNRADD_21_1_1A',
-//   ActionSell = 'HBKRCQ_20_1_1A',
-//   SignOut = 'VLSSOQ_04_1_1A',
-// }
-
 export enum Method {
   POST = 'POST',
   GET = 'GET',
@@ -347,99 +177,7 @@ export enum Method {
   DELETE = 'DELETE',
 }
 
-export enum HotelAmadeus {
-  XmlnsSoapenv = 'http://schemas.xmlsoap.org/soap/envelope/',
-  XmlnsSec = 'http://xml.amadeus.com/2010/06/Security_v1',
-  XmlnsTyp = 'http://xml.amadeus.com/2010/06/Types_v1',
-  XmlnsApp = 'http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3',
-  XmlnsSes = 'http://xml.amadeus.com/2010/06/Session_v3',
-  XmlnsLink = 'http://wsdl.amadeus.com/2010/06/ws/Link_v1',
-  XmlnsVls = 'http://xml.amadeus.com/VLSSOQ_04_1',
-  XmlnsIat = 'http://www.iata.org/IATA/2007/00/IATA2010.1',
-  XmlnsAdd = 'http://www.w3.org/2005/08/addressing',
-  XmlnsOas = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd',
-  XmlnsOas1 = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd',
-  Oas1Id = 'UsernameToken-1',
-  EncodingType = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary',
-  OasPasswordType = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest',
-  AMA_SecurityHostedUserXmlns = 'http://xml.amadeus.com/2010/06/Security_v1',
-  XmlnsAwsse = 'http://xml.amadeus.com/2010/06/Session_v3',
-  XmlnsHotelSell = 'http://xml.amadeus.com/HBKRCQ_20_1_1A',
-}
 
-export enum SearchCacheLevelAmadeus {
-  VeryRecent = 'VeryRecent',
-  LessRecent = 'LessRecent',
-  Live = 'Live',
-}
-
-export enum EchoTokenAmadeus {
-  MultiSingle = 'MultiSingle',
-  Pricing = 'Pricing',
-  WithParsing = 'WithParsing',
-  PartialWithParsing = 'PartialWithParsing',
-}
-
-export enum RoomPolicies {
-  MealIncluded = 'meal_included',
-  Refundable = 'refundable',
-  CancelDeadline = 'cancel_deadline',
-  PayNow = 'pay_now',
-  PayAtProperty = 'pay_at_property',
-  NoCard = 'no_card',
-  // Smoking = 'smoking',
-}
-
-export enum TaxonomyType {
-  PostCategory = 1,
-  PostTag = 2,
-  PropertyType = 3,
-  HotelFacilities = 4,
-  HotelServices = 5,
-  RoomFacilities = 6,
-  RoomViews = 7,
-  RoomBeds = 8,
-  RoomMeals = 9,
-  RoomPolicies = 10,
-  Tile = 11,
-  Gender = 12,
-  PaymentMethod = 13,
-  paymentStatus = 14,
-  OrderStatus = 15,
-  RoomTypes = 16,
-  Transits = 17,
-  CabinClass = 18,
-  PaymentType = 19,
-  FAQCategories = 20,
-  ClassTypes = 21,
-  FareRule = 22,
-  CustomerGroup = 23, // API not used
-  ManageCache = 24, // API not used
-  ContactCategory = 25,
-  ContactType = 26,
-  PictureCategory = 27,
-  MeetingRoom = 28,
-  Restaurants = 29,
-  SegmentCategory = 30,
-  SecurityCode = 31,
-  GuestRoomInfo = 32,
-  AdditionalDetail = 33,
-  AttractionCategories = 34,
-  IndexPoint = 35,
-  PaymentCodes = 36,
-  Perks = 37,
-  FAQTags = 38,
-  EventType = 39,
-}
-
-export enum PropertyType {
-  Hotel = 'hotel',
-  Condo = 'condo',
-  Villa = 'villa',
-  Guesthouse = 'guesthouse',
-  Apartment = 'apartment',
-  Resort = 'resort',
-}
 
 export enum PropertyTypeNumber {
   Hotel = '20',
@@ -453,7 +191,6 @@ export enum OrderBy {
 export enum HTTPCode {
   SUCCESS = 200,
   CHANGE_VALUE = 303,
-  // VERIFY_ERROR = 304, //304,
   REQUIRED = 400,
   INVALID = 400,
   BAD_REQUEST = 400,
@@ -465,37 +202,6 @@ export enum HTTPCode {
   CAN_NOT_PERFORMED = 400, //422,
 }
 
-export enum HeyoCountry {
-  VIET_NAM = 'VN',
-}
-
-export enum FlightWayStatus {
-  DRAFT = 'draft',
-  PROCESSING = 'processing',
-  BOOKED = 'booked',
-  ISSUED = 'issued',
-  FAILD = 'faild',
-  CANCELLED = 'cancelled',
-}
-
-export enum HotelRoomStatus {
-  DRAFT = 'draft',
-  PROCESSING = 'processing',
-  BOOKED = 'booked',
-  ISSUED = 'issued',
-  FAILD = 'faild',
-  CANCELLED = 'cancelled',
-}
-
-export enum PacipicFlightNumber {
-  CODE = 'VN6',
-  LENGTH = 6,
-}
-
-export enum StripeTypeGuarantee {
-  DEPOSIT = 'Deposit',
-  GUARANTEE = 'Guarantee',
-}
 
 export enum Gender {
   MALE = 'male',
@@ -519,17 +225,6 @@ export enum FlightWayType {
   ARRIVAL = 'arrival',
   // DOMESTIC = 0,
   // INTERNATIONAL = 1,
-}
-
-export enum FlightType {
-  DOMESTIC = 0,
-  INTERNATIONAL = 1,
-}
-
-export enum RoomAvailabilityBooked {
-  SELECT = 0,
-  // HOLD = 0,
-  BOOKED = 1,
 }
 
 export enum CacheExpTimeFlight {

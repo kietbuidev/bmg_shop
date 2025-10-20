@@ -23,7 +23,7 @@ export class SystemController {
         throw new CustomError(HTTPCode.REQUIRED, 'IMAGE_SOURCE_REQUIRED');
       }
 
-      const result = await this.systemService.uploadImageToDrive({
+      const result = await this.systemService.uploadImage({
         base64: payload.image_base64,
         buffer: file?.buffer,
         contentType: file?.mimetype,

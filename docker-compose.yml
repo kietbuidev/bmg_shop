@@ -5,7 +5,10 @@ services:
     build: .
     ports:
       - 3000:3000
-    env_file: .env
+    environment:
+      - APP_ENV=develop
+    volumes:
+      - ./docker/env/.env.develop:/app/docker/env/.env.develop:ro
     depends_on:
       - db
   db:

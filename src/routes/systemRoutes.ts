@@ -7,7 +7,6 @@ import SystemController from '../controllers/systemController';
 import {validateDto} from '../middleware/validateDto';
 import {CreateCounterDto, GetCounterChartQueryDto} from '../database/models/dtos/counterDto';
 import {UploadImageDto} from '../database/models/dtos/systemDto';
-import {google, drive_v3} from 'googleapis';
 
 @Service()
 export class SystemRouter {
@@ -122,8 +121,8 @@ export default SystemRouter;
  *  post:
  *     tags:
  *     - System
- *     summary: Upload image to Google Drive
- *     description: Upload an image using multipart/form-data and specify the destination path in Google Drive.
+ *     summary: Upload image to Cloudinary
+ *     description: Upload an image using multipart/form-data and specify the destination folder in Cloudinary.
  *     requestBody:
  *      required: true
  *      content:

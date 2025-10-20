@@ -1,16 +1,16 @@
 import {Service} from 'typedi';
-import {google, drive_v3, Auth} from 'googleapis';
-import {Readable} from 'stream';
 import path from 'path';
+import {v2 as cloudinary, UploadApiOptions, UploadApiResponse} from 'cloudinary';
+import streamifier from 'streamifier';
 import {decodeBase64Image} from '../utils/service';
 import {CustomError} from '../utils/customError';
 import {HTTPCode, UploadImageType} from '../utils/enums';
 import {logger} from '../utils/logger';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+const CLOUDINARY_ROOT_FOLDER = process.env.CLOUDINARY_FOLDER;
 
 interface UploadOptions {
   base64?: string;
@@ -24,23 +24,20 @@ interface UploadOptions {
 
 @Service()
 export class SystemService {
-  private readonly drive: drive_v3.Drive;
-  private readonly auth: Auth.OAuth2Client;
-
   constructor() {
-    if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN || !GOOGLE_REDIRECT_URI) {
-      throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'GOOGLE_OAUTH_CREDENTIALS_NOT_FOUND');
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+      throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'CLOUDINARY_CREDENTIALS_NOT_FOUND');
     }
 
-    this.auth = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI);
-    this.auth.setCredentials({
-      refresh_token: GOOGLE_REFRESH_TOKEN,
+    cloudinary.config({
+      cloud_name: CLOUDINARY_CLOUD_NAME,
+      api_key: CLOUDINARY_API_KEY,
+      api_secret: CLOUDINARY_API_SECRET,
+      secure: true,
     });
-
-    this.drive = google.drive({version: 'v3', auth: this.auth});
   }
 
-  async uploadImageToDrive(options: UploadOptions = {}) {
+  async uploadImage(options: UploadOptions = {}) {
     const hasBase64 = Boolean(options.base64);
     const hasBuffer = Boolean(options.buffer);
 
@@ -63,67 +60,53 @@ export class SystemService {
       extension = contentType.includes('/') ? contentType.split('/')[1] : undefined;
     }
 
-    const mappedFolderId = options.type ? this.resolveFolderId(options.type) : undefined;
-    if (options.type && !mappedFolderId) {
-      throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'DRIVE_FOLDER_NOT_CONFIGURED', {type: options.type});
+    const mappedFolder = options.type ? this.resolveFolder(options.type) : undefined;
+    if (options.type && !mappedFolder) {
+      throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'CLOUDINARY_FOLDER_NOT_CONFIGURED', {type: options.type});
     }
 
-    const ROOT_ID = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID;
-
-    const targetFolderId = options.folderId ?? mappedFolderId ?? ROOT_ID;
+    const targetFolder = options.folderId ?? mappedFolder ?? CLOUDINARY_ROOT_FOLDER;
 
     const providedName = options.fileName?.trim() || options.originalName?.trim();
     const baseName = providedName && providedName.length > 0 ? providedName : `image-${Date.now()}`;
     const currentExt = path.extname(baseName);
     const nameWithoutExt = currentExt ? baseName.slice(0, -currentExt.length) : baseName.replace(/\.+$/, '');
     const finalExtension = currentExt ? currentExt.replace('.', '') : extension;
-    const fileName = finalExtension ? `${nameWithoutExt}.${finalExtension}` : nameWithoutExt;
+    const publicId = this.sanitizePublicId(nameWithoutExt);
 
     try {
-      const created = await this.drive.files.create({
-        requestBody: {
-          name: fileName,
-          parents: targetFolderId ? [targetFolderId] : undefined,
-        },
-        media: {
-          mimeType: contentType,
-          body: Readable.from(buffer),
-        },
-        fields: 'id, name, mimeType, size',
-      });
+      const uploadOptions: UploadApiOptions = {
+        folder: targetFolder,
+        public_id: publicId,
+        resource_type: 'image',
+        overwrite: false,
+        use_filename: false,
+        unique_filename: false,
+      };
 
-      const fileId = created.data.id;
-      if (!fileId) {
-        throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'UPLOAD_IMAGE_FAILED');
+      if (finalExtension) {
+        uploadOptions.format = finalExtension.toLowerCase();
       }
 
-      await this.drive.permissions.create({
-        fileId,
-        requestBody: {
-          role: 'reader',
-          type: 'anyone',
-        },
-        supportsAllDrives: true,
-      });
-
-      const detail = await this.drive.files.get({
-        fileId,
-        fields: 'id, name, mimeType, size, webViewLink, webContentLink, imageMediaMetadata/width, imageMediaMetadata/height',
-        supportsAllDrives: true,
-      });
+      const uploadResult = hasBase64
+        ? await cloudinary.uploader.upload(options.base64 as string, uploadOptions)
+        : await this.uploadBuffer(buffer, uploadOptions);
 
       return {
-        id: detail.data.id,
-        name: detail.data.name ?? fileName,
-        mimeType: detail.data.mimeType ?? contentType,
-        size: detail.data.size ? Number(detail.data.size) : buffer.length,
-        width: detail.data.imageMediaMetadata?.width,
-        height: detail.data.imageMediaMetadata?.height,
-        webViewLink: detail.data.webViewLink,
-        downloadLink: detail.data.webContentLink,
+        id: uploadResult.public_id,
+        name: uploadResult.original_filename ?? publicId,
+        mimeType:
+          uploadResult.resource_type && uploadResult.format
+            ? `${uploadResult.resource_type}/${uploadResult.format}`
+            : contentType,
+        size: uploadResult.bytes ?? buffer.length,
+        width: uploadResult.width ?? undefined,
+        height: uploadResult.height ?? undefined,
+        webViewLink: uploadResult.secure_url ?? uploadResult.url,
+        downloadLink: uploadResult.secure_url ?? uploadResult.url,
       };
     } catch (error) {
-      logger.error(`Failed to upload image to Google Drive: ${(error as Error)?.message}`);
+      logger.error(`Failed to upload image to Cloudinary: ${(error as Error)?.message}`);
       if (error instanceof CustomError) {
         throw error;
       }
@@ -131,14 +114,46 @@ export class SystemService {
     }
   }
 
-  private resolveFolderId(type: UploadImageType): string | undefined {
+  private uploadBuffer(buffer: Buffer, options: UploadApiOptions): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        if (!result) {
+          reject(new Error('Empty response from Cloudinary'));
+          return;
+        }
+
+        resolve(result);
+      });
+
+      streamifier.createReadStream(buffer).pipe(uploadStream);
+    });
+  }
+
+  private resolveFolder(type: UploadImageType): string | undefined {
     const mapping: Record<UploadImageType, string | undefined> = {
-      [UploadImageType.CATEGORIES]: process.env.DRIVE_FOLDER_CATEGORIES,
-      [UploadImageType.POSTS]: process.env.DRIVE_FOLDER_POSTS,
-      [UploadImageType.PRODUCTS]: process.env.DRIVE_FOLDER_PRODUCTS,
+      [UploadImageType.CATEGORIES]: process.env.CLOUDINARY_FOLDER_CATEGORIES,
+      [UploadImageType.POSTS]: process.env.CLOUDINARY_FOLDER_POSTS,
+      [UploadImageType.PRODUCTS]: process.env.CLOUDINARY_FOLDER_PRODUCTS,
     };
 
     return mapping[type];
+  }
+
+  private sanitizePublicId(input: string): string {
+    const cleaned = input
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9-_]+/g, '-')
+      .replace(/-{2,}/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+
+    return cleaned.length > 0 ? cleaned : `image-${Date.now()}`;
   }
 }
 
