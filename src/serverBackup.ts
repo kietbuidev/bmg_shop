@@ -17,7 +17,7 @@ require('dotenv').config();
 
 const VERSION = process.env.VERSION || '';
 const PORT = Number(process.env.PORT) || 3000;
-const NODE_ENV = process.env.NODE_ENV || 'localhost';
+const NODE_ENV = process.env.DEVELOPMENT || 'localhost';
 
 const app = express();
 const logFormat = process.env.LOG_FORMAT || 'short';

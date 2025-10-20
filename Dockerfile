@@ -38,7 +38,7 @@ COPY --from=build /app/dist ./dist
 COPY package.json ./
 
 # Quyền & logs
-RUN mkdir -p /app/logs && chown -R node:node /app
+RUN mkdir -p /app/logs /app/src/logs && chown -R node:node /app
 USER node
 
 EXPOSE 8000

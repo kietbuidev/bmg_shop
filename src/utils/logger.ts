@@ -18,18 +18,24 @@ const ensureDir = (dir: string): boolean => {
 };
 
 const candidateDirs: string[] = [];
+const isRunningInContainer = existsSync('/.dockerenv') || process.env.CONTAINER === 'true' || process.env.DOCKER_CONTAINER === 'true';
 
 // 1. Cho phép override qua env
 if (process.env.LOG_DIR) candidateDirs.push(resolve(process.env.LOG_DIR));
 
-// 2. Mặc định tốt nhất trong container
-candidateDirs.push('/app/logs');
+// 2. Ưu tiên ghi log vào src/logs trong project (tự tạo nếu chưa có)
+const srcLogsDir = resolve(process.cwd(), 'src/logs');
+candidateDirs.push(srcLogsDir);
 
-// 3. Luôn ghi được trên mọi PaaS
+// 3. Nếu chạy từ dist, vẫn thử sibling ../logs (giữ tương thích cũ)
+const compiledLogsDir = resolve(__dirname, '../logs');
+if (!candidateDirs.includes(compiledLogsDir)) candidateDirs.push(compiledLogsDir);
+
+// 4. Mặc định tốt nhất trong container
+if (isRunningInContainer) candidateDirs.push('/app/logs');
+
+// 5. Luôn ghi được trên mọi PaaS
 candidateDirs.push('/tmp/bmg-logs');
-
-// 4. Cuối cùng mới fallback vào ../logs
-candidateDirs.push(resolve(__dirname, '../logs'));
 
 const logDir = candidateDirs.find((dir) => ensureDir(dir));
 

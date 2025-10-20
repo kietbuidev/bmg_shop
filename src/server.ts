@@ -18,7 +18,7 @@ require('dotenv').config();
 
 const VERSION = process.env.VERSION || '';
 const PORT = Number(process.env.PORT) || 8000; // Koyeb sẽ set PORT, 8000 là fallback an toàn
-const NODE_ENV = process.env.NODE_ENV || 'production';
+const NODE_ENV = process.env.ENVIRONMENT || 'production';
 const LOG_FORMAT = process.env.LOG_FORMAT || 'short';
 
 const app = express();
