@@ -1,11 +1,14 @@
 # syntax=docker/dockerfile:1
 
 ARG NODE_VERSION=20
+ARG BASE=node:${NODE_VERSION}-alpine
 
-# Install all dependencies (including dev) so we can build TypeScript
-FROM node:${NODE_VERSION}-alpine AS deps
+# ---------- deps: cài deps để build ----------
+FROM ${BASE} AS deps
 WORKDIR /app
+# Toolchain chỉ cần ở stage build (native addons)
 RUN apk add --no-cache python3 make g++ tzdata
+# Giữ cache tốt: copy lockfile trước
 COPY package.json package-lock.json* ./
 RUN if [ -f package-lock.json ]; then \
       npm ci --ignore-scripts; \
@@ -13,45 +16,52 @@ RUN if [ -f package-lock.json ]; then \
       npm install --ignore-scripts; \
     fi
 
-# Compile TypeScript sources to dist/
-FROM node:${NODE_VERSION}-alpine AS build
+# ---------- build: compile TS -> dist ----------
+FROM ${BASE} AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY tsconfig.json ./
 COPY src ./src
+# Bật source map cho debug production (tuỳ chọn)
+ENV NODE_OPTIONS=--enable-source-maps
 RUN npx tsc --project tsconfig.json
-# Copy any non-TS assets that should ship with the build
 RUN if [ -d src/docs ]; then mkdir -p dist/docs && cp -r src/docs/. dist/docs/; fi
 
-# Install only production dependencies
-FROM node:${NODE_VERSION}-alpine AS prod-deps
+# ---------- prod-deps: chỉ deps runtime ----------
+FROM ${BASE} AS prod-deps
 WORKDIR /app
-RUN apk add --no-cache python3 make g++
+# Không cần toolchain ở runtime deps stage
 COPY package.json package-lock.json* ./
 RUN if [ -f package-lock.json ]; then \
       npm ci --omit=dev --ignore-scripts; \
     else \
       npm install --omit=dev --ignore-scripts; \
-    fi
+    fi \
+ && npm cache clean --force
 
-# Minimal runtime image
-FROM node:${NODE_VERSION}-alpine AS runner
+# ---------- runner: tối giản runtime ----------
+FROM ${BASE} AS runner
 WORKDIR /app
+
 ENV NODE_ENV=production
+ENV TZ=Asia/Ho_Chi_Minh
 ENV PORT=5001
+# Tuỳ chọn: giúp stacktrace dễ đọc khi lỗi prod
+ENV NODE_OPTIONS=--enable-source-maps
 
 RUN apk add --no-cache tzdata
 
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY package.json ./
-COPY docker/env/.env.develop ./.env
+# Copy với quyền đúng ngay từ đầu (nhanh & ít layer hơn chown cả thư mục)
+COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
+COPY --from=build     --chown=node:node /app/dist         ./dist
+COPY --chown=node:node package.json ./
 
-# Prepare writable directories for logs
-RUN mkdir -p /app/logs && chown -R node:node /app
+# KHÔNG copy .env vào image. Truyền qua -e hoặc --env-file khi run.
+# Nếu cần thư mục logs
+RUN mkdir -p /app/logs && chown -R node:node /app/logs
 
 USER node
 
 EXPOSE 5001
 
-CMD ["node", "dist/server.js"]
+CMD ["npm", "start"]

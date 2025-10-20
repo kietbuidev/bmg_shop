@@ -6,14 +6,9 @@
   "author": "Mirko Martinovic <mirko.martinovic@quantox.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && npm run",
-    "dev": "tsnd --respawn src/server.ts --watch",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "test": "jest --runInBand",
-    "lint:fix": "npm run lint -- --quiet --fix",
-    "lint": "eslint -c .eslintrc.js \"./src/**/*.+(js|ts)\"",
-    "prettier": "prettier --write \"**/*.+(json|yml|yaml|ts|md|mdx)\"",
-    "prettier:check": "prettier --check \"**/*.+(json|yml|yaml|ts|md|mdx)\""
+    "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
   "engines": {
     "node": ">=20.0.0"
