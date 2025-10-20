@@ -50,6 +50,14 @@ app.use(express.json());
 
 const httpServer = http.createServer(app);
 
+app.get('/healthz', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+  });
+});
+
 // Connect to Redis
 // const redisInstance = new RedisClient();
 // redisInstance.connect().catch((error) => {
