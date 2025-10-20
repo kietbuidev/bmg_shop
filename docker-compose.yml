@@ -20,4 +20,4 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
-    command: ["node", "dist/main.js"]
+    command: ["node", "dist/server.js"]
