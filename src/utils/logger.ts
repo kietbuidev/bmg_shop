@@ -1,18 +1,17 @@
-import {existsSync, mkdirSync} from 'fs';
-import {join, resolve} from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import { join, resolve } from 'path';
 import winston from 'winston';
-import winstonDaily from 'winston-daily-rotate-file';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
-const logFormat = winston.format.printf(({timestamp, level, message}) => `${timestamp} ${level}: ${message}`);
+const logFormat = winston.format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`);
 
 const ensureDir = (dir: string): boolean => {
   try {
     if (!existsSync(dir)) {
-      mkdirSync(dir, {recursive: true});
+      mkdirSync(dir, { recursive: true });
     }
     return true;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.warn(`Logger: unable to access ${dir}. Skipping.`, error);
     return false;
   }
@@ -20,21 +19,23 @@ const ensureDir = (dir: string): boolean => {
 
 const candidateDirs: string[] = [];
 
-if (process.env.LOG_DIR) {
-  candidateDirs.push(resolve(process.env.LOG_DIR));
-}
+// 1. Cho phép override qua env
+if (process.env.LOG_DIR) candidateDirs.push(resolve(process.env.LOG_DIR));
 
-candidateDirs.push(resolve(__dirname, '../logs'));
+// 2. Mặc định tốt nhất trong container
+candidateDirs.push('/app/logs');
+
+// 3. Luôn ghi được trên mọi PaaS
 candidateDirs.push('/tmp/bmg-logs');
+
+// 4. Cuối cùng mới fallback vào ../logs
+candidateDirs.push(resolve(__dirname, '../logs'));
 
 const logDir = candidateDirs.find((dir) => ensureDir(dir));
 
-const buildFileTransport = (level: 'debug' | 'error'): winstonDaily | null => {
-  if (!logDir) {
-    return null;
-  }
-
-  return new winstonDaily({
+const buildFileTransport = (level: 'debug' | 'error'): DailyRotateFile | null => {
+  if (!logDir) return null;
+  return new DailyRotateFile({
     level,
     datePattern: 'YYYY-MM-DD',
     dirname: join(logDir, level),
@@ -48,41 +49,30 @@ const buildFileTransport = (level: 'debug' | 'error'): winstonDaily | null => {
 
 const transports: winston.transport[] = [
   new winston.transports.Console({
-    format: winston.format.combine(winston.format.colorize(), winston.format.splat(), logFormat),
+    format: winston.format.combine(
+      winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      winston.format.colorize(),
+      winston.format.splat(),
+      logFormat
+    ),
   }),
 ];
 
 const debugTransport = buildFileTransport('debug');
 const errorTransport = buildFileTransport('error');
 
-if (debugTransport) {
-  transports.push(debugTransport);
-}
+if (debugTransport) transports.push(debugTransport);
+if (errorTransport) transports.push(errorTransport);
 
-if (errorTransport) {
-  transports.push(errorTransport);
-}
-
-/*
- * Log Level
- * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
- */
 const logger = winston.createLogger({
+  exitOnError: false, // Không để crash app vì lỗi log
   format: winston.format.combine(
-    winston.format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss',
-    }),
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.splat(),
-    logFormat,
+    logFormat
   ),
   transports,
 });
-
-// logger.add(
-//   new winston.transports.Console({
-//     format: winston.format.combine(winston.format.splat(), winston.format.colorize()),
-//   }),
-// );
 
 const stream = {
   write: (message: string) => {
@@ -90,4 +80,4 @@ const stream = {
   },
 };
 
-export {logger, stream};
+export { logger, stream };

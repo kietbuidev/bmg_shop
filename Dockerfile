@@ -6,7 +6,6 @@ FROM node:${NODE_VERSION}-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ tzdata
 COPY package.json package-lock.json* ./
-# Cài deps (không chạy lifecycle scripts để tránh postinstall fail)
 RUN if [ -f package-lock.json ]; then \
       npm ci --ignore-scripts; \
     else \
@@ -18,7 +17,6 @@ FROM deps AS build
 WORKDIR /app
 COPY tsconfig.json ./
 COPY src ./src
-# Build ra dist (yêu cầu tsc trong devDependencies)
 RUN npm run build
 
 # ---------- prod-deps (chỉ deps runtime) ----------
@@ -37,24 +35,20 @@ WORKDIR /app
 RUN apk add --no-cache tzdata
 
 ENV NODE_ENV=production
-# ❌ KHÔNG đặt PORT ở đây; để Koyeb set qua env
-# ENV PORT=3000
-# ENV APP_ENV=develop  # nếu thật sự cần thì set trong Koyeb env
 
 # Copy deps runtime + build output
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build     /app/dist         ./dist
 COPY package.json ./
 
-# Chạy bằng user 'node' (an toàn)
-USER node
+# Tạo và cấp quyền thư mục log
+RUN mkdir -p /app/logs && chown -R node:node /app
 
-# EXPOSE chỉ mang tính metadata; để 8000 cho quen với PaaS
+USER node
 EXPOSE 8000
 
-# Healthcheck HTTP vào /_healthz trên $PORT (fallback 8000)
+# Healthcheck HTTP vào /_healthz
 HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||8000)+'/_healthz',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 
-# Không dùng entrypoint để tránh exit 1 sớm
 CMD ["node", "dist/server.js"]
