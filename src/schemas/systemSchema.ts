@@ -182,22 +182,51 @@
  *          properties:
  *            id:
  *              type: string
- *              example: "1ZdR3sJpLkMn"
+ *              example: "bmg_shop/posts/image-172387234"
+ *            assetId:
+ *              type: string
+ *              example: "e64adf1a3de9d0c7b1234567890abcde"
  *            name:
  *              type: string
- *              example: "image-172387234.png"
+ *              example: "bmg_shop/posts/image-172387234"
+ *            originalFilename:
+ *              type: string
+ *              example: "feature-banner.png"
+ *            folder:
+ *              type: string
+ *              example: "bmg_shop/posts"
+ *            format:
+ *              type: string
+ *              example: "png"
+ *            resourceType:
+ *              type: string
+ *              example: "image"
  *            mimeType:
  *              type: string
  *              example: "image/png"
  *            size:
  *              type: integer
  *              example: 58234
+ *            width:
+ *              type: integer
+ *              example: 1280
+ *            height:
+ *              type: integer
+ *              example: 720
+ *            url:
+ *              type: string
+ *              format: uri
+ *              example: "http://res.cloudinary.com/dbms5fhqs/image/upload/v1723872345/bmg_shop/posts/image-172387234.png"
+ *            secureUrl:
+ *              type: string
+ *              format: uri
+ *              example: "https://res.cloudinary.com/dbms5fhqs/image/upload/v1723872345/bmg_shop/posts/image-172387234.png"
  *            webViewLink:
  *              type: string
  *              format: uri
- *              example: "https://drive.google.com/file/d/1ZdR3sJpLkMn/view"
+ *              example: "https://res.cloudinary.com/dbms5fhqs/image/upload/v1723872345/bmg_shop/posts/image-172387234.png"
  *            downloadLink:
  *              type: string
  *              format: uri
- *              example: "https://drive.google.com/uc?id=1ZdR3sJpLkMn&export=download"
+ *              example: "https://res.cloudinary.com/dbms5fhqs/image/upload/v1723872345/bmg_shop/posts/image-172387234.png"
  */

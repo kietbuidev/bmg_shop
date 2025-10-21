@@ -79,6 +79,9 @@ export default class Product extends Model<Product> {
   declare view_count: number;
 
   @Column({type: DataType.BOOLEAN, allowNull: false, defaultValue: true})
+  declare is_bmg: boolean;
+
+  @Column({type: DataType.BOOLEAN, allowNull: false, defaultValue: true})
   declare is_active: boolean;
 
   @Column({type: DataType.BOOLEAN, allowNull: false, defaultValue: false})

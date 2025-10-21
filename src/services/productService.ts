@@ -179,7 +179,7 @@ export class ProductService {
   }
 
   async list(query: ProductQueryDto): Promise<IPaginateResult<Product>> {
-    const {page = 1, limit = 10, category_id, status, search} = query;
+    const {page = 1, limit = 10, category_id, status, search, is_bmg} = query;
 
     const where: {[key: string]: unknown; [key: symbol]: unknown} = {};
 
@@ -190,6 +190,10 @@ export class ProductService {
     const statusFilter = status ? status.toUpperCase() : undefined;
     if (statusFilter) {
       where.status = statusFilter;
+    }
+
+    if (is_bmg !== undefined) {
+      where.is_bmg = is_bmg;
     }
 
     if (search) {
@@ -313,6 +317,7 @@ export class ProductService {
       is_active: payload.is_active ?? true,
       is_popular: payload.is_popular ?? false,
       priority: payload.priority ?? 0,
+      is_bmg: payload.is_bmg ?? true,
     });
 
     const product = await this.productRepository.create(data as Product);
@@ -363,6 +368,7 @@ export class ProductService {
       style,
       status,
       slug: slugValue,
+      is_bmg: payload.is_bmg,
     });
     const [affected] = await this.productRepository.update(id, data as Partial<Product>);
     if (!affected) {

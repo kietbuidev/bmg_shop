@@ -206,6 +206,11 @@ export class CreateProductDto {
   is_popular?: boolean;
 
   @IsOptional()
+  @Transform(({value}) => toBooleanWithDefault(value, true))
+  @IsBoolean()
+  is_bmg?: boolean;
+
+  @IsOptional()
   @Transform(({value}) => {
     if (value === undefined || value === null || value === '') {
       return 0;
@@ -314,6 +319,11 @@ export class UpdateProductDto {
   is_popular?: boolean;
 
   @IsOptional()
+  @Transform(({value}) => toBooleanWithDefault(value, undefined))
+  @IsBoolean()
+  is_bmg?: boolean;
+
+  @IsOptional()
   @Transform(({value}) => {
     if (value === undefined || value === null || value === '') return undefined;
     const parsed = Number(value);
@@ -355,4 +365,9 @@ export class ProductQueryDto {
 
   @IsOptional() @IsString()
   search?: string;
+
+  @IsOptional()
+  @Transform(({value}) => toBooleanWithDefault(value, undefined))
+  @IsBoolean()
+  is_bmg?: boolean;
 }
