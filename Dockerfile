@@ -1,41 +1,58 @@
 # syntax=docker/dockerfile:1
+ARG NODE_VERSION=20
+ARG BASE=node:${NODE_VERSION}-alpine
 
-FROM node:20-slim AS app
-
-# Cập nhật npm để tránh notice (từ vấn đề trước)
-RUN npm install -g npm@latest
-
+# ---------- STAGE 1: PROD DEPS ----------
+# Stage này CHỈ cài 'dependencies' (bỏ qua dev)
+# Nhưng vẫn cần tools để build bcrypt
+FROM ${BASE} AS prod-deps
 WORKDIR /app
 
-# Cài toolchain nếu cần build native (bcrypt), nhưng với slim thì ít cần hơn Alpine
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+# Cần toolchain để build native addon (bcrypt)
+RUN apk add --no-cache python3 make g++ libc6-compat
 
-# Copy và cài deps (gộp deps + prod-deps)
-COPY package*.json ./
-RUN npm ci --omit=dev \
+COPY package.json package-lock.json* ./
+
+# CHỈ CÀI DEPENDENCIES (production)
+RUN if [ -f package-lock.json ]; then \
+      npm ci --omit=dev; \
+    else \
+      npm install --omit=dev; \
+    fi \
  && npm rebuild bcrypt --build-from-source \
  && npm cache clean --force
 
-# Compile TS (gộp build stage)
-COPY tsconfig.json ./
-COPY src ./src
-ENV NODE_OPTIONS=--enable-source-maps
-RUN npx tsc --project tsconfig.json
-# Nếu có docs, copy thủ công (hoặc bỏ nếu không cần)
-# RUN if [ -d src/docs ]; then mkdir -p dist/docs && cp -r src/docs/. dist/docs/; fi
+# ---------- STAGE 2: RUNNER (Production) ----------
+# Stage này siêu mỏng nhẹ, không chứa tools build
+FROM ${BASE} AS runner
+WORKDIR /app
 
-# Setup runtime
 ENV NODE_ENV=production
 ENV TZ=Asia/Ho_Chi_Minh
 ENV PORT=5001
-RUN mkdir -p /app/logs
+# ENV NODE_OPTIONS=--enable-source-maps # Bật nếu bạn có file .map
 
-# Copy package.json cuối để checksum thay đổi
-COPY package.json ./
+# Chỉ cài đặt runtime dependencies của OS
+RUN apk add --no-cache tzdata
 
-# Chạy với user node cho security (giữ nguyên)
+# Copy node_modules (chỉ prod) từ stage 1
+COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
+
+# QUAN TRỌNG: Copy code đã compile (thư mục dist) từ máy của bạn
+# Bạn phải chạy 'npm run build' ở máy local TRƯỚC KHI build image
+COPY --chown=node:node ./dist ./dist 
+
+# Copy package.json (cần cho 'npm start' nếu dùng)
+COPY --chown=node:node package.json ./
+
+RUN mkdir -p /app/logs && chown -R node:node /app # Bỏ comment nếu cần
+
+# HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+#   CMD wget -qO- http://127.0.0.1:${PORT}/api/ || exit 1
+
 USER node
 
 EXPOSE 5001
 
+# Chạy trực tiếp bằng node (nhanh hơn npm start)
 CMD ["npm", "start"]
