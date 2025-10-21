@@ -6,15 +6,21 @@ ARG BASE=node:${NODE_VERSION}-alpine
 # ---------- deps: cài deps để build ----------
 FROM ${BASE} AS deps
 WORKDIR /app
-# Toolchain chỉ cần ở stage build (native addons)
-RUN apk add --no-cache python3 make g++ tzdata
-# Giữ cache tốt: copy lockfile trước
+
+# Cần toolchain + glibc-compat để build native addon trên Alpine
+RUN apk add --no-cache python3 make g++ libc6-compat
+
 COPY package.json package-lock.json* ./
+
+# QUAN TRỌNG: KHÔNG dùng --ignore-scripts ở prod (để postinstall chạy),
+# rồi rebuild bcrypt từ source để chắc chắn có binary đúng kiến trúc
 RUN if [ -f package-lock.json ]; then \
-      npm ci --ignore-scripts; \
+      npm ci --omit=dev; \
     else \
-      npm install --ignore-scripts; \
-    fi
+      npm install --omit=dev; \
+    fi \
+ && npm rebuild bcrypt --build-from-source \
+ && npm cache clean --force
 
 # ---------- build: compile TS -> dist ----------
 FROM ${BASE} AS build
@@ -30,13 +36,20 @@ RUN if [ -d src/docs ]; then mkdir -p dist/docs && cp -r src/docs/. dist/docs/; 
 # ---------- prod-deps: chỉ deps runtime ----------
 FROM ${BASE} AS prod-deps
 WORKDIR /app
-# Không cần toolchain ở runtime deps stage
+
+# Cần toolchain + glibc-compat để build native addon trên Alpine
+RUN apk add --no-cache python3 make g++ libc6-compat
+
 COPY package.json package-lock.json* ./
+
+# QUAN TRỌNG: KHÔNG dùng --ignore-scripts ở prod (để postinstall chạy),
+# rồi rebuild bcrypt từ source để chắc chắn có binary đúng kiến trúc
 RUN if [ -f package-lock.json ]; then \
-      npm ci --omit=dev --ignore-scripts; \
+      npm ci --omit=dev; \
     else \
-      npm install --omit=dev --ignore-scripts; \
+      npm install --omit=dev; \
     fi \
+ && npm rebuild bcrypt --build-from-source \
  && npm cache clean --force
 
 # ---------- runner: tối giản runtime ----------
@@ -59,6 +72,9 @@ COPY --chown=node:node package.json ./
 # KHÔNG copy .env vào image. Truyền qua -e hoặc --env-file khi run.
 # Nếu cần thư mục logs
 RUN mkdir -p /app/logs && chown -R node:node /app
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:${PORT}/api/ || exit 1
 
 USER node
 

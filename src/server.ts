@@ -16,8 +16,8 @@ import { connectDatabase } from './database';
 
 require('dotenv').config();
 
-const PORT = Number(process.env.PORT) || 8000;
-const NODE_ENV = process.env.ENVIRONMENT || 'production';
+const PORT = Number(process.env.PORT) || 5001;
+const NODE_ENV = process.env.ENVIRONMENT || 'DEVELOPMENT';
 const LOG_FORMAT = process.env.LOG_FORMAT || 'short';
 
 const app = express();
