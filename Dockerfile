@@ -12,12 +12,12 @@ RUN apk add --no-cache python3 make g++ libc6-compat
 
 COPY package.json package-lock.json* ./
 
-# QUAN TRỌNG: KHÔNG dùng --ignore-scripts ở prod (để postinstall chạy),
-# rồi rebuild bcrypt từ source để chắc chắn có binary đúng kiến trúc
+# Stage build cần đủ cả devDependencies (TypeScript...) để compile
+ENV NODE_ENV=development
 RUN if [ -f package-lock.json ]; then \
-      npm ci --omit=dev; \
+      npm ci; \
     else \
-      npm install --omit=dev; \
+      npm install; \
     fi \
  && npm rebuild bcrypt --build-from-source \
  && npm cache clean --force
