@@ -1,81 +1,39 @@
 # syntax=docker/dockerfile:1
 
-ARG NODE_VERSION=20
-ARG BASE=node:${NODE_VERSION}-alpine
+FROM node:20-slim AS app
 
-# ---------- deps: cài deps để build ----------
-FROM ${BASE} AS deps
+# Cập nhật npm để tránh notice (từ vấn đề trước)
+RUN npm install -g npm@latest
+
 WORKDIR /app
 
-# Cần toolchain + glibc-compat để build native addon trên Alpine
-RUN apk add --no-cache python3 make g++ libc6-compat
+# Cài toolchain nếu cần build native (bcrypt), nhưng với slim thì ít cần hơn Alpine
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
-COPY package.json package-lock.json* ./
-
-# Stage build cần đủ cả devDependencies (TypeScript...) để compile
-ENV NODE_ENV=development
-RUN if [ -f package-lock.json ]; then \
-      npm ci; \
-    else \
-      npm install; \
-    fi \
+# Copy và cài deps (gộp deps + prod-deps)
+COPY package*.json ./
+RUN npm ci --omit=dev \
  && npm rebuild bcrypt --build-from-source \
  && npm cache clean --force
 
-# ---------- build: compile TS -> dist ----------
-FROM ${BASE} AS build
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Compile TS (gộp build stage)
 COPY tsconfig.json ./
 COPY src ./src
-# Bật source map cho debug production (tuỳ chọn)
 ENV NODE_OPTIONS=--enable-source-maps
 RUN npx tsc --project tsconfig.json
-RUN if [ -d src/docs ]; then mkdir -p dist/docs && cp -r src/docs/. dist/docs/; fi
+# Nếu có docs, copy thủ công (hoặc bỏ nếu không cần)
+# RUN if [ -d src/docs ]; then mkdir -p dist/docs && cp -r src/docs/. dist/docs/; fi
 
-# ---------- prod-deps: chỉ deps runtime ----------
-FROM ${BASE} AS prod-deps
-WORKDIR /app
-
-# Cần toolchain + glibc-compat để build native addon trên Alpine
-RUN apk add --no-cache python3 make g++ libc6-compat
-
-COPY package.json package-lock.json* ./
-
-# QUAN TRỌNG: KHÔNG dùng --ignore-scripts ở prod (để postinstall chạy),
-# rồi rebuild bcrypt từ source để chắc chắn có binary đúng kiến trúc
-RUN if [ -f package-lock.json ]; then \
-      npm ci --omit=dev; \
-    else \
-      npm install --omit=dev; \
-    fi \
- && npm rebuild bcrypt --build-from-source \
- && npm cache clean --force
-
-# ---------- runner: tối giản runtime ----------
-FROM ${BASE} AS runner
-WORKDIR /app
-
+# Setup runtime
 ENV NODE_ENV=production
 ENV TZ=Asia/Ho_Chi_Minh
 ENV PORT=5001
-# Tuỳ chọn: giúp stacktrace dễ đọc khi lỗi prod
-ENV NODE_OPTIONS=--enable-source-maps
+RUN mkdir -p /app/logs
 
-RUN apk add --no-cache tzdata
+# Copy package.json cuối để checksum thay đổi
+COPY package.json ./
 
-# Copy với quyền đúng ngay từ đầu (nhanh & ít layer hơn chown cả thư mục)
-COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
-COPY --from=build     --chown=node:node /app/dist         ./dist
-COPY --chown=node:node package.json ./
-
-# KHÔNG copy .env vào image. Truyền qua -e hoặc --env-file khi run.
-# Nếu cần thư mục logs
-RUN mkdir -p /app/logs && chown -R node:node /app
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:${PORT}/api/ || exit 1
-
+# Chạy với user node cho security (giữ nguyên)
 USER node
 
 EXPOSE 5001
