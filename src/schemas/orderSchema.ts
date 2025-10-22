@@ -112,6 +112,10 @@
  *        customer_id:
  *          type: string
  *          format: uuid
+ *        buyer_id:
+ *          type: string
+ *          format: uuid
+ *          nullable: true
  *        status:
  *          type: string
  *          example: "PENDING"
@@ -138,6 +142,23 @@
  *          format: date-time
  *        customer:
  *          $ref: '#/components/schemas/OrderCustomer'
+ *        buyer:
+ *          type: object
+ *          nullable: true
+ *          properties:
+ *            id:
+ *              type: string
+ *              format: uuid
+ *            first_name:
+ *              type: string
+ *              nullable: true
+ *            last_name:
+ *              type: string
+ *              nullable: true
+ *            email:
+ *              type: string
+ *              format: email
+ *              nullable: true
  *        items:
  *          type: array
  *          items:

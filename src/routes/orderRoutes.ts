@@ -3,6 +3,7 @@ import type {NextFunction, Request, Response} from 'express';
 import {Service} from 'typedi';
 import OrderController from '../controllers/orderController';
 import {validateDto} from '../middleware/validateDto';
+import {authenticateUserToken} from '../middleware/authenticateToken';
 import {CreateOrderDto, OrderListQueryDto, OrderSearchQueryDto, UpdateOrderStatusDto} from '../database/models/dtos/orderDto';
 
 @Service()
@@ -33,6 +34,7 @@ export class OrderRouter {
 
     this.router.post(
       '/',
+      authenticateUserToken,
       validateDto(CreateOrderDto),
       async (req: Request, res: Response, next: NextFunction) => {
         await this.orderController.create(req, res, next);
@@ -164,6 +166,8 @@ export default OrderRouter;
  *     parameters:
  *      - $ref: '#/components/parameters/language'
  *      - $ref: '#/components/parameters/platform'
+ *     security:
+ *      - bearerAuth: []
  *     requestBody:
  *      required: true
  *      content:

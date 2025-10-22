@@ -40,7 +40,14 @@ export class OrderController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
       const payload = req.body as CreateOrderDto;
-      const order = await this.orderService.create(payload);
+      const authUser = (req as any).user;
+      const buyerId = authUser?.userId ?? authUser?.id;
+
+      if (!buyerId) {
+        throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
+      }
+
+      const order = await this.orderService.create(payload, String(buyerId));
 
       res.status(201).json(
         BuildResponse.created({

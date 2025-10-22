@@ -6,6 +6,7 @@ import Order from '../database/models/order';
 import OrderItem from '../database/models/order_item';
 import Product from '../database/models/product';
 import Customer from '../database/models/customer';
+import User from '../database/models/user';
 import OrderRepository from '../database/repositories/order';
 import CustomerRepository from '../database/repositories/customer';
 import ProductRepository from '../database/repositories/product';
@@ -175,7 +176,7 @@ export class OrderService {
     });
   }
 
-  async create(payload: CreateOrderDto): Promise<Order> {
+  async create(payload: CreateOrderDto, buyerId: string): Promise<Order> {
     if (!payload.items || payload.items.length === 0) {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'ORDER_ITEMS_REQUIRED');
     }
@@ -199,6 +200,7 @@ export class OrderService {
         {
           order_code: this.generateOrderCode(),
           customer_id: customer.id,
+          buyer_id: buyerId,
           status: 'PENDING',
           currency: calculated[0]?.unitCurrency ?? 'VND',
           total_items: totalItems,
@@ -230,6 +232,7 @@ export class OrderService {
         include: [
           {model: Customer, as: 'customer'},
           {model: OrderItem, as: 'items'},
+          {model: User, as: 'buyer'},
         ],
         transaction,
       });
@@ -261,6 +264,7 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer'},
         {model: OrderItem, as: 'items'},
+        {model: User, as: 'buyer'},
       ],
       order: [['created_at', 'DESC']],
     };
@@ -315,6 +319,7 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer', where: customerWhere},
         {model: OrderItem, as: 'items'},
+        {model: User, as: 'buyer'},
       ],
       order: [['created_at', 'DESC']],
     });
@@ -333,6 +338,7 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer'},
         {model: OrderItem, as: 'items'},
+        {model: User, as: 'buyer'},
       ],
     });
 
@@ -346,6 +352,7 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer'},
         {model: OrderItem, as: 'items'},
+        {model: User, as: 'buyer'},
       ],
     });
 

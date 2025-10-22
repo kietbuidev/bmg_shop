@@ -4,6 +4,7 @@ import {
 } from 'sequelize-typescript';
 import OrderItem from './order_item';
 import Customer from './customer';
+import User from './user';
 
 @Table({ tableName: 'orders', underscored: true })
 export default class Order extends Model<Order> {
@@ -21,6 +22,13 @@ export default class Order extends Model<Order> {
 
   @BelongsTo(() => Customer, {foreignKey: 'customer_id', as: 'customer'})
   customer?: Customer;
+
+  @ForeignKey(() => User)
+  @Column({ type: DataType.UUID, allowNull: true })
+  declare buyer_id: string | null;
+
+  @BelongsTo(() => User, {foreignKey: 'buyer_id', as: 'buyer'})
+  buyer?: User;
 
   @Column({ type: DataType.STRING(32), allowNull: false, defaultValue: 'PENDING' })
   declare status: string;
