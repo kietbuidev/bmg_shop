@@ -119,6 +119,54 @@ export class UserRouter {
  */
 /**
  * @openapi
+ * '/api/users/password/forgot':
+ *   post:
+ *     tags:
+ *       - Users
+ *     summary: Request password reset code
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SendCodeVerifyInput'
+ *     responses:
+ *       200:
+ *         description: Password reset code sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SendCodeVerifyOutput'
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Account not found
+ *
+ * '/api/users/password/reset':
+ *   post:
+ *     tags:
+ *       - Users
+ *     summary: Reset password using verification code
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResetPasswordInput'
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ResetPasswordOutput'
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Account not found
+ */
+/**
+ * @openapi
  * '/api/users/password':
  *   put:
  *     tags:
