@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {Op} from 'sequelize';
 import User from '../database/models/user';
+import Role from '../database/models/role';
 import Notification from '../database/models/notification';
 import UserRepository from '../database/repositories/user';
 import NotificationRepository from '../database/repositories/notification';
@@ -12,6 +13,7 @@ import {IConfig, IPaginateResult, IRequestQuery} from '../utils/types';
 import authJwt from '../middleware/authJwt';
 import configJwt from '../config/jwt';
 import {RegisterDto, LoginDto, UpdatePasswordDto, DeleteUserDto} from '../database/models/dtos/userDto';
+import {logger} from '../utils/logger';
 
 interface AuthTokens {
   access_token: string;
@@ -27,6 +29,7 @@ type NotificationResponse = Record<string, unknown> & {
 export class UserService {
   private readonly userRepository: UserRepository;
   private readonly notificationRepository: NotificationRepository;
+  private readonly roleInclude = [{model: Role, as: 'roles',}];
 
   constructor() {
     this.userRepository = new UserRepository();
@@ -50,6 +53,18 @@ export class UserService {
     delete plain.password;
     delete plain.remember_token;
     delete plain.refresh_token;
+    if (Array.isArray(plain.roles)) {
+      plain.roles = plain.roles
+        .filter(Boolean)
+        .map((role: Role) => ({
+          id: role.id,
+          name: role.name,
+        }));
+      plain.is_admin = plain.roles.some((role: {name: string}) => (role.name ?? '').toLowerCase() === 'admin');
+    } else {
+      plain.roles = [];
+      plain.is_admin = false;
+    }
     return plain;
   }
 
@@ -66,6 +81,8 @@ export class UserService {
 
   private buildPayload(user: User): any {
     const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.email;
+    const roles = Array.isArray(user.roles) ? user.roles.map(role => role.name) : [];
+    const isAdmin = roles.some(role => (role ?? '').toLowerCase() === 'admin');
     return {
       user_id: user.id,
       full_name: fullName,
@@ -73,6 +90,8 @@ export class UserService {
       avatar: undefined,
       tier: null,
       email: user.email,
+      roles,
+      is_admin: isAdmin,
     };
   }
 
@@ -133,7 +152,25 @@ export class UserService {
       status: StatusActive.On,
     } as unknown as User);
 
-    return this.sanitizeUser(user);
+    try {
+      const defaultRole = await Role.findOne({
+        where: {
+          name: {
+            [Op.iLike]: 'customer',
+          },
+        },
+      });
+
+      if (defaultRole) {
+        await user.$set('roles', [defaultRole.id]);
+      }
+    } catch (error) {
+      // Default role assignment failed; proceed without blocking registration
+      logger.warn('Failed to assign default role on register', error as Error);
+    }
+
+    const reloaded = await this.userRepository.getById(user.id, {include: this.roleInclude});
+    return this.sanitizeUser(reloaded ?? user);
   }
 
   async checkExist(config: IConfig, body: {email: string}): Promise<boolean> {
@@ -151,10 +188,11 @@ export class UserService {
 
   async login(config: IConfig, userDto: LoginDto): Promise<AuthTokens> {
     this.normalizeConfig(config);
-    const user = await this.userRepository.getByOne({
+    let user = await this.userRepository.getByOne({
       where: {
         email: userDto.email,
       },
+      include: this.roleInclude,
     });
 
     if (!user) {
@@ -165,15 +203,20 @@ export class UserService {
       throw new CustomError(HTTPCode.UNAUTHORIZE, 'ACCOUNT_DISABLED');
     }
 
+    user = user.get({plain: true}) as any;
     const isValid = await this.comparePassword(userDto.password, user.password);
     if (!isValid) {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_LOGIN_CREDENTIALS');
     }
 
-    return this.issueTokens(user, {
+    const tokens = await this.issueTokens(user, {
       device_token: userDto.device_token ?? null,
       fcm_token: userDto.fcm_token ?? null,
     });
+
+    return {
+      ...tokens,
+    };
   }
 
 
@@ -209,7 +252,7 @@ export class UserService {
       throw new CustomError(HTTPCode.UNAUTHORIZE, 'USER_CONTEXT_REQUIRED');
     }
 
-    const user = await this.userRepository.getById(normalized.user_id);
+    const user = await this.userRepository.getById(normalized.user_id, {include: this.roleInclude});
     if (!user) {
       throw new NotFoundError('ACCOUNT_NOT_FOUND');
     }
@@ -264,7 +307,7 @@ export class UserService {
       address: userDto.address ?? user.address,
     } as Partial<User>);
 
-    const updated = await this.userRepository.getById(user.id);
+    const updated = await this.userRepository.getById(user.id, {include: this.roleInclude});
     return this.sanitizeUser(updated ?? user);
   }
 
@@ -298,7 +341,7 @@ export class UserService {
 
   async getUserById(config: IConfig, id: number): Promise<Record<string, unknown>> {
     this.normalizeConfig(config);
-    const user = await this.userRepository.getById(id);
+    const user = await this.userRepository.getById(id, {include: this.roleInclude});
     if (!user) {
       throw new NotFoundError('ACCOUNT_NOT_FOUND');
     }

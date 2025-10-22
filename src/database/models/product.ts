@@ -3,10 +3,7 @@ import Category from './category';
 
 @DefaultScope(() => ({
   where: {is_active: true},
-  order: [
-    ['priority', 'DESC'],
-    ['name', 'ASC'],
-  ],
+  order: [['name', 'ASC']],
 }))
 @Scopes(() => ({
   withInactive: {},
@@ -46,9 +43,6 @@ export default class Product extends Model<Product> {
   declare style: string | null;
 
   @Column({type: DataType.STRING(255), allowNull: true})
-  declare status: string | null;
-
-  @Column({type: DataType.STRING(255), allowNull: true})
   declare thumbnail: string | null;
 
   @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
@@ -67,28 +61,22 @@ export default class Product extends Model<Product> {
   declare currency: string;
 
   @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
+  declare status: string[];
+
+  @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
   declare sizes: (number | string)[];
 
   @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
   declare colors: (number | string)[];
 
-  @Column({type: DataType.JSONB, allowNull: false, defaultValue: []})
-  declare material: (number | string)[];
-
   @Column({type: DataType.BIGINT, allowNull: false, defaultValue: 0})
   declare view_count: number;
 
   @Column({type: DataType.BOOLEAN, allowNull: false, defaultValue: true})
-  declare is_bmg: boolean;
-
-  @Column({type: DataType.BOOLEAN, allowNull: false, defaultValue: true})
   declare is_active: boolean;
 
-  @Column({type: DataType.BOOLEAN, allowNull: false, defaultValue: false})
-  declare is_popular: boolean;
-
-  @Column({type: DataType.INTEGER, allowNull: false, defaultValue: 0})
-  declare priority: number;
+  @Column({type: DataType.TEXT, allowNull: false, defaultValue: 'IN HOUSE'})
+  declare source_type: string;
 
   @Column({type: DataType.STRING(255), allowNull: true})
   declare meta_title: string | null;

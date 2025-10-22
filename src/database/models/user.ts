@@ -1,6 +1,8 @@
-import {Table, Column, Model, CreatedAt, UpdatedAt, DataType, AutoIncrement, PrimaryKey, Unique, HasOne, Default} from 'sequelize-typescript';
+import {Table, Column, Model, CreatedAt, UpdatedAt, DataType, AutoIncrement, PrimaryKey, Unique, HasOne, Default, BelongsToMany} from 'sequelize-typescript';
+import Role from './role';
+import RoleUser from './role_user';
 
-@Table({tableName: 'users'})
+@Table({tableName: 'users', underscored: true})
 export default class User extends Model<User> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
@@ -59,7 +61,8 @@ export default class User extends Model<User> {
   // Vitual
 
   // Relationship
-
+  @BelongsToMany(() => Role, {through: () => RoleUser, as: 'roles', foreignKey: 'user_id', otherKey: 'role_id'})
+  roles?: Role[];
 }
 
 User.prototype.toJSON = function toJSON() {
@@ -71,6 +74,14 @@ User.prototype.toJSON = function toJSON() {
   delete values.created_at;
   delete values.updated_by;
   delete values.updated_at;
+  if (Array.isArray(values.roles)) {
+    values.roles = values.roles
+      .filter(Boolean)
+      .map((role: Role) => ({
+        id: role.id,
+        name: role.name,
+      }));
+  }
 
   return values;
 };

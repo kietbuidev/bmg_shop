@@ -40,6 +40,16 @@ const toOptionalUpperStatus = (value: unknown): ProductStatus | undefined => {
   return PRODUCT_STATUS_VALUES.includes(normalized as ProductStatus) ? (normalized as ProductStatus) : undefined;
 };
 
+const toOptionalUpperString = (value: unknown): string | undefined => {
+  const raw = toOptionalString(value);
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  const normalized = raw.trim();
+  return normalized ? normalized.toUpperCase() : undefined;
+};
+
 const toBooleanWithDefault = (value: unknown, defaultValue?: boolean): boolean | undefined => {
   if (value === undefined || value === null || value === '') {
     return defaultValue;
@@ -108,6 +118,16 @@ const toArray = (value: unknown, fallback: unknown[] | undefined): unknown[] | u
   return [value];
 };
 
+const toStatusArray = (value: unknown, fallback: ProductStatus[] | undefined): ProductStatus[] | undefined => {
+  const arrayValue = toArray(value, fallback);
+  if (arrayValue === undefined) {
+    return fallback;
+  }
+
+  const items = Array.isArray(arrayValue) ? [...arrayValue] : [];
+  return items.map(item => (typeof item === 'string' ? item.trim().toUpperCase() : item)) as ProductStatus[];
+};
+
 export class CreateProductDto {
   @Transform(({value}) => (value === undefined || value === null ? value : String(value)))
   @IsNotEmpty()
@@ -139,21 +159,20 @@ export class CreateProductDto {
   content?: string | null;
 
   @IsOptional()
-  @IsArray()
-  @IsString({each: true})
-  @Transform(({value}) => toArray(value, []))
-  material?: string[];
-
-  @IsOptional()
   @IsString()
   @MaxLength(255)
   @Transform(({value}) => toNullableString(value))
   style?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => toOptionalUpperStatus(value))
-  @IsIn(PRODUCT_STATUS_VALUES, {message: 'status must be one of NEW, BEST_SELLER, SALE_OFF, NORMAL'})
-  status?: ProductStatus;
+  @IsArray()
+  @IsString({each: true})
+  @IsIn(PRODUCT_STATUS_VALUES, {
+    each: true,
+    message: 'status must contain values from NEW, BEST_SELLER, SALE_OFF, NORMAL',
+  })
+  @Transform(({value}) => toStatusArray(value, []))
+  status?: ProductStatus[];
 
   @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))
@@ -206,20 +225,10 @@ export class CreateProductDto {
   is_popular?: boolean;
 
   @IsOptional()
-  @Transform(({value}) => toBooleanWithDefault(value, true))
-  @IsBoolean()
-  is_bmg?: boolean;
-
-  @IsOptional()
-  @Transform(({value}) => {
-    if (value === undefined || value === null || value === '') {
-      return 0;
-    }
-    const parsed = Number(value);
-    return Number.isNaN(parsed) ? 0 : parsed;
-  })
-  @IsInt()
-  priority?: number;
+  @IsString()
+  @MaxLength(255)
+  @Transform(({value}) => toOptionalUpperString(value))
+  source_type?: string;
 
   @IsOptional()
   @IsString()
@@ -258,10 +267,6 @@ export class UpdateProductDto {
   @IsOptional() @IsString()
   content?: string | null;
 
-  @IsOptional() @IsArray() @IsString({each: true})
-  @Transform(({value}) => toArray(value, undefined))
-  material?: string[];
-
   @IsOptional()
   @IsString()
   @MaxLength(255)
@@ -269,9 +274,14 @@ export class UpdateProductDto {
   style?: string | null;
 
   @IsOptional()
-  @Transform(({value}) => (value === undefined ? undefined : toOptionalUpperStatus(value)))
-  @IsIn(PRODUCT_STATUS_VALUES, {message: 'status must be one of NEW, BEST_SELLER, SALE_OFF, NORMAL'})
-  status?: ProductStatus;
+  @IsArray()
+  @IsString({each: true})
+  @IsIn(PRODUCT_STATUS_VALUES, {
+    each: true,
+    message: 'status must contain values from NEW, BEST_SELLER, SALE_OFF, NORMAL',
+  })
+  @Transform(({value}) => toStatusArray(value, undefined))
+  status?: ProductStatus[];
 
   @IsNotEmpty()
   @Transform(({value}) => toNullableString(value))
@@ -319,18 +329,10 @@ export class UpdateProductDto {
   is_popular?: boolean;
 
   @IsOptional()
-  @Transform(({value}) => toBooleanWithDefault(value, undefined))
-  @IsBoolean()
-  is_bmg?: boolean;
-
-  @IsOptional()
-  @Transform(({value}) => {
-    if (value === undefined || value === null || value === '') return undefined;
-    const parsed = Number(value);
-    return Number.isNaN(parsed) ? undefined : parsed;
-  })
-  @IsInt() @Min(0)
-  priority?: number;
+  @IsString()
+  @MaxLength(255)
+  @Transform(({value}) => (value === undefined ? undefined : toOptionalUpperString(value)))
+  source_type?: string;
 
   @IsOptional() @IsString() @MaxLength(255)
   meta_title?: string | null;
@@ -367,7 +369,9 @@ export class ProductQueryDto {
   search?: string;
 
   @IsOptional()
-  @Transform(({value}) => toBooleanWithDefault(value, undefined))
-  @IsBoolean()
-  is_bmg?: boolean;
+  @Transform(({value}) => toOptionalUpperString(value))
+  @IsString()
+  @MaxLength(255)
+  source_type?: string;
+
 }

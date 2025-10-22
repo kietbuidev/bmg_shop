@@ -119,6 +119,11 @@ export default ProductRouter;
  *            - NORMAL
  *          example: NEW
  *      - in: query
+ *        name: source_type
+ *        schema:
+ *          type: string
+ *          example: IN_HOUSE
+ *      - in: query
  *        name: search
  *        schema:
  *          type: string
@@ -268,11 +273,9 @@ export default ProductRouter;
  *            description: "Elegant minimal dress for summer."
  *            short_description: "Minimal summer dress"
  *            content: "<p>Detailed HTML description</p>"
- *            material:
- *              - "Cotton"
- *              - "Linen"
  *            style: "Casual"
- *            status: "NEW"
+ *            status:
+ *              - "NEW"
  *            thumbnail: "mg/thumbnail-1.jpg"
  *            gallery:
  *              - "img/gallery-1.jpg"
@@ -290,7 +293,7 @@ export default ProductRouter;
  *              - "L"
  *            is_active: true
  *            is_popular: false
- *            priority: 5
+ *            source_type: "IN_HOUSE"
  *            meta_title: "Minimal Dress"
  *            meta_keyword: "dress,minimal"
  *            meta_description: "Minimalist dress product meta"
@@ -333,11 +336,9 @@ export default ProductRouter;
  *            description: "Updated description for the minimal dress."
  *            sale_price: 219000
  *            percent: 30
- *            material:
- *              - "Linen"
- *              - "Viscose"
  *            style: "Summer"
- *            status: "SALE_OFF"
+ *            status:
+ *              - "SALE_OFF"
  *            colors:
  *              - "red"
  *              - "white"
@@ -346,7 +347,7 @@ export default ProductRouter;
  *              - "L"
  *            is_active: true
  *            is_popular: true
- *            priority: 10
+ *            source_type: "IN_HOUSE"
  *            note: "Only fields provided will be updated"
  *     responses:
  *      200:

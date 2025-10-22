@@ -48,9 +48,15 @@ export const isUserToken = async (req: RequestCustom, res: Response, next: NextF
   }
 
   if (token) {
-    jwt.verify(token, secrect, (err, user: User) => {
+    jwt.verify(token, secrect, (err, user: User & {roles?: string[]; is_admin?: boolean}) => {
       if (user) {
         req.headers['user_id'] = user?.['userId'] as any;
+        if (user?.roles) {
+          req.headers['user_roles'] = Array.isArray(user.roles) ? user.roles.join(',') : '';
+        }
+        if (typeof user?.is_admin === 'boolean') {
+          req.headers['is_admin'] = String(user.is_admin);
+        }
         next();
       } else {
         next();

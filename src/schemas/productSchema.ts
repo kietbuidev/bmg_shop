@@ -32,26 +32,22 @@
  *        content:
  *          type: string
  *          nullable: true
- *        material:
- *          type: array
- *          items:
- *            type: string
- *          example:
- *            - "Cotton"
- *            - "Linen"
  *        style:
  *          type: string
  *          nullable: true
  *          example: "Casual"
  *        status:
- *          type: string
- *          nullable: true
- *          enum:
- *            - NEW
- *            - BEST_SELLER
- *            - SALE_OFF
- *            - NORMAL
- *          example: "NEW"
+ *          type: array
+ *          items:
+ *            type: string
+ *            enum:
+ *              - NEW
+ *              - BEST_SELLER
+ *              - SALE_OFF
+ *              - NORMAL
+ *          example:
+ *            - "NEW"
+ *            - "BEST_SELLER"
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -99,9 +95,9 @@
  *        is_popular:
  *          type: boolean
  *          example: false
- *        priority:
- *          type: integer
- *          example: 5
+ *        source_type:
+ *          type: string
+ *          example: "IN_HOUSE"
  *        meta_title:
  *          type: string
  *          nullable: true
@@ -150,22 +146,18 @@
  *        content:
  *          type: string
  *          nullable: true
- *        material:
- *          type: array
- *          items:
- *            type: string
  *        style:
  *          type: string
  *          nullable: true
  *        status:
- *          type: string
- *          nullable: true
- *          enum:
- *            - NEW
- *            - BEST_SELLER
- *            - SALE_OFF
- *            - NORMAL
- *          example: "NEW"
+ *          type: array
+ *          items:
+ *            type: string
+ *            enum:
+ *              - NEW
+ *              - BEST_SELLER
+ *              - SALE_OFF
+ *              - NORMAL
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -199,9 +191,9 @@
  *        is_popular:
  *          type: boolean
  *          example: false
- *        priority:
- *          type: integer
- *          example: 5
+ *        source_type:
+ *          type: string
+ *          example: "IN_HOUSE"
  *        meta_title:
  *          type: string
  *          nullable: true
@@ -236,21 +228,18 @@
  *        content:
  *          type: string
  *          nullable: true
- *        material:
- *          type: array
- *          items:
- *            type: string
  *        style:
  *          type: string
  *          nullable: true
  *        status:
- *          type: string
- *          nullable: true
- *          enum:
- *            - NEW
- *            - BEST_SELLER
- *            - SALE_OFF
- *            - NORMAL
+ *          type: array
+ *          items:
+ *            type: string
+ *            enum:
+ *              - NEW
+ *              - BEST_SELLER
+ *              - SALE_OFF
+ *              - NORMAL
  *        thumbnail:
  *          type: string
  *          nullable: true
@@ -278,8 +267,8 @@
  *          type: boolean
  *        is_popular:
  *          type: boolean
- *        priority:
- *          type: integer
+ *        source_type:
+ *          type: string
  *        meta_title:
  *          type: string
  *          nullable: true

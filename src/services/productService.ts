@@ -70,6 +70,27 @@ export class ProductService {
     return trimmed ? trimmed : null;
   }
 
+  private normalizeSourceType(input: string | undefined): string | undefined {
+    if (input === undefined || input === null) {
+      return undefined;
+    }
+
+    const normalized = String(input).trim().toUpperCase();
+    return normalized ? normalized : undefined;
+  }
+
+  private normalizeStatusArray(input: unknown, fallback: string[] | undefined): string[] | undefined {
+    const normalized = this.normalizeArray(input, fallback);
+    if (normalized === undefined) {
+      return fallback;
+    }
+
+    const values = Array.isArray(normalized) ? [...normalized] : [];
+    return values
+      .map(item => (typeof item === 'string' ? item.trim().toUpperCase() : item))
+      .filter((item): item is string => typeof item === 'string' && item.length > 0);
+  }
+
   private async ensureUniqueCode(code: string, excludeId?: string): Promise<void> {
     const model = this.productRepository.getModel().scope(null);
     const where: Record<string, unknown> = {code};
@@ -179,7 +200,7 @@ export class ProductService {
   }
 
   async list(query: ProductQueryDto): Promise<IPaginateResult<Product>> {
-    const {page = 1, limit = 10, category_id, status, search, is_bmg} = query;
+    const {page = 1, limit = 10, category_id, status, search, source_type} = query;
 
     const where: {[key: string]: unknown; [key: symbol]: unknown} = {};
 
@@ -189,11 +210,13 @@ export class ProductService {
 
     const statusFilter = status ? status.toUpperCase() : undefined;
     if (statusFilter) {
-      where.status = statusFilter;
+      where.status = {
+        [Op.contains]: [statusFilter],
+      };
     }
 
-    if (is_bmg !== undefined) {
-      where.is_bmg = is_bmg;
+    if (source_type) {
+      where.source_type = source_type;
     }
 
     if (search) {
@@ -209,10 +232,7 @@ export class ProductService {
           attributes: ['id', 'name', 'slug', 'description', 'thumbnail', 'gallery', 'priority'],
         },
       ],
-      order: [
-        ['priority', 'ASC'],
-        ['name', 'ASC'],
-      ],
+      order: [['name', 'ASC']],
     };
 
       const pageNumber = Number(page) || 1;
@@ -248,10 +268,7 @@ export class ProductService {
       .scope(...scopes)
       .findAll({
         include: [{model: Category, as: 'category'}],
-        order: [
-          ['priority', 'DESC'],
-          ['name', 'ASC'],
-        ],
+        order: [['name', 'ASC']],
       });
   }
 
@@ -294,9 +311,9 @@ export class ProductService {
     const gallery = this.normalizeArray(payload.gallery, []);
     const sizes = this.normalizeArray(payload.sizes, []);
     const colors = this.normalizeArray(payload.colors, []);
-    const material = this.normalizeArray(payload.material, []);
     const style = this.normalizeNullableString(payload.style);
-    const status = this.normalizeNullableString(payload.status);
+    const status = this.normalizeStatusArray(payload.status, []);
+    const sourceType = this.normalizeSourceType(payload.source_type) ?? 'IN_HOUSE';
 
     const data = this.sanitizePayload({
       ...payload,
@@ -307,17 +324,14 @@ export class ProductService {
       gallery,
       sizes,
       colors,
-      material,
       style,
       status,
+      source_type: sourceType,
       regular_price: payload.regular_price ?? 0,
       sale_price: payload.sale_price ?? 0,
       percent: payload.percent ?? 0,
       currency: payload.currency ?? 'VND',
       is_active: payload.is_active ?? true,
-      is_popular: payload.is_popular ?? false,
-      priority: payload.priority ?? 0,
-      is_bmg: payload.is_bmg ?? true,
     });
 
     const product = await this.productRepository.create(data as Product);
@@ -330,9 +344,9 @@ export class ProductService {
     const gallery = this.normalizeArray(payload.gallery, undefined);
     const sizes = this.normalizeArray(payload.sizes, undefined);
     const colors = this.normalizeArray(payload.colors, undefined);
-    const material = this.normalizeArray(payload.material, undefined);
     const style = this.normalizeNullableString(payload.style);
-    const status = this.normalizeNullableString(payload.status);
+    const status = this.normalizeStatusArray(payload.status, undefined);
+    const sourceType = this.normalizeSourceType(payload.source_type);
 
     let name = payload.name;
     if (name !== undefined) {
@@ -364,11 +378,10 @@ export class ProductService {
       gallery,
       sizes,
       colors,
-      material,
       style,
       status,
+      source_type: sourceType,
       slug: slugValue,
-      is_bmg: payload.is_bmg,
     });
     const [affected] = await this.productRepository.update(id, data as Partial<Product>);
     if (!affected) {

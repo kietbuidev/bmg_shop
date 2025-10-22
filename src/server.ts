@@ -24,7 +24,7 @@ const logFormat = process.env.LOG_FORMAT || 'short';
 
 // Add a list of allowed origins.
 // If you have more origins you would like to add, you can add them to the array below.
-const allowedOrigins = ['http://localhost:3000', 'https://bmgshop-production.up.railway.app', 'http://192.168.0.115:3000', 'https://bmg-admin-shop.vercel.app', '*'];
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001' , 'https://bmgshop-production.up.railway.app', 'http://192.168.0.115:3000', 'http://192.168.0.118:3001', 'http://192.168.0.118:3000' , 'https://bmg-admin-shop.vercel.app', '*'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins,
