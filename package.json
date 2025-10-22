@@ -43,6 +43,7 @@
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
+    "nodemailer": "^6.9.13",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "php-serialize": "^4.1.1",

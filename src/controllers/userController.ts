@@ -12,6 +12,8 @@ import {
   RefreshTokenDto,
   UpdatePasswordDto,
   UpdateUserDto,
+  SendCodeVerify,
+  ResetPasswordDto,
 } from '../database/models/dtos/userDto';
 
 @Service()
@@ -78,6 +80,38 @@ export class UserController {
       const isUser = await this.userService.checkExist(config, body);
 
       res.status(200).json(BuildResponse.get({data: isUser}));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async requestPasswordReset(req: RequestCustom, res: Response, next: NextFunction) {
+    try {
+      const body = req.body as SendCodeVerify;
+      await this.userService.requestPasswordReset(body);
+
+      res.status(200).json(
+        BuildResponse.get({
+          message: 'Password reset code sent!',
+          data: true,
+        }),
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resetPassword(req: RequestCustom, res: Response, next: NextFunction) {
+    try {
+      const body = req.body as ResetPasswordDto;
+      const result = await this.userService.resetPasswordWithCode(body);
+
+      res.status(200).json(
+        BuildResponse.updated({
+          message: 'Password reset successfully!',
+          data: result,
+        }),
+      );
     } catch (error) {
       next(error);
     }

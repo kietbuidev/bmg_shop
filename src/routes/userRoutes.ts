@@ -5,7 +5,16 @@ import {RequestCustom} from '../utils/types';
 import {Service} from 'typedi';
 import {validateDto} from '../middleware/validateDto';
 import {authenticateUserToken} from '../middleware/authenticateToken';
-import {RegisterDto, LoginDto, RefreshTokenDto, CheckExistDto, UpdatePasswordDto, UpdateUserDto} from '../database/models/dtos/userDto';
+import {
+  RegisterDto,
+  LoginDto,
+  RefreshTokenDto,
+  CheckExistDto,
+  UpdatePasswordDto,
+  UpdateUserDto,
+  SendCodeVerify,
+  ResetPasswordDto,
+} from '../database/models/dtos/userDto';
 
 @Service()
 export class UserRouter {
@@ -23,6 +32,14 @@ export class UserRouter {
 
     this.router.post('/check-exist', validateDto(CheckExistDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
       await this.userController.checkExist(req, res, next);
+    });
+
+    this.router.post('/password/forgot', validateDto(SendCodeVerify), async (req: RequestCustom, res: Response, next: NextFunction) => {
+      await this.userController.requestPasswordReset(req, res, next);
+    });
+
+    this.router.post('/password/reset', validateDto(ResetPasswordDto), async (req: RequestCustom, res: Response, next: NextFunction) => {
+      await this.userController.resetPassword(req, res, next);
     });
 
     this.router.post('/login', validateDto(LoginDto), async (req: RequestCustom, res: Response, next: NextFunction) => {

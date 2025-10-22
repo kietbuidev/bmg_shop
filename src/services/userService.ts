@@ -12,8 +12,17 @@ import {ConfigDefault, HTTPCode, StatusActive} from '../utils/enums';
 import {IConfig, IPaginateResult, IRequestQuery} from '../utils/types';
 import authJwt from '../middleware/authJwt';
 import configJwt from '../config/jwt';
-import {RegisterDto, LoginDto, UpdatePasswordDto, DeleteUserDto} from '../database/models/dtos/userDto';
+import {
+  RegisterDto,
+  LoginDto,
+  UpdatePasswordDto,
+  DeleteUserDto,
+  SendCodeVerify,
+  ResetPasswordDto,
+} from '../database/models/dtos/userDto';
 import {logger} from '../utils/logger';
+import {sendMail} from '../utils/mailer';
+import {passwordResetStore} from '../utils/passwordResetStore';
 
 interface AuthTokens {
   access_token: string;
@@ -95,6 +104,10 @@ export class UserService {
     };
   }
 
+  private generateResetCode(): string {
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
+
   private async issueTokens(user: User, extras?: {device_token?: string | null; fcm_token?: string | null}): Promise<AuthTokens> {
     const payload = this.buildPayload(user);
     const [access, refresh] = await Promise.all([authJwt.signAccessToken(payload), authJwt.signRefreshToken(String(user.id))]);
@@ -123,7 +136,7 @@ export class UserService {
     return bcrypt.compare(password, hashed);
   }
 
-  async register(config: IConfig, registerUser: RegisterDto): Promise<Record<string, unknown>> {
+  async register(config: IConfig, registerUser: RegisterDto): Promise<AuthTokens & {user: Record<string, unknown>}> {
     this.normalizeConfig(config);
 
     if (registerUser.password !== registerUser.confirm_password) {
@@ -170,7 +183,14 @@ export class UserService {
     }
 
     const reloaded = await this.userRepository.getById(user.id, {include: this.roleInclude});
-    return this.sanitizeUser(reloaded ?? user);
+    const userWithRoles = reloaded ?? user;
+    const sanitized = this.sanitizeUser(userWithRoles);
+    const tokens = await this.issueTokens(userWithRoles);
+
+    return {
+      ...tokens,
+      user: sanitized,
+    };
   }
 
   async checkExist(config: IConfig, body: {email: string}): Promise<boolean> {
@@ -186,9 +206,72 @@ export class UserService {
     return Boolean(user);
   }
 
+  async requestPasswordReset(body: SendCodeVerify): Promise<boolean> {
+    const email = body.email.trim().toLowerCase();
+    const user = await this.userRepository.getByOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundError('ACCOUNT_NOT_FOUND');
+    }
+
+    const code = this.generateResetCode();
+    passwordResetStore.set(email, code);
+
+    const html = `
+      <p>Xin chào ${user.first_name ?? user.last_name ?? 'bạn'},</p>
+      <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản tại BMG Shop.</p>
+      <p>Mã xác nhận của bạn là: <strong>${code}</strong></p>
+      <p>Mã này sẽ hết hạn sau 15 phút. Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+      <p>Trân trọng,<br/>Đội ngũ BMG Shop</p>
+    `;
+
+    await sendMail({
+      to: email,
+      subject: 'BMG Shop - Mã xác nhận đặt lại mật khẩu',
+      html,
+      text: `Ma xac nhan cua ban la: ${code}. Ma het han sau 15 phut.`,
+    });
+
+    return true;
+  }
+
+  async resetPasswordWithCode(body: ResetPasswordDto): Promise<boolean> {
+    const email = body.email.trim().toLowerCase();
+    if (body.password !== body.confirm_password) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'PASSWORDS_DO_NOT_MATCH');
+    }
+
+    const isValidCode = passwordResetStore.verify(email, body.code_reset_password.trim());
+    if (!isValidCode) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_RESET_CODE');
+    }
+
+    const user = await this.userRepository.getByOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundError('ACCOUNT_NOT_FOUND');
+    }
+
+    const hashed = await this.hashPassword(body.password);
+    await this.userRepository.update(user.id, {
+      password: hashed,
+    } as Partial<User>);
+
+    passwordResetStore.clear(email);
+    return true;
+  }
+
   async login(config: IConfig, userDto: LoginDto): Promise<AuthTokens> {
     this.normalizeConfig(config);
-    let user = await this.userRepository.getByOne({
+    const user = await this.userRepository.getByOne({
       where: {
         email: userDto.email,
       },
@@ -203,7 +286,6 @@ export class UserService {
       throw new CustomError(HTTPCode.UNAUTHORIZE, 'ACCOUNT_DISABLED');
     }
 
-    user = user.get({plain: true}) as any;
     const isValid = await this.comparePassword(userDto.password, user.password);
     if (!isValid) {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_LOGIN_CREDENTIALS');
@@ -215,7 +297,7 @@ export class UserService {
     });
 
     return {
-      ...tokens,
+      ...tokens
     };
   }
 
