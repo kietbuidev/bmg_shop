@@ -48,6 +48,13 @@ export class OrderRouter {
         await this.orderController.updateStatus(req, res, next);
       },
     );
+
+    this.router.get(
+      '/:id',
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.orderController.detail(req, res, next);
+      },
+    );
   }
 
   public getRouter() {
@@ -240,6 +247,31 @@ export default OrderRouter;
  *              $ref: '#/components/schemas/OrderDetailResponse'
  *      400:
  *        description: Validation error
+ *      404:
+ *        description: Order not found
+ *
+ * '/api/orders/{id}':
+ *  get:
+ *     tags:
+ *     - Orders
+ *     summary: Get order detail
+ *     description: Retrieve detailed information for a specific order.
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: string
+ *          format: uuid
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/OrderDetailResponse'
  *      404:
  *        description: Order not found
  */

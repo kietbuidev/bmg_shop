@@ -76,6 +76,21 @@ export class OrderController {
     }
   }
 
+  async detail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = this.parseId(req.params.id, 'INVALID_ORDER_ID');
+      const order = await this.orderService.getDetail(id);
+
+      res.status(200).json(
+        BuildResponse.get({
+          data: order,
+        }),
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
   private parseId(idParam: string, errorCode: string): string {
     const id = idParam?.trim();
 

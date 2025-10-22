@@ -232,7 +232,7 @@ export class OrderService {
         include: [
           {model: Customer, as: 'customer'},
           {model: OrderItem, as: 'items'},
-          {model: User, as: 'buyer'},
+          {model: User, as: 'buyer', attributes: ['id', 'first_name', 'last_name', 'email', 'phone']},
         ],
         transaction,
       });
@@ -264,7 +264,7 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer'},
         {model: OrderItem, as: 'items'},
-        {model: User, as: 'buyer'},
+        {model: User, as: 'buyer', attributes: []},
       ],
       order: [['created_at', 'DESC']],
     };
@@ -319,12 +319,28 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer', where: customerWhere},
         {model: OrderItem, as: 'items'},
-        {model: User, as: 'buyer'},
+        {model: User, as: 'buyer', attributes: ['id', 'first_name', 'last_name', 'email', 'phone']},
       ],
       order: [['created_at', 'DESC']],
     });
 
     return orders as Order[];
+  }
+
+  async getDetail(id: string): Promise<Order> {
+    const order = await this.orderRepository.getById(id, {
+      include: [
+        {model: Customer, as: 'customer'},
+        {model: OrderItem, as: 'items'},
+        {model: User, as: 'buyer', attributes: ['id', 'first_name', 'last_name', 'email', 'phone']},
+      ],
+    });
+
+    if (!order) {
+      throw new NotFoundError('ORDER_NOT_FOUND');
+    }
+
+    return order;
   }
 
   async updateStatus(id: string, status: string): Promise<Order> {
@@ -338,7 +354,7 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer'},
         {model: OrderItem, as: 'items'},
-        {model: User, as: 'buyer'},
+        {model: User, as: 'buyer', attributes: ['id', 'first_name', 'last_name', 'email', 'phone']},
       ],
     });
 
@@ -352,7 +368,7 @@ export class OrderService {
       include: [
         {model: Customer, as: 'customer'},
         {model: OrderItem, as: 'items'},
-        {model: User, as: 'buyer'},
+        {model: User, as: 'buyer', attributes: ['id', 'first_name', 'last_name', 'email', 'phone']},
       ],
     });
 

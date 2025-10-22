@@ -38,7 +38,7 @@ type NotificationResponse = Record<string, unknown> & {
 export class UserService {
   private readonly userRepository: UserRepository;
   private readonly notificationRepository: NotificationRepository;
-  private readonly roleInclude = [{model: Role, as: 'roles',}];
+  private readonly roleInclude = [{model: Role, as: 'roles'}];
 
   constructor() {
     this.userRepository = new UserRepository();
@@ -273,7 +273,7 @@ export class UserService {
 
   async login(config: IConfig, userDto: LoginDto): Promise<AuthTokens> {
     this.normalizeConfig(config);
-    const user = await this.userRepository.getByOne({
+    let user = await this.userRepository.getByOne({
       where: {
         email: userDto.email,
       },
@@ -292,6 +292,7 @@ export class UserService {
     if (!isValid) {
       throw new CustomError(HTTPCode.BAD_REQUEST, 'INVALID_LOGIN_CREDENTIALS');
     }
+    user = user.get({ plain: true});
 
     const tokens = await this.issueTokens(user, {
       device_token: userDto.device_token ?? null,

@@ -159,6 +159,9 @@
  *              type: string
  *              format: email
  *              nullable: true
+ *            phone:
+ *              type: string
+ *              nullable: true
  *        items:
  *          type: array
  *          items:
