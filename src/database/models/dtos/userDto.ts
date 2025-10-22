@@ -18,10 +18,10 @@ export class RegisterDto {
   phone: string;
 
   @IsNotEmpty()
-  phone_code: string;
+  gender: string;
 
   @IsNotEmpty()
-  country: string;
+  birthday: Date;
 
   @IsString()
   @IsNotEmpty()
@@ -30,7 +30,7 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
-  confirm_password;
+  confirm_password: string;
 }
 
 export class VerifyCodeDto {
@@ -153,10 +153,6 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  phone_code?: string;
-
-  @IsOptional()
-  @IsString()
   country?: string;
 
   @IsOptional()
@@ -184,7 +180,6 @@ export class UserContactDto {
   last_name: string;
   email: string;
   phone: string;
-  phone_code: string;
   country: string;
 }
 

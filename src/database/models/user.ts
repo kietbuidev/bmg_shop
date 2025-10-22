@@ -23,10 +23,13 @@ export default class User extends Model<User> {
   declare phone: string | null;
 
   @Column({type: DataType.STRING(10), allowNull: true})
-  declare phone_code: string | null;
+  declare country: string | null;
 
   @Column({type: DataType.STRING(10), allowNull: true})
-  declare country: string | null;
+  declare gender: string | null;
+
+  @Column({type: DataType.DATEONLY, allowNull: true})
+  declare birthday: Date | null;
 
   @Column({type: DataType.STRING(255), allowNull: true})
   declare password: string | null;

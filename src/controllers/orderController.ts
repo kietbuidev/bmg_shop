@@ -3,7 +3,7 @@ import {Service} from 'typedi';
 import {validate as uuidValidate, version as uuidVersion} from 'uuid';
 import BuildResponse from '../utils/buildResponse';
 import OrderService from '../services/orderService';
-import {CreateOrderDto, OrderListQueryDto, UpdateOrderStatusDto} from '../database/models/dtos/orderDto';
+import {CreateOrderDto, OrderListQueryDto, OrderSearchQueryDto, UpdateOrderStatusDto} from '../database/models/dtos/orderDto';
 import {CustomError} from '../utils/customError';
 import {HTTPCode} from '../utils/enums';
 
@@ -17,6 +17,21 @@ export class OrderController {
       const orders = await this.orderService.list(query);
 
       res.status(200).json(BuildResponse.get(orders));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async findByContact(req: Request, res: Response, next: NextFunction) {
+    try {
+      const query = ((req as any).validated ?? req.query) as OrderSearchQueryDto;
+      const orders = await this.orderService.findByContact(query);
+
+      res.status(200).json(
+        BuildResponse.get({
+          data: orders,
+        }),
+      );
     } catch (error) {
       next(error);
     }

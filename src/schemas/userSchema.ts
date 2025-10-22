@@ -7,9 +7,10 @@
  *      required:
  *        - first_name
  *        - last_name
- *        - phone_code
  *        - phone
  *        - email
+ *        - gender
+ *        - birthday
  *        - password
  *      properties:
  *        first_name:
@@ -18,15 +19,16 @@
  *        last_name:
  *          type: string
  *          default: Account
- *        phone_code:
- *          type: string
- *          default: +84
  *        phone:
  *          type: string
  *          default: 1234567890
- *        country:
+ *        gender:
  *          type: string
- *          default: vn
+ *          default: male
+ *        birthday:
+ *          type: string
+ *          format: date
+ *          default: 1990-01-01
  *        email:
  *          type: string
  *          default: example@gmail.com
@@ -419,9 +421,6 @@
  *        phone:
  *          type: string
  *          default: 0123456789
- *        phone_code:
- *          type: string
- *          default: +84
  *        country:
  *          type: string
  *          default: vi
@@ -455,8 +454,6 @@
  *            email:
  *              type: string
  *            phone:
- *              type: string
- *            phone_code:
  *              type: string
  *            country:
  *              type: string
@@ -557,8 +554,6 @@
  *            email:
  *              type: string
  *            phone:
- *              type: string
- *            phone_code:
  *              type: string
  *            country:
  *              type: string
@@ -832,8 +827,6 @@
  *            title:
  *              type: string
  *            phone:
- *              type: string
- *            phone_code:
  *              type: string
  *            key:
  *              type: string

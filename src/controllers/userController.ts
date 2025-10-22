@@ -205,7 +205,6 @@ export class UserController {
         first_name: body.first_name,
         last_name: body.last_name,
         phone: body.phone,
-        phone_code: body.phone_code,
         country: body.country,
         address: body.address,
       };

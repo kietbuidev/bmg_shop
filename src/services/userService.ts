@@ -154,13 +154,15 @@ export class UserService {
     }
 
     const hashedPassword = await this.hashPassword(registerUser.password);
+    const normalizedBirthday = registerUser.birthday ? new Date(registerUser.birthday) : null;
+    const birthdayValue = normalizedBirthday && !Number.isNaN(normalizedBirthday.valueOf()) ? normalizedBirthday : null;
     const user: User = await this.userRepository.create({
       first_name: registerUser.first_name,
       last_name: registerUser.last_name,
       email: registerUser.email,
       phone: registerUser.phone,
-      phone_code: registerUser.phone_code,
-      country: registerUser.country,
+      gender: registerUser.gender,
+      birthday: birthdayValue,
       password: hashedPassword,
       status: StatusActive.On,
     } as unknown as User);
@@ -384,7 +386,6 @@ export class UserService {
       first_name: userDto.first_name ?? user.first_name,
       last_name: userDto.last_name ?? user.last_name,
       phone: userDto.phone ?? user.phone,
-      phone_code: userDto.phone_code ?? user.phone_code,
       country: userDto.country ?? user.country,
       address: userDto.address ?? user.address,
     } as Partial<User>);

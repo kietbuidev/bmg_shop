@@ -3,7 +3,7 @@ import type {NextFunction, Request, Response} from 'express';
 import {Service} from 'typedi';
 import OrderController from '../controllers/orderController';
 import {validateDto} from '../middleware/validateDto';
-import {CreateOrderDto, OrderListQueryDto, UpdateOrderStatusDto} from '../database/models/dtos/orderDto';
+import {CreateOrderDto, OrderListQueryDto, OrderSearchQueryDto, UpdateOrderStatusDto} from '../database/models/dtos/orderDto';
 
 @Service()
 export class OrderRouter {
@@ -15,6 +15,14 @@ export class OrderRouter {
   }
 
   private initRoutes() {
+    this.router.get(
+      '/search',
+      validateDto(OrderSearchQueryDto),
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.orderController.findByContact(req, res, next);
+      },
+    );
+
     this.router.get(
       '/',
       validateDto(OrderListQueryDto),
@@ -47,6 +55,48 @@ export class OrderRouter {
 
 export default OrderRouter;
 
+/**
+ * @openapi
+ * '/api/orders/search':
+ *   get:
+ *     tags:
+ *       - Orders
+ *     summary: Find orders by email or phone
+ *     description: Retrieve the latest orders linked to a customer by email or phone number.
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: Customer email address.
+ *       - in: query
+ *         name: phone
+ *         schema:
+ *           type: string
+ *         description: Customer phone number.
+ *     responses:
+ *       200:
+ *         description: Orders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: data has been received!
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/OrderDetailResponse'
+ *       400:
+ *         description: Email or phone is required
+ */
 /**
  * @openapi
  * '/api/orders':

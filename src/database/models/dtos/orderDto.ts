@@ -41,6 +41,15 @@ const toRequiredUppercaseStatus = (value: unknown): string => {
   return value.trim().toUpperCase();
 };
 
+const toOptionalTrimmedString = (value: unknown): string | undefined => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
 export class CreateOrderItemDto {
   @IsUUID()
   product_id!: string;
@@ -127,3 +136,15 @@ export class UpdateOrderStatusDto {
 }
 
 export const ORDER_STATUS_FILTER_VALUES = ORDER_STATUS_VALUES;
+
+export class OrderSearchQueryDto {
+  @IsOptional()
+  @Transform(({value}) => toOptionalTrimmedString(value))
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @Transform(({value}) => toOptionalTrimmedString(value))
+  @IsString()
+  phone?: string;
+}

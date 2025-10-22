@@ -9,7 +9,7 @@ import Customer from '../database/models/customer';
 import OrderRepository from '../database/repositories/order';
 import CustomerRepository from '../database/repositories/customer';
 import ProductRepository from '../database/repositories/product';
-import {CreateOrderDto, CreateOrderItemDto, OrderListQueryDto} from '../database/models/dtos/orderDto';
+import {CreateOrderDto, CreateOrderItemDto, OrderListQueryDto, OrderSearchQueryDto} from '../database/models/dtos/orderDto';
 import {CustomError, NotFoundError} from '../utils/customError';
 import {HTTPCode, NotificationType} from '../utils/enums';
 import {IPaginateResult} from '../utils/types';
@@ -291,6 +291,35 @@ export class OrderService {
       },
       rows: rows as Order[],
     };
+  }
+
+  async findByContact(query: OrderSearchQueryDto): Promise<Order[]> {
+    const email = query.email?.toLowerCase();
+    const phone = query.phone;
+
+    if (!email && !phone) {
+      throw new CustomError(HTTPCode.BAD_REQUEST, 'EMAIL_OR_PHONE_REQUIRED');
+    }
+
+    const customerWhere: Record<string, unknown> = {};
+
+    if (email) {
+      customerWhere.email = {[Op.iLike]: email};
+    }
+
+    if (phone) {
+      customerWhere.phone = {[Op.iLike]: phone};
+    }
+
+    const orders = await this.orderRepository.getModel().findAll({
+      include: [
+        {model: Customer, as: 'customer', where: customerWhere},
+        {model: OrderItem, as: 'items'},
+      ],
+      order: [['created_at', 'DESC']],
+    });
+
+    return orders as Order[];
   }
 
   async updateStatus(id: string, status: string): Promise<Order> {
