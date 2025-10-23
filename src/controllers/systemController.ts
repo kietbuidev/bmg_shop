@@ -38,6 +38,26 @@ export class SystemController {
       next(err);
     }
   }
+
+  async listProvinces(req: Request, res: Response, next: NextFunction) {
+    try {
+      const provinces = await this.systemService.listProvinces();
+      res.status(200).json(BuildResponse.get({ data: provinces }));
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  }
+
+  async listDistrictsByProvince(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { province_id } = ((req as any).validated ?? req.query ?? {}) as { province_id?: string };
+      const districts = await this.systemService.listDistrictsByProvince(province_id ?? '');
+      res.status(200).json(BuildResponse.get({ data: districts }));
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export default SystemController;

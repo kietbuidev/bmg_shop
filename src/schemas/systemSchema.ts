@@ -230,3 +230,65 @@
  *              format: uri
  *              example: "https://res.cloudinary.com/dbms5fhqs/image/upload/v1723872345/bmg_shop/posts/image-172387234.png"
  */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    Province:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: "9d6f8e55-3c21-43b7-9f3a-5c36a8d4fd13"
+ *        name:
+ *          type: string
+ *          example: "Hồ Chí Minh"
+ *    ProvinceListResponse:
+ *      type: object
+ *      properties:
+ *        code:
+ *          type: integer
+ *          example: 200
+ *        message:
+ *          type: string
+ *          example: "data has been received!"
+ *        data:
+ *          type: array
+ *          items:
+ *            $ref: '#/components/schemas/Province'
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    District:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: "23d7b560-9b6a-4c14-a14d-0c9e4bf322c5"
+ *        province_id:
+ *          type: string
+ *          format: uuid
+ *          example: "9d6f8e55-3c21-43b7-9f3a-5c36a8d4fd13"
+ *        name:
+ *          type: string
+ *          example: "Quận 1"
+ *    DistrictListResponse:
+ *      type: object
+ *      properties:
+ *        code:
+ *          type: integer
+ *          example: 200
+ *        message:
+ *          type: string
+ *          example: "data has been received!"
+ *        data:
+ *          type: array
+ *          items:
+ *            $ref: '#/components/schemas/District'
+ */

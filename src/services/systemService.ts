@@ -6,6 +6,8 @@ import {decodeBase64Image} from '../utils/service';
 import {CustomError} from '../utils/customError';
 import {HTTPCode, UploadImageType} from '../utils/enums';
 import {logger} from '../utils/logger';
+import ProvinceRepository from '../database/repositories/province';
+import DistrictRepository from '../database/repositories/district';
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
@@ -24,20 +26,33 @@ interface UploadOptions {
 
 @Service()
 export class SystemService {
-  constructor() {
-    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-      throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'CLOUDINARY_CREDENTIALS_NOT_FOUND');
-    }
+  private readonly provinceRepository: ProvinceRepository;
+  private readonly districtRepository: DistrictRepository;
+  private readonly cloudinaryConfigured: boolean;
 
-    cloudinary.config({
-      cloud_name: CLOUDINARY_CLOUD_NAME,
-      api_key: CLOUDINARY_API_KEY,
-      api_secret: CLOUDINARY_API_SECRET,
-      secure: true,
-    });
+  constructor() {
+    this.provinceRepository = new ProvinceRepository();
+    this.districtRepository = new DistrictRepository();
+
+    if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
+      cloudinary.config({
+        cloud_name: CLOUDINARY_CLOUD_NAME,
+        api_key: CLOUDINARY_API_KEY,
+        api_secret: CLOUDINARY_API_SECRET,
+        secure: true,
+      });
+      this.cloudinaryConfigured = true;
+    } else {
+      this.cloudinaryConfigured = false;
+      logger.warn('Cloudinary credentials are not fully configured; upload image feature is disabled.');
+    }
   }
 
   async uploadImage(options: UploadOptions = {}) {
+    if (!this.cloudinaryConfigured) {
+      throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'CLOUDINARY_CREDENTIALS_NOT_FOUND');
+    }
+
     const hasBase64 = Boolean(options.base64);
     const hasBuffer = Boolean(options.buffer);
 
@@ -131,6 +146,30 @@ export class SystemService {
       webViewLink: secureUrl,
       downloadLink: secureUrl,
     };
+  }
+
+  async listProvinces() {
+    return this.provinceRepository.findByOptions({
+      attributes: ['id', 'name'],
+      order: [['name', 'ASC']],
+    });
+  }
+
+  async listDistrictsByProvince(provinceId: string) {
+    if (!provinceId) {
+      throw new CustomError(HTTPCode.REQUIRED, 'PROVINCE_ID_REQUIRED');
+    }
+
+    const province = await this.provinceRepository.getById(provinceId);
+    if (!province) {
+      throw new CustomError(HTTPCode.NOT_FOUND, 'PROVINCE_NOT_FOUND');
+    }
+
+    return this.districtRepository.findByOptions({
+      where: {province_id: provinceId},
+      attributes: ['id', 'name', 'description', 'province_id'],
+      order: [['name', 'ASC']],
+    });
   }
 
   private resolveFolder(type: UploadImageType): string | undefined {

@@ -12,6 +12,8 @@ import User from './models/user';
 import Notification from './models/notification';
 import Role from './models/role';
 import RoleUser from './models/role_user';
+import Province from './models/province';
+import District from './models/district';
 
 const database = process.env.DB_NAME || 'neondb';
 const username = process.env.DB_USER || 'neondb_owner';
@@ -29,7 +31,22 @@ const sequelize = new Sequelize({
   port,
   dialect: 'postgres',
   logging: enableLogging ? (msg) => logger.debug(msg) : false,
-  models: [Category, Contact, Order, Product, Post, Customer, OrderItem, Counter, User, Notification, Role, RoleUser],
+  models: [
+    Category,
+    Contact,
+    Order,
+    Product,
+    Post,
+    Customer,
+    OrderItem,
+    Counter,
+    User,
+    Notification,
+    Role,
+    RoleUser,
+    Province,
+    District,
+  ],
   dialectOptions:
     ssl === 'true'
       ? {

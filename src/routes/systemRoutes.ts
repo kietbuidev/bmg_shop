@@ -6,7 +6,7 @@ import CounterController from '../controllers/counterController';
 import SystemController from '../controllers/systemController';
 import {validateDto} from '../middleware/validateDto';
 import {CreateCounterDto, GetCounterChartQueryDto} from '../database/models/dtos/counterDto';
-import {UploadImageDto} from '../database/models/dtos/systemDto';
+import {UploadImageDto, GetDistrictsQueryDto} from '../database/models/dtos/systemDto';
 
 @Service()
 export class SystemRouter {
@@ -44,6 +44,18 @@ export class SystemRouter {
       validateDto(UploadImageDto),
       async (req: Request, res: Response, next: NextFunction) => {
         await this.systemController.uploadImage(req, res, next);
+      },
+    );
+
+    this.router.get('/provinces', async (req: Request, res: Response, next: NextFunction) => {
+      await this.systemController.listProvinces(req, res, next);
+    });
+
+    this.router.get(
+      '/districts',
+      validateDto(GetDistrictsQueryDto),
+      async (req: Request, res: Response, next: NextFunction) => {
+        await this.systemController.listDistrictsByProvince(req, res, next);
       },
     );
   }
@@ -150,4 +162,46 @@ export default SystemRouter;
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/UploadImageResponse'
+ */
+/**
+ * @openapi
+ * '/api/system/provinces':
+ *  get:
+ *     tags:
+ *     - System
+ *     summary: List all provinces
+ *     description: Retrieve the complete list of provinces.
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ProvinceListResponse'
+ */
+/**
+ * @openapi
+ * '/api/system/districts':
+ *  get:
+ *     tags:
+ *     - System
+ *     summary: List districts by province
+ *     description: Retrieve all districts that belong to the provided province.
+ *     parameters:
+ *      - $ref: '#/components/parameters/language'
+ *      - $ref: '#/components/parameters/platform'
+ *      - in: query
+ *        name: province_id
+ *        required: true
+ *        schema:
+ *          type: string
+ *          format: uuid
+ *        description: Province identifier used to filter districts.
+ *     responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/DistrictListResponse'
  */

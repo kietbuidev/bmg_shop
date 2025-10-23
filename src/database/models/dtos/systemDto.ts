@@ -1,4 +1,4 @@
-import {IsEnum, IsOptional, IsString, MaxLength} from 'class-validator';
+import {IsEnum, IsOptional, IsString, IsUUID, MaxLength} from 'class-validator';
 import {UploadImageType} from '../../../utils/enums';
 
 export class UploadImageDto {
@@ -18,4 +18,9 @@ export class UploadImageDto {
   @IsString()
   @MaxLength(255)
   file_name?: string;
+}
+
+export class GetDistrictsQueryDto {
+  @IsUUID()
+  province_id!: string;
 }
