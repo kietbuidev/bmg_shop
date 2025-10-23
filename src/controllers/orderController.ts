@@ -14,7 +14,31 @@ export class OrderController {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       const query = ((req as any).validated ?? req.query) as OrderListQueryDto;
-      const orders = await this.orderService.list(query);
+      const authUser = (req as any).user;
+      let userContext: {
+        userId?: string;
+        roles?: string[];
+        isAdmin?: boolean;
+      } | undefined;
+
+      if (authUser) {
+        const userId = authUser?.userId ?? authUser?.id;
+        const roles = Array.isArray(authUser?.roles)
+          ? authUser.roles.filter((role: unknown): role is string => typeof role === 'string')
+          : [];
+        const isAdmin =
+          typeof authUser?.is_admin === 'boolean'
+            ? authUser.is_admin
+            : roles.some((role: string) => role.toLowerCase() === 'admin');
+
+        userContext = {
+          userId: userId ? String(userId) : undefined,
+          roles,
+          isAdmin,
+        };
+      }
+
+      const orders = await this.orderService.list(query, userContext);
 
       res.status(200).json(BuildResponse.get(orders));
     } catch (error) {

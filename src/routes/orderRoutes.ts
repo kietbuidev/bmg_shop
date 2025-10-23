@@ -113,7 +113,7 @@ export default OrderRouter;
  *     tags:
  *     - Orders
  *     summary: List orders
- *     description: Retrieve orders with pagination and optional status filter
+ *     description: Retrieve orders with pagination and optional status or keyword filters
  *     parameters:
  *      - $ref: '#/components/parameters/language'
  *      - $ref: '#/components/parameters/platform'
@@ -138,6 +138,11 @@ export default OrderRouter;
  *            - PROCESSING
  *            - COMPLETED
  *            - ALL
+ *      - in: query
+ *        name: keyword
+ *        schema:
+ *          type: string
+ *        description: Search by order code (partial matches supported, case-insensitive).
  *     responses:
  *      200:
  *        description: Success
@@ -182,6 +187,7 @@ export default OrderRouter;
  *          schema:
  *            $ref: '#/components/schemas/OrderCreateInput'
  *          example:
+ *            payment_method: "Cash on Delivery"
  *            customer:
  *              full_name: "Jane Doe"
  *              email: "jane@example.com"

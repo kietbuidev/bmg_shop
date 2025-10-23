@@ -209,10 +209,10 @@ export enum PaymentStatus {
 }
 
 export enum PaymentMethod {
-  FMC_PAY = 'fmcpay',
-  APPOTA_PAY = 'appotapay',
-  CREDIT_CARD = 'creditcard',
-  POSTPAID = 'postpaid',
+ COD = 'Cash on Delivery',
+ EWallet = 'EWallet',
+ QRCode = 'QRCode',
+ OnlineBanking = 'OnlineBanking'
 }
 
 export enum StatusSendEmail {

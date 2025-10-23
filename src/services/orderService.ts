@@ -29,6 +29,12 @@ interface CalculatedItem {
   payload: CreateOrderItemDto;
 }
 
+type OrderListContext = {
+  userId?: string;
+  isAdmin?: boolean;
+  roles?: string[];
+};
+
 const toNumber = (value: unknown): number => {
   if (typeof value === 'number') {
     return value;
@@ -203,6 +209,7 @@ export class OrderService {
           buyer_id: buyerId,
           status: 'PENDING',
           currency: calculated[0]?.unitCurrency ?? 'VND',
+          payment_method: payload.payment_method,
           total_items: totalItems,
           subtotal_amount: formatAmount(subtotal),
           discount_amount: formatAmount(totalDiscount),
@@ -249,14 +256,30 @@ export class OrderService {
     return order;
   }
 
-  async list(query: OrderListQueryDto): Promise<IPaginateResult<Order>> {
+  async list(query: OrderListQueryDto, context?: OrderListContext): Promise<IPaginateResult<Order>> {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
     const requestedStatus = typeof query.status === 'string' ? query.status.trim().toUpperCase() : undefined;
+    const keyword = typeof query.keyword === 'string' ? query.keyword.trim() : undefined;
+
+    const candidateRoles = Array.isArray(context?.roles) ? (context?.roles as unknown[]) : [];
+    const normalizedRoles = candidateRoles.filter((role): role is string => typeof role === 'string');
+    const isAdmin =
+      typeof context?.isAdmin === 'boolean'
+        ? context.isAdmin
+        : normalizedRoles.some((role) => role.toLowerCase() === 'admin');
 
     const where: WhereOptions<Order> = {};
     if (requestedStatus && requestedStatus !== 'ALL') {
       where.status = requestedStatus;
+    }
+
+    if (keyword) {
+      where.order_code = {[Op.iLike]: `%${keyword}%`};
+    }
+
+    if (!isAdmin && context?.userId) {
+      where.buyer_id = context.userId;
     }
 
     const options: FindOptions = {

@@ -134,6 +134,14 @@
  *        total_amount:
  *          type: string
  *          example: "498000.00"
+ *        payment_method:
+ *          type: string
+ *          example: "Cash on Delivery"
+ *          enum:
+ *            - Cash on Delivery
+ *            - EWallet
+ *            - QRCode
+ *            - OnlineBanking
  *        created_at:
  *          type: string
  *          format: date-time
@@ -175,9 +183,18 @@
  *    OrderCreateInput:
  *      type: object
  *      required:
+ *        - payment_method
  *        - customer
  *        - items
  *      properties:
+ *        payment_method:
+ *          type: string
+ *          enum:
+ *            - Cash on Delivery
+ *            - EWallet
+ *            - QRCode
+ *            - OnlineBanking
+ *          example: "Cash on Delivery"
  *        customer:
  *          type: object
  *          required:

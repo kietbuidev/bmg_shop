@@ -3,6 +3,7 @@ import {Transform} from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -12,6 +13,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import {PaymentMethod} from '../../../utils/enums';
 
 const ORDER_STATUS_VALUES = [
   'PENDING',
@@ -91,6 +93,10 @@ export class CreateOrderCustomerDto {
 }
 
 export class CreateOrderDto {
+  @Transform(({value}) => (typeof value === 'string' ? value.trim() : value))
+  @IsEnum(PaymentMethod, {message: `payment_method must be one of: ${Object.values(PaymentMethod).join(', ')}`})
+  payment_method!: PaymentMethod;
+
   @ValidateNested()
   @Type(() => CreateOrderCustomerDto)
   customer!: CreateOrderCustomerDto;
@@ -125,6 +131,11 @@ export class OrderListQueryDto {
   @Transform(({value}) => toOptionalUppercaseStatus(value))
   @IsIn([...ORDER_STATUS_VALUES, 'ALL'], {message: `status must be one of: ${[...ORDER_STATUS_VALUES, 'ALL'].join(', ')}`})
   status?: string;
+
+  @IsOptional()
+  @Transform(({value}) => toOptionalTrimmedString(value))
+  @IsString()
+  keyword?: string;
 }
 
 export class UpdateOrderStatusDto {

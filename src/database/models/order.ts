@@ -1,6 +1,6 @@
 import {
   Table, Column, Model, DataType, PrimaryKey, Default,
-  CreatedAt, UpdatedAt, ForeignKey, BelongsTo, HasMany
+  CreatedAt, UpdatedAt, ForeignKey, BelongsTo, HasMany,
 } from 'sequelize-typescript';
 import OrderItem from './order_item';
 import Customer from './customer';
@@ -47,6 +47,9 @@ export default class Order extends Model<Order> {
 
   @Column({ type: DataType.DECIMAL(12, 2), allowNull: false, defaultValue: 0 })
   declare total_amount: string;
+
+  @Column({ type: DataType.TEXT, allowNull: false})
+  declare payment_method: string;
 
   @CreatedAt declare created_at: Date;
   @UpdatedAt declare updated_at: Date;
