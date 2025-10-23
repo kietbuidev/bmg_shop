@@ -1,4 +1,5 @@
 import {Table, Column, Model, CreatedAt, UpdatedAt, DataType, AutoIncrement, PrimaryKey, Unique, HasOne, Default, BelongsToMany} from 'sequelize-typescript';
+import type {IUserAddress} from '../../utils/types';
 import Role from './role';
 import RoleUser from './role_user';
 
@@ -34,8 +35,8 @@ export default class User extends Model<User> {
   @Column({type: DataType.STRING(255), allowNull: true})
   declare password: string | null;
 
-  @Column({type: DataType.STRING(255), allowNull: true})
-  declare address: string | null;
+  @Column({type: DataType.JSONB, allowNull: true})
+  declare address: IUserAddress | null;
 
   @Column({type: DataType.INTEGER, allowNull: true, defaultValue: null})
   declare avatar: number | any;

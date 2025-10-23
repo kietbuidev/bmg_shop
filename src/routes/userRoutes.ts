@@ -204,6 +204,18 @@ export class UserRouter {
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/UpdateUserInput'
+ *           example:
+ *             first_name: "Linh"
+ *             last_name: "Nguyen"
+ *             phone: "0912345678"
+ *             country: "vn"
+ *             gender: "female"
+ *             address:
+ *               detail: "12 Nguyễn Huệ"
+ *               district: "Quận 1"
+ *               province: "TP.HCM"
+ *               district_id: "9b8d0e2a-1234-4e6f-a1c2-9876543210ab"
+ *               province_id: "1a2b3c4d-5678-4f9a-b0c1-abcdef123456"
  *     responses:
  *       200:
  *         description: Profile updated successfully

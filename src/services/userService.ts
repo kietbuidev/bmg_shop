@@ -388,7 +388,8 @@ export class UserService {
       last_name: userDto.last_name ?? user.last_name,
       phone: userDto.phone ?? user.phone,
       country: userDto.country ?? user.country,
-      address: userDto.address ?? user.address,
+      gender: userDto.gender ?? user.gender,
+  address: userDto.address !== undefined ? userDto.address : user.address,
     } as Partial<User>);
 
     const updated = await this.userRepository.getById(user.id, {include: this.roleInclude});

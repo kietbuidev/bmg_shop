@@ -1,5 +1,29 @@
-import {IsEmail, IsNotEmpty, IsPhoneNumber, IsString, Equals, Validate, ValidateIf, Matches, IsBoolean, IsOptional} from 'class-validator';
+import {IsEmail, IsNotEmpty, IsPhoneNumber, IsString, Equals, Validate, ValidateIf, Matches, IsBoolean, IsOptional, ValidateNested} from 'class-validator';
+import {Type} from 'class-transformer';
 import {ValidatePassword} from '../decorators/registerDecorator';
+import type {IUserAddress} from '../../../utils/types';
+
+export class AddressDto implements IUserAddress {
+  @IsString()
+  @IsNotEmpty()
+  detail!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  district!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  province!: string;
+
+  @IsOptional()
+  @IsString()
+  district_id?: string | null;
+
+  @IsOptional()
+  @IsString()
+  province_id?: string | null;
+}
 
 export class RegisterDto {
   @IsString()
@@ -157,7 +181,12 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  address?: string;
+  gender?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => AddressDto)
+  address?: AddressDto | null;
 }
 
 export class DeleteUserDto {

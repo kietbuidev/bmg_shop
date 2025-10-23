@@ -65,6 +65,15 @@ const ORDER_STATUS_SET = new Set([
   'COMPLETED',
 ]);
 
+type OrderContactSummary = {
+  order_code: string;
+  name: string | null;
+  phone: string | null;
+  address: string | null;
+  created_at: Date;
+  status: string;
+};
+
 @Service()
 export class OrderService {
   private readonly orderRepository: OrderRepository;
@@ -320,7 +329,7 @@ export class OrderService {
     };
   }
 
-  async findByContact(query: OrderSearchQueryDto): Promise<Order[]> {
+  async findByContact(query: OrderSearchQueryDto): Promise<OrderContactSummary[]> {
     const email = query.email?.toLowerCase();
     const phone = query.phone;
 
@@ -339,15 +348,27 @@ export class OrderService {
     }
 
     const orders = await this.orderRepository.getModel().findAll({
+      attributes: ['order_code', 'status', 'created_at'],
       include: [
-        {model: Customer, as: 'customer', where: customerWhere},
-        {model: OrderItem, as: 'items'},
-        {model: User, as: 'buyer', attributes: ['id', 'first_name', 'last_name', 'email', 'phone']},
+        {
+          model: Customer,
+          as: 'customer',
+          where: customerWhere,
+          attributes: ['full_name', 'phone', 'address'],
+          required: true,
+        },
       ],
       order: [['created_at', 'DESC']],
     });
 
-    return orders as Order[];
+    return orders.map((order) => ({
+      order_code: order.order_code,
+      name: order.customer?.full_name ?? null,
+      phone: order.customer?.phone ?? null,
+      address: order.customer?.address ?? null,
+      created_at: order.created_at,
+      status: order.status,
+    }));
   }
 
   async getDetail(id: string): Promise<Order> {

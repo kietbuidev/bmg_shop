@@ -105,6 +105,32 @@
  * @openapi
  * components:
  *  schemas:
+ *    UserAddress:
+ *      type: object
+ *      properties:
+ *        detail:
+ *          type: string
+ *          example: "12 Nguyễn Huệ"
+ *        district:
+ *          type: string
+ *          example: "Quận 1"
+ *        province:
+ *          type: string
+ *          example: "TP.HCM"
+ *        district_id:
+ *          type: string
+ *          format: uuid
+ *          nullable: true
+ *        province_id:
+ *          type: string
+ *          format: uuid
+ *          nullable: true
+ */
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
  *    ProfileResponse:
  *      type: object
  *      properties:
@@ -130,7 +156,8 @@
  *            phone:
  *              type: string
  *            address:
- *              type: string
+ *              $ref: '#/components/schemas/UserAddress'
+ *              nullable: true
  *            description:
  *              type: string
  *            request_date:
@@ -424,9 +451,12 @@
  *        country:
  *          type: string
  *          default: vi
- *        address:
+ *        gender:
  *          type: string
- *          default: 133 Tân Cảng, Phường 25, Bình Thạnh, TP.HCM
+ *          default: male
+ *        address:
+ *          $ref: '#/components/schemas/UserAddress'
+ *          nullable: true
  */
 
 /**
@@ -457,8 +487,11 @@
  *              type: string
  *            country:
  *              type: string
- *            address:
+ *            gender:
  *              type: string
+ *            address:
+ *              $ref: '#/components/schemas/UserAddress'
+ *              nullable: true
  *            avatar:
  *              type: string
  *              nullable: true
@@ -557,8 +590,11 @@
  *              type: string
  *            country:
  *              type: string
- *            address:
+ *            gender:
  *              type: string
+ *            address:
+ *              $ref: '#/components/schemas/UserAddress'
+ *              nullable: true
  */
 
 /**

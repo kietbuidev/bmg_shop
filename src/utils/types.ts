@@ -63,3 +63,11 @@ export interface IPaginateResult<T> {
   };
   summay_status?: object;
 }
+
+export interface IUserAddress {
+  detail: string;
+  district: string;
+  province: string;
+  district_id?: string | null;
+  province_id?: string | null;
+}

@@ -200,13 +200,22 @@ export class UserController {
         ...(req.headers as unknown as IConfig),
         user_id: userId,
       };
-      const body = req.body as UpdateUserDto;
+      const body = ((req as any).validated ?? req.body) as UpdateUserDto;
       const payload: Partial<User> = {
         first_name: body.first_name,
         last_name: body.last_name,
         phone: body.phone,
         country: body.country,
-        address: body.address,
+        gender: body.gender,
+        address: body.address
+          ? {
+              detail: body.address.detail,
+              district: body.address.district,
+              province: body.address.province,
+              district_id: body.address.district_id ?? null,
+              province_id: body.address.province_id ?? null,
+            }
+          : body.address,
       };
 
       const user = await this.userService.updateUser(config, payload);
