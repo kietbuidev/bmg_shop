@@ -49,6 +49,12 @@ export class SystemService {
   }
 
   async uploadImage(options: UploadOptions = {}) {
+    console.log('Cloudinary ENV check:', {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'MISSING',
+      api_key: process.env.CLOUDINARY_API_KEY || 'MISSING',
+      api_secret: process.env.CLOUDINARY_API_SECRET ? 'SET' : 'MISSING',
+    });
+
     if (!this.cloudinaryConfigured) {
       throw new CustomError(HTTPCode.CAN_NOT_PERFORMED, 'CLOUDINARY_CREDENTIALS_NOT_FOUND');
     }
@@ -84,11 +90,7 @@ export class SystemService {
 
     const providedName = options.fileName?.trim() || options.originalName?.trim();
     const providedExt = providedName ? path.extname(providedName) : '';
-    const nameWithoutExt = providedName
-      ? providedExt
-        ? providedName.slice(0, -providedExt.length)
-        : providedName
-      : undefined;
+    const nameWithoutExt = providedName ? (providedExt ? providedName.slice(0, -providedExt.length) : providedName) : undefined;
     const sanitizedName = nameWithoutExt ? this.sanitizeFileName(nameWithoutExt) : undefined;
     let finalExtension = providedExt ? providedExt.replace('.', '') : extension;
     finalExtension = finalExtension ? finalExtension.toLowerCase() : undefined;
@@ -126,8 +128,7 @@ export class SystemService {
     }
 
     const secureUrl = result.secure_url ?? result.url;
-    const computedMimeType =
-      result.resource_type === 'image' && result.format ? `image/${result.format}` : contentType ?? 'application/octet-stream';
+    const computedMimeType = result.resource_type === 'image' && result.format ? `image/${result.format}` : contentType ?? 'application/octet-stream';
 
     return {
       id: result.public_id,
