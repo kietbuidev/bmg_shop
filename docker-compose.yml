@@ -5,22 +5,10 @@ services:
     build: .
     ports:
       - 3000:3000
-    env_file: .env
-    depends_on:
-      - db
-  db:
-    container_name: heyotrip-db
-    image: postgres:15
     environment:
-      - POSTGRES_DB=heyotrip
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=changeme
-    networks:
-      - app_network
-    ports:
-      - 5432:5432
-    restart: on-failure
-    volumes:
-      - ./../data/db/postgres:/var/lib/postgresql/data:delegated
-volumes:
-  db-data-q-software:
+      DB_USER: ${DB_USER:-neondb_owner}
+      DB_PASSWORD: ${DB_PASSWORD:-npg_oUs8lLVi1cWv}
+      DB_HOST: ${DB_HOST:-ep-silent-mode-a1zbfikm-pooler.ap-southeast-1.aws.neon.tech}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-neondb}
+      DB_SSL: ${DB_SSL:-true}
