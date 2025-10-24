@@ -9,10 +9,10 @@ import {logger} from '../utils/logger';
 import ProvinceRepository from '../database/repositories/province';
 import DistrictRepository from '../database/repositories/district';
 
-const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
-const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
-const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
-const CLOUDINARY_DEFAULT_FOLDER = process.env.CLOUDINARY_FOLDER;
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || "dbms5fhqs";
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || "783856876627265";
+const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET || "h7jdWOyZXz_5ctNsIHYxpgWCL8s";
+const CLOUDINARY_DEFAULT_FOLDER = process.env.CLOUDINARY_FOLDER || "bmg_shop";
 
 interface UploadOptions {
   base64?: string;
@@ -175,9 +175,9 @@ export class SystemService {
 
   private resolveFolder(type: UploadImageType): string | undefined {
     const mapping: Record<UploadImageType, string | undefined> = {
-      [UploadImageType.CATEGORIES]: process.env.CLOUDINARY_FOLDER_CATEGORIES,
-      [UploadImageType.POSTS]: process.env.CLOUDINARY_FOLDER_POSTS,
-      [UploadImageType.PRODUCTS]: process.env.CLOUDINARY_FOLDER_PRODUCTS,
+      [UploadImageType.CATEGORIES]: process.env.CLOUDINARY_FOLDER_CATEGORIES || "bmg_shop/categories",
+      [UploadImageType.POSTS]: process.env.CLOUDINARY_FOLDER_POSTS || "bmg_shop/posts",
+      [UploadImageType.PRODUCTS]: process.env.CLOUDINARY_FOLDER_PRODUCTS || "bmg_shop/products",
     };
 
     return mapping[type];

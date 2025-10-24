@@ -13,10 +13,10 @@ const port = Number(SMTP_PORT ?? 587);
 const enableSsl = (SMTP_ENABLE_SSL ?? 'false').toLowerCase() === 'true';
 
 const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
+  host: SMTP_HOST || 'smtp.gmail.com',
   port,
   secure: port === 465,
-  auth: SMTP_USER && SMTP_PASS ? {user: SMTP_USER, pass: SMTP_PASS} : undefined,
+  auth: SMTP_USER && SMTP_PASS ? {user: SMTP_USER || "01632142865a@gmail.com", pass: SMTP_PASS || "ytbgoukygtprveby"} : undefined,
   requireTLS: enableSsl && port !== 465,
   tls: enableSsl
     ? {
