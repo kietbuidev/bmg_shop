@@ -25,18 +25,14 @@ services:
       
       LOG_DIR: ${LOG_DIR:-src/logs}
       
-      # Cloudinary
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-dbms5fhqs}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-783856876627265}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-h7jdWOyZXz_5ctNsIHYxpgWCL8s}
-      CLOUDINARY_FOLDER: ${CLOUDINARY_FOLDER:-bmg_shop}
-      CLOUDINARY_FOLDER_CATEGORIES: ${CLOUDINARY_FOLDER_CATEGORIES:-bmg_shop/categories}
-      CLOUDINARY_FOLDER_POSTS: ${CLOUDINARY_FOLDER_POSTS:-bmg_shop/posts}
-      CLOUDINARY_FOLDER_PRODUCTS: ${CLOUDINARY_FOLDER_PRODUCTS:-bmg_shop/products}
-      
+      # Cloudinary - dùng hard values thay vì ${VAR:-default}
+      CLOUDINARY_CLOUD_NAME: dbms5fhqs
+      CLOUDINARY_API_KEY: 783856876627265
+      CLOUDINARY_API_SECRET: h7jdWOyZXz_5ctNsIHYxpgWCL8s
+  
       # SMTP
-      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      SMTP_USER: ${SMTP_USER:-01632142865a@gmail.com}
-      SMTP_PASS: ${SMTP_PASS:-ytbgoukygtprveby}
-      SMTP_ENABLE_SSL: ${SMTP_ENABLE_SSL:-true}
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: 01632142865a@gmail.com
+      SMTP_PASS: ytbgoukygtprveby
+      SMTP_ENABLE_SSL: true
