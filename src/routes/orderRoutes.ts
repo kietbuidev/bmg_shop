@@ -26,6 +26,7 @@ export class OrderRouter {
 
     this.router.get(
       '/',
+      authenticateUserToken,
       validateDto(OrderListQueryDto),
       async (req: Request, res: Response, next: NextFunction) => {
         await this.orderController.list(req, res, next);
