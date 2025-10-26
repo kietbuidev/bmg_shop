@@ -100,6 +100,7 @@ const startServer = async () => {
       logger.info(`=================================`);
       logger.info(`======= ENV: ${NODE_ENV} =======`);
       logger.info(`🚀 App listening on the port ${PORT}`);
+      logger.info(`🌐 Server URL: http://localhost:${PORT}`);
       logger.info(`=================================`);
     });
   } catch (error) {

@@ -39,7 +39,7 @@ RUN apk add --no-cache tzdata
 
 # Cấu hình biến mặc định
 ENV NODE_ENV=production
-ENV PORT=5001
+ENV PORT=5000
 
 # Copy node_modules và dist
 COPY --from=prod-deps /app/node_modules ./node_modules
@@ -50,7 +50,7 @@ COPY package.json ./
 RUN mkdir -p /app/logs && chown -R node:node /app
 
 USER node
-EXPOSE 5001
+EXPOSE 5000
 
 # HEALTHCHECK ping /health của server
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
