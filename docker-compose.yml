@@ -1,38 +1,19 @@
-version: '3.3'
+version: '3.8'
+
 services:
   app:
-    container_name: heyotrip-app
+    container_name: bmg-shop
     build: .
     ports:
-      - 3000:3000
-    environment:
-      # General
-      ENVIRONMENT: ${ENVIRONMENT:-DEVELOPMENT}
-      PORT: ${PORT:-5001}
-      
-      # Database
-      DB_USER: ${DB_USER:-neondb_owner}
-      DB_PASSWORD: ${DB_PASSWORD:-npg_oUs8lLVi1cWv}
-      DB_HOST: ${DB_HOST:-ep-silent-mode-a1zbfikm-pooler.ap-southeast-1.aws.neon.tech}
-      DB_PORT: ${DB_PORT:-5432}
-      DB_NAME: ${DB_NAME:-neondb}
-      DB_SSL: ${DB_SSL:-true}
-      DB_CONNECT_RETRIES: ${DB_CONNECT_RETRIES:-10}
-      DB_CONNECT_RETRY_DELAY_MS: ${DB_CONNECT_RETRY_DELAY_MS:-5000}
-      
-      # Timezone
-      TIMEZONE: ${TIMEZONE:-+07:00}
-      
-      LOG_DIR: ${LOG_DIR:-src/logs}
-      
-      # Cloudinary - dùng hard values thay vì ${VAR:-default}
-      CLOUDINARY_CLOUD_NAME: dbms5fhqs
-      CLOUDINARY_API_KEY: 783856876627265
-      CLOUDINARY_API_SECRET: h7jdWOyZXz_5ctNsIHYxpgWCL8s
-  
-      # SMTP
-      SMTP_HOST: smtp.gmail.com
-      SMTP_PORT: 587
-      SMTP_USER: 01632142865a@gmail.com
-      SMTP_PASS: ytbgoukygtprveby
-      SMTP_ENABLE_SSL: true
+      - "${PORT:-5001}:5001"
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    volumes:
+      - ./logs:/app/logs

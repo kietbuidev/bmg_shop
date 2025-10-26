@@ -64,6 +64,10 @@ app.get(`/api/`, (req: Request, res: Response) => {
   res.status(200).send('Congratulations! API is working!');
 });
 
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use('/robots.txt', (req, res, next) => {
   const error = new NotFoundError('Access to robots.txt is forbidden');
   next(error);
