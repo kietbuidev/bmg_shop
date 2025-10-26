@@ -15,8 +15,8 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `${VERSION}`,
-        description: 'API version 2',
+        url: `http://103.216.119.121:${process.env.PORT || 5000}`,
+        description: 'API Server BMG Shop',
       },
     ],
     components: {
@@ -35,10 +35,7 @@ const options: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: [
-    path.join(__dirname, '../routes/**/*.{ts,js}'),
-    path.join(__dirname, '../schemas/**/*.{ts,js}'),
-  ],
+  apis: [path.join(__dirname, '../routes/**/*.{ts,js}'), path.join(__dirname, '../schemas/**/*.{ts,js}')],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
