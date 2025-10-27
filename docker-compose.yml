@@ -1,10 +1,9 @@
 services:
   app:
-    container_name: bmg-shop
-    build: .
+    container_name: bmg-kaylin-be
+    image: ghcr.io/OWNER/REPO:${IMAGE_TAG}
     env_file: .env
-    expose:
-      - "5000"
+    expose: ["5000"]
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5000/health"]
@@ -18,12 +17,11 @@ services:
   nginx:
     image: nginx:alpine
     container_name: nginx
-    ports:
-      - "80:80"
-      - "443:443"
+    ports: ["80:80", "443:443"]
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./certs:/etc/nginx/certs:ro
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     restart: unless-stopped
