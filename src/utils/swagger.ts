@@ -13,12 +13,12 @@ const options: swaggerJsdoc.Options = {
       title: 'REST API Docs',
       version: '2.0.0',
     },
-    servers: [
-      {
-        url: `http://103.216.119.121:${process.env.PORT || 5000}`,
-        description: 'API Server BMG Shop',
-      },
-    ],
+    // servers: [
+    //   {
+    //     url: `http://103.216.119.121:${process.env.PORT || 5000}`,
+    //     description: 'API Server BMG Shop',
+    //   },
+    // ],
     components: {
       securitySchemes: {
         bearerAuth: {
