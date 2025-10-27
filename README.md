@@ -30,3 +30,5 @@ note: For Jest tests docker-compose will create separate database
 2. Install jest in root of project with command: "yarn add jest"
 
 3. To run tests, in root of project run: "yarn run test"
+
+
