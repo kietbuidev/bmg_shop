@@ -3,6 +3,7 @@ import {CustomError} from 'utils/customError';
 import {logger} from '../utils/logger';
 import {IConfig} from '../utils/types';
 import {ConfigDefault} from '../utils/enums';
+import i18n from '../lang/i18n';
 
 const errorMiddleware = (error: CustomError, req: Request, res: Response, next: NextFunction) => {
   try {
@@ -12,7 +13,7 @@ const errorMiddleware = (error: CustomError, req: Request, res: Response, next: 
     const status: number = error.statusCode || 500;
     const option: any = error.option;
     const error_code: string = error.errorCode;
-    const message: string = error.errorCode ?? 'Something went wrong!';
+    const message: string = error.errorCode ? i18n.t(error.errorCode, {defaultValue: error.errorCode}) : error.message || 'Something went wrong!';
     // const errors: string[] = [message];
     logger.error(`[${req?.method}] ${req?.path} >> StatusCode:: ${status}, Message:: ${message}`);
 
