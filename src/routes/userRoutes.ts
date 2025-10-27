@@ -87,6 +87,8 @@ export class UserRouter {
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *       - $ref: '#/components/parameters/page'
  *       - $ref: '#/components/parameters/limit'
  *     responses:
@@ -107,6 +109,9 @@ export class UserRouter {
  *     description: Update the last check timestamp so all notifications become read.
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     responses:
  *       200:
  *         description: Notifications marked as read successfully
@@ -124,6 +129,9 @@ export class UserRouter {
  *     tags:
  *       - Users
  *     summary: Request password reset code
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     requestBody:
  *       required: true
  *       content:
@@ -147,6 +155,9 @@ export class UserRouter {
  *     tags:
  *       - Users
  *     summary: Reset password using verification code
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     requestBody:
  *       required: true
  *       content:
@@ -174,6 +185,9 @@ export class UserRouter {
  *     summary: Update user password
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     requestBody:
  *       required: true
  *       content:
@@ -198,6 +212,9 @@ export class UserRouter {
  *     summary: Update user profile information
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     requestBody:
  *       required: false
  *       content:
@@ -237,6 +254,9 @@ export class UserRouter {
  *     summary: Retrieve authenticated user profile
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     responses:
  *       200:
  *         description: Profile retrieved successfully
@@ -254,6 +274,9 @@ export class UserRouter {
  *     tags:
  *       - Users
  *     summary: Register a new user account
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     requestBody:
  *       required: true
  *       content:
@@ -275,6 +298,9 @@ export class UserRouter {
  *     tags:
  *       - Users
  *     summary: Authenticate user credentials
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     requestBody:
  *       required: true
  *       content:
@@ -300,6 +326,9 @@ export class UserRouter {
  *     tags:
  *       - Users
  *     summary: Issue a new access token using a refresh token
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     requestBody:
  *       required: true
  *       content:

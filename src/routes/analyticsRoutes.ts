@@ -57,6 +57,9 @@ export default AnalyticsRouter;
  *     - Analytics
  *     summary: Order analytics overview
  *     description: Retrieve aggregate statistics for orders grouped by status.
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     responses:
  *      200:
  *        description: Success
@@ -84,6 +87,9 @@ export default AnalyticsRouter;
  *     - Analytics
  *     summary: Product analytics overview
  *     description: Retrieve aggregate statistics for products grouped by status.
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     responses:
  *      200:
  *        description: Success
@@ -111,6 +117,9 @@ export default AnalyticsRouter;
  *     - Analytics
  *     summary: Post analytics overview
  *     description: Retrieve aggregate statistics for posts grouped by status.
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     responses:
  *      200:
  *        description: Success
@@ -141,6 +150,9 @@ export default AnalyticsRouter;
  *     - Analytics
  *     summary: Contact analytics overview
  *     description: Retrieve aggregate statistics for contacts grouped by status.
+ *     parameters:
+ *       - $ref: '#/components/parameters/language'
+ *       - $ref: '#/components/parameters/platform'
  *     responses:
  *      200:
  *        description: Success
