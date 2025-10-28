@@ -1,7 +1,11 @@
 node_modules
+dist
+.git
+.github
+.idea
+.vscode
 .env
-/logs
-/dist
-/src/logs
-package-lock.json
-.ideasrc/utils/translate/heyotrip-translate.json
+.env copy
+dump.rdb
+logs
+*.log

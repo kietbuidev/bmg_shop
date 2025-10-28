@@ -21,23 +21,32 @@ RUN if [ -f package-lock.json ]; then npm ci --omit=dev --ignore-scripts; else n
 
 FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
-RUN apk add --no-cache tzdata wget \
- && addgroup -S nodegrp && adduser -S node -G nodegrp
+
+# chỉ cài packages; KHÔNG tạo user node nữa (đã có sẵn)
+RUN apk add --no-cache tzdata wget
+
+# khai báo lại ARG trong stage này rồi mới dùng
+ARG APP_VERSION
+ARG GIT_SHA
+
 ENV NODE_ENV=production
 ENV PORT=5000
 ENV APP_VERSION=${APP_VERSION}
 ENV GIT_SHA=${GIT_SHA}
 
-LABEL org.opencontainers.image.title="bmg-kaylin-be" \
-      org.opencontainers.image.version="${APP_VERSION}" \
+LABEL org.opencontainers.image.version="${APP_VERSION}" \
       org.opencontainers.image.revision="${GIT_SHA}"
 
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./
-RUN mkdir -p /app/logs && chown -R node:nodegrp /app
+
+# cấp quyền thư mục logs cho user node có sẵn
+RUN mkdir -p /app/logs && chown -R node:node /app
+
 USER node
 EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD wget -qO- http://127.0.0.1:${PORT}/health || exit 1
+
 CMD ["node", "dist/server.js"]
